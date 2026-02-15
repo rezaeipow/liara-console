@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files
+.env
+.env.*.local
+
+# Coverage
+coverage/
+
+# MSW worker (اگر میخوای public نگه داری)
+public/mockServiceWorker.js
