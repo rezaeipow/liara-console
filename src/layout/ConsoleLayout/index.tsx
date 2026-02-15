@@ -10,9 +10,9 @@ export default function ConsoleLayout({
 }) {
   return (
     <div className="flex h-screen w-screen bg-background">
-      <Sidebar />
+      <Topbar />
       <div className="flex-1 flex flex-col">
-        <Topbar />
+        <Sidebar />
         <MainContent>{children}</MainContent>
       </div>
     </div>
