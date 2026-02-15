@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slices/authSlice";
 import accountReducer from "./slices/accountSlice";
-import uiReducer from "./slices/uiSlice";
+import uiReducer from "./slices/uiSlice"
 
 // اگر RTK Query API اضافه شد، اینجا inject میشه
 // import { api } from "./api";
