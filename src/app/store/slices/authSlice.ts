@@ -1,5 +1,7 @@
 // src/app/store/slices/authSlice.ts
-import { createSlice,type PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { AuthAPI } from "../../../api/authApi";
+import type { RootState } from "../Index";
 
 
 // ---------------------------
@@ -30,6 +32,13 @@ const initialState: AuthState = {
   error: null,
 };
 
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return fallback;
+}
+
 // ---------------------------
 // Async Thunks
 // ---------------------------
@@ -43,8 +52,8 @@ export const login = createAsyncThunk<
   try {
     const res = await AuthAPI.login(credentials); // mock API call
     return res;
-  } catch (err: any) {
-    return rejectWithValue(err.message || "Login failed");
+  } catch (error: unknown) {
+    return rejectWithValue(getErrorMessage(error, "Login failed"));
   }
 });
 
@@ -57,8 +66,8 @@ export const signup = createAsyncThunk<
   try {
     const res = await AuthAPI.signup(payload); // mock API call
     return res;
-  } catch (err: any) {
-    return rejectWithValue(err.message || "Signup failed");
+  } catch (error: unknown) {
+    return rejectWithValue(getErrorMessage(error, "Signup failed"));
   }
 });
 
@@ -77,8 +86,8 @@ export const fetchMe = createAsyncThunk<
   try {
     const user = await AuthAPI.getMe();
     return user;
-  } catch (err: any) {
-    return rejectWithValue(err.message || "Fetch user failed");
+  } catch (error: unknown) {
+    return rejectWithValue(getErrorMessage(error, "Fetch user failed"));
   }
 });
 
