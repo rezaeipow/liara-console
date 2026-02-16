@@ -7,7 +7,7 @@ import App from "./app/App";
 
 // MSW فقط در dev اجرا می‌شود
 if (import.meta.env.DEV) {
-  import("./mocks/browser").then(({ worker }) => {
+  import("./mocks/handlers/browser").then(({ worker }) => {
     worker.start();
   });
 }
