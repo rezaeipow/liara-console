@@ -1,26 +1,15 @@
-import { type ReactNode, useMemo } from "react";
-import { ThemeProvider as MUIThemeProvider, CssBaseline } from "@mui/material";
-import { useSelector } from "react-redux";
-import { themes } from "./theme";
-import { type RootState } from "../app/store/Index";
+import { type ReactNode } from "react";
+import { CssBaseline, ThemeProvider as MUIThemeProvider } from "@mui/material";
+import { Theme } from "./theme";
 
 interface Props {
   children: ReactNode;
 }
 
 export const ThemeProvider = ({ children }: Props) => {
-  const themeMode = useSelector(
-    (state: RootState) => state.ui.preferences.theme,
-  );
-
-  const theme = useMemo(
-    () => (themeMode === "light" ? themes.light : themes.dark),
-    [themeMode],
-  );
-
   return (
-    <MUIThemeProvider theme={theme}>
-      <CssBaseline /> {/* ریست و normalize MUI */}
+    <MUIThemeProvider theme={Theme}>
+      <CssBaseline />
       {children}
     </MUIThemeProvider>
   );

@@ -1,20 +1,19 @@
-import React from "react";
+import { Box } from "@mui/material";
+import type { ReactNode } from "react";
+import MainContent from "./MainContent";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
-import MainContent from "./MainContent";
 
-export default function ConsoleLayout({
-  children,
-}: {
-  children?: React.ReactNode;
-}) {
+export default function ConsoleLayout({ children }: { children?: ReactNode }) {
   return (
-    <div className="flex h-screen w-screen bg-background">
+    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <Topbar />
-      <div className="flex-1 flex flex-col">
+      <Box sx={{ display: "flex", flex: 1, minHeight: 0 }}>
         <Sidebar />
-        <MainContent>{children}</MainContent>
-      </div>
-    </div>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <MainContent>{children}</MainContent>
+        </Box>
+      </Box>
+    </Box>
   );
 }
