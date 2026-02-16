@@ -1,0 +1,89 @@
+import { http, HttpResponse } from "msw";
+import type { HttpHandler } from "msw";
+import { createId, db } from "../data/db";
+
+export const appHandlers: HttpHandler[] = [
+  http.get("/projects/:projectId/apps", ({ params }) => {
+    const apps = db.apps.filter((a) => a.projectId === params.projectId);
+    return HttpResponse.json({ items: apps });
+  }),
+
+  http.post("/projects/:projectId/apps", async ({ params, request }) => {
+    const body = (await request.json()) as { name?: string; region?: string; plan?: string };
+    if (!body.name || !body.region || !body.plan) {
+      return HttpResponse.json({ message: "Invalid payload" }, { status: 400 });
+    }
+
+    const app = {
+      id: createId("app"),
+      projectId: String(params.projectId),
+      name: body.name,
+      region: body.region,
+      plan: body.plan,
+      status: "deploying" as const,
+    };
+
+    db.apps.unshift(app);
+    db.envByAppId[app.id] = [];
+    return HttpResponse.json(app, { status: 201 });
+  }),
+
+  http.get("/apps/:appId", ({ params }) => {
+    const app = db.apps.find((a) => a.id === params.appId);
+    if (!app) {
+      return HttpResponse.json({ message: "app not found" }, { status: 404 });
+    }
+    return HttpResponse.json(app);
+  }),
+
+  http.get("/apps/:appId/deployments", ({ params }) => {
+    const items = db.deployments.filter((d) => d.appId === params.appId);
+    return HttpResponse.json({ items });
+  }),
+
+  http.get("/apps/:appId/env", ({ params }) => {
+    const env = db.envByAppId[String(params.appId)] ?? [];
+    return HttpResponse.json({ items: env });
+  }),
+
+  http.put("/apps/:appId/env", async ({ params, request }) => {
+    const body = (await request.json()) as { items?: Array<{ key: string; value: string; secret?: boolean }> };
+    if (!Array.isArray(body.items)) {
+      return HttpResponse.json({ message: "items array is required" }, { status: 400 });
+    }
+
+    db.envByAppId[String(params.appId)] = body.items;
+    return HttpResponse.json({ success: true });
+  }),
+
+  http.get("/apps/:appId/logs", ({ request, params }) => {
+    const url = new URL(request.url);
+    const level = url.searchParams.get("level") ?? "info";
+    return HttpResponse.json({
+      items: [
+        { id: createId("log"), appId: params.appId, level, message: "Application started" },
+        { id: createId("log"), appId: params.appId, level, message: "Healthcheck passed" },
+      ],
+    });
+  }),
+
+  http.post("/apps/:appId/restart", ({ params }) => {
+    const app = db.apps.find((a) => a.id === params.appId);
+    if (!app) {
+      return HttpResponse.json({ message: "app not found" }, { status: 404 });
+    }
+
+    app.status = "deploying";
+    return HttpResponse.json({ success: true });
+  }),
+
+  http.delete("/apps/:appId", ({ params }) => {
+    const next = db.apps.filter((a) => a.id !== params.appId);
+    if (next.length === db.apps.length) {
+      return HttpResponse.json({ message: "app not found" }, { status: 404 });
+    }
+
+    db.apps = next;
+    return new HttpResponse(null, { status: 204 });
+  }),
+];
