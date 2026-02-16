@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import {
   Drawer,
   List,
@@ -13,59 +13,74 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import FolderIcon from "@mui/icons-material/Folder";
-import StorageIcon from "@mui/icons-material/Storage";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
-import SettingsIcon from "@mui/icons-material/Settings";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import {
+  Dashboard as DashboardIcon,
+  Folder as FolderIcon,
+  Storage as StorageIcon,
+  CreditCard as CreditCardIcon,
+  Support as SupportIcon,
+  Notifications as NotificationsIcon,
+  Settings as SettingsIcon,
+  ChevronLeft as ChevronLeftIcon,
+  Menu as MenuIcon,
+} from "@mui/icons-material";
 import { NavLink } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { toggleSidebar } from "@/store/uiSlice";
+import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
+import {
+  selectSidebarMode,
+  selectMobileSidebarOpen,
+  toggleSidebarMode,
+  openMobileSidebar,
+  closeMobileSidebar,
+} from "../../app/store/slices/uiSlice";
 
 const DRAWER_WIDTH = 240;
 const COLLAPSED_WIDTH = 72;
 
 const navItems = [
-  { label: "Dashboard", path: "/console/dashboard", icon: <DashboardIcon /> },
+  { label: "Dashboard", path: "/console", icon: <DashboardIcon /> },
   { label: "Projects", path: "/console/projects", icon: <FolderIcon /> },
   { label: "Services", path: "/console/services", icon: <StorageIcon /> },
   { label: "Billing", path: "/console/billing", icon: <CreditCardIcon /> },
+  { label: "Support", path: "/console/support/tickets", icon: <SupportIcon /> },
+  {
+    label: "Notifications",
+    path: "/console/notifications",
+    icon: <NotificationsIcon />,
+  },
   { label: "Settings", path: "/console/settings", icon: <SettingsIcon /> },
 ];
 
 export default function Sidebar() {
   const dispatch = useAppDispatch();
-  const sidebarMode = useAppSelector((s) => s.ui.sidebarMode);
+  const sidebarMode = useAppSelector(selectSidebarMode);
+  const mobileOpen = useAppSelector(selectMobileSidebarOpen);
 
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down("sm"));
   const isLgUp = useMediaQuery(theme.breakpoints.up("lg"));
 
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  const isCollapsed = sidebarMode === "collapsed" && !isXs && !isLgUp;
-
+  const isCollapsed = !isXs && !isLgUp && sidebarMode === "collapsed";
   const drawerWidth = isCollapsed ? COLLAPSED_WIDTH : DRAWER_WIDTH;
 
   const glassStyles = {
     backdropFilter: "blur(16px)",
-    background:
+    backgroundColor:
       theme.palette.mode === "light"
-        ? "rgba(255,255,255,0.6)"
-        : "rgba(20,20,20,0.6)",
-    borderRight:
+        ? "rgba(255,255,255,0.7)"
+        : "rgba(30,30,30,0.65)",
+    borderRight: `1px solid ${
       theme.palette.mode === "light"
-        ? "1px solid rgba(0,0,0,0.06)"
-        : "1px solid rgba(255,255,255,0.08)",
+        ? theme.palette.divider
+        : "rgba(255,255,255,0.08)"
+    }`,
   };
 
-  const drawerContent = (
+  const content = (
     <Box
       sx={{
-        height: "100%",
         width: drawerWidth,
+        height: "100%",
         transition: "width .25s ease",
         ...glassStyles,
       }}
@@ -74,15 +89,15 @@ export default function Sidebar() {
         sx={{
           display: "flex",
           justifyContent: isCollapsed ? "center" : "space-between",
-          px: 1.5,
+          px: 2,
         }}
       >
-        {!isCollapsed && "Console"}
+        {!isCollapsed && <Box sx={{ fontWeight: 600 }}>Console</Box>}
 
         {!isXs && !isLgUp && (
           <IconButton
-            aria-label="Toggle sidebar"
-            onClick={() => dispatch(toggleSidebar())}
+            aria-label="Collapse sidebar"
+            onClick={() => dispatch(toggleSidebarMode())}
           >
             <ChevronLeftIcon />
           </IconButton>
@@ -101,19 +116,20 @@ export default function Sidebar() {
             <ListItemButton
               component={NavLink}
               to={item.path}
-              onClick={() => setMobileOpen(false)}
+              onClick={() => isXs && dispatch(closeMobileSidebar())}
               sx={{
                 justifyContent: isCollapsed ? "center" : "flex-start",
                 px: isCollapsed ? 1 : 2,
+                borderRadius: 2,
+                mx: 1,
+                my: 0.5,
                 "&.active": {
-                  background:
+                  backgroundColor:
                     theme.palette.mode === "light"
                       ? "rgba(0,0,0,0.08)"
                       : "rgba(255,255,255,0.12)",
                 },
-                borderRadius: 2,
-                mx: 1,
-                my: 0.5,
+                color: theme.palette.text.primary,
               }}
             >
               <ListItemIcon
@@ -121,6 +137,7 @@ export default function Sidebar() {
                   minWidth: 0,
                   mr: isCollapsed ? 0 : 2,
                   justifyContent: "center",
+                  color: theme.palette.text.primary,
                 }}
               >
                 {item.icon}
@@ -131,6 +148,7 @@ export default function Sidebar() {
                   primary={item.label}
                   primaryTypographyProps={{
                     fontWeight: 500,
+                    color: theme.palette.text.primary,
                   }}
                 />
               )}
@@ -141,66 +159,68 @@ export default function Sidebar() {
     </Box>
   );
 
-  return (
-    <>
-      {/* xs → temporary */}
-      {isXs && (
-        <>
+  // -------- Mobile Drawer --------
+  if (isXs) {
+    return (
+      <>
+        {!mobileOpen && (
           <IconButton
             aria-label="Open sidebar"
-            onClick={() => setMobileOpen(true)}
+            onClick={() => dispatch(openMobileSidebar())}
             sx={{ position: "fixed", top: 16, left: 16, zIndex: 1400 }}
           >
             <MenuIcon />
           </IconButton>
+        )}
 
-          <Drawer
-            variant="temporary"
-            open={mobileOpen}
-            onClose={() => setMobileOpen(false)}
-            ModalProps={{ keepMounted: true }}
-          >
-            {drawerContent}
-          </Drawer>
-        </>
-      )}
-
-      {/* sm/md */}
-      {!isXs && !isLgUp && (
         <Drawer
-          variant="permanent"
-          open
-          sx={{
-            width: drawerWidth,
-            "& .MuiDrawer-paper": {
-              width: drawerWidth,
-              boxSizing: "border-box",
-              ...glassStyles,
-              transition: "width .25s ease",
-            },
-          }}
+          variant="temporary"
+          open={mobileOpen}
+          onClose={() => dispatch(closeMobileSidebar())}
+          ModalProps={{ keepMounted: true }}
         >
-          {drawerContent}
+          {content}
         </Drawer>
-      )}
+      </>
+    );
+  }
 
-      {/* lg */}
-      {isLgUp && (
-        <Drawer
-          variant="permanent"
-          open
-          sx={{
+  // -------- Large screens --------
+  if (isLgUp) {
+    return (
+      <Drawer
+        variant="permanent"
+        open
+        sx={{
+          width: DRAWER_WIDTH,
+          "& .MuiDrawer-paper": {
             width: DRAWER_WIDTH,
-            "& .MuiDrawer-paper": {
-              width: DRAWER_WIDTH,
-              boxSizing: "border-box",
-              ...glassStyles,
-            },
-          }}
-        >
-          {drawerContent}
-        </Drawer>
-      )}
-    </>
+            boxSizing: "border-box",
+            ...glassStyles,
+          },
+        }}
+      >
+        {content}
+      </Drawer>
+    );
+  }
+
+  // -------- sm/md screens (collapsible) --------
+  return (
+    <Drawer
+      variant="permanent"
+      open
+      sx={{
+        width: drawerWidth,
+        "& .MuiDrawer-paper": {
+          width: drawerWidth,
+          boxSizing: "border-box",
+          ...glassStyles,
+          transition: "width .25s ease",
+        },
+      }}
+    >
+      {content}
+    </Drawer>
   );
 }

@@ -1,13 +1,11 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import ConsoleLayout from "../layout/ConsoleLayout";
+import ConsoleLayout from "../layout/ConsoleLayout/Index";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <ConsoleLayout />,
-    children: [
-   
-    ],
+    children: [],
   },
 ]);
 
