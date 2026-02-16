@@ -2,7 +2,8 @@ import { Alert } from "@mui/material";
 import { Suspense } from "react";
 import type { ReactNode } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { GuardedConsole, PublicOnly } from "./guards";
+import { logoutAction, loginAction, protectedConsoleLoader, publicOnlyLoader, signupAction } from "./authData";
+import { GuardedConsole } from "./guards";
 import {
   AccountsPage,
   AppDeploymentsPage,
@@ -46,16 +47,21 @@ export const router = createBrowserRouter([
     errorElement: <RouteFallback />,
   },
   {
-    element: <PublicOnly />,
+    path: "/logout",
+    action: logoutAction,
+  },
+  {
+    loader: publicOnlyLoader,
     errorElement: <RouteFallback />,
     children: [
-      { path: "/login", element: withSuspense(<LoginPage />) },
-      { path: "/signup", element: withSuspense(<SignupPage />) },
+      { path: "/login", element: withSuspense(<LoginPage />), action: loginAction },
+      { path: "/signup", element: withSuspense(<SignupPage />), action: signupAction },
     ],
   },
   {
     path: "/console",
     element: <GuardedConsole />,
+    loader: protectedConsoleLoader,
     errorElement: <RouteFallback />,
     children: [
       { index: true, element: withSuspense(<ConsoleHomePage />) },

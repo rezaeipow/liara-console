@@ -21,12 +21,14 @@ import {
   Menu as MenuIcon,
   Notifications as NotificationsIcon,
 } from "@mui/icons-material";
+import { useFetcher } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import { selectAccounts, selectActiveAccountId, switchAccount } from "../../app/store/slices/accountSlice";
 import { openMobileSidebar, selectSidebarMode, toggleSidebarMode } from "../../app/store/slices/uiSlice";
 
 export default function Topbar() {
   const dispatch = useAppDispatch();
+  const logoutFetcher = useFetcher();
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down("sm"));
   const isLgUp = useMediaQuery(theme.breakpoints.up("lg"));
@@ -42,6 +44,11 @@ export default function Topbar() {
   };
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    handleMenuClose();
+    logoutFetcher.submit(null, { method: "post", action: "/logout" });
   };
 
   const accountItems = useMemo(
@@ -188,7 +195,7 @@ export default function Topbar() {
           >
             <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
             <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Box>
       </Toolbar>

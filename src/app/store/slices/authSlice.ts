@@ -1,36 +1,57 @@
-// src/app/store/slices/authSlice.ts
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { AuthAPI } from "../../../api/authApi";
+import { AuthAPI, type AuthResponse, type LoginRequest, type SignupRequest } from "../../../api/authApi";
+import type { User } from "../../../api/types";
 import type { RootState } from "../Index";
 
+type AuthStatus = "idle" | "loading" | "authenticated" | "error";
 
-// ---------------------------
-// Types
-// ---------------------------
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-  twoFAEnabled?: boolean;
+interface PersistedAuth {
+  token: string | null;
+  user: User | null;
 }
 
 export interface AuthState {
   user: User | null;
   token: string | null;
-  loading: boolean;
+  status: AuthStatus;
   error: string | null;
+  initialized: boolean;
 }
 
-// ---------------------------
-// Initial state
-// ---------------------------
-const initialState: AuthState = {
-  user: null,
-  token: null,
-  loading: false,
-  error: null,
-};
+const STORAGE_KEY = "console-auth-session";
+
+function readPersistedAuth(): PersistedAuth {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      return { token: null, user: null };
+    }
+
+    const parsed = JSON.parse(raw) as PersistedAuth;
+    return {
+      token: parsed.token ?? null,
+      user: parsed.user ?? null,
+    };
+  } catch {
+    return { token: null, user: null };
+  }
+}
+
+function persistAuth(payload: PersistedAuth) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+    // ignore persistence errors
+  }
+}
+
+function clearPersistedAuth() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore persistence errors
+  }
+}
 
 function getErrorMessage(error: unknown, fallback: string): string {
   if (error instanceof Error && error.message) {
@@ -39,152 +60,190 @@ function getErrorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
-// ---------------------------
-// Async Thunks
-// ---------------------------
+const persisted = readPersistedAuth();
 
-// Login
+const initialState: AuthState = {
+  user: persisted.user,
+  token: persisted.token,
+  status: persisted.token ? "authenticated" : "idle",
+  error: null,
+  initialized: false,
+};
+
 export const login = createAsyncThunk<
-  { user: User; token: string },
-  { email: string; password: string },
+  AuthResponse,
+  LoginRequest,
   { rejectValue: string }
 >("auth/login", async (credentials, { rejectWithValue }) => {
   try {
-    const res = await AuthAPI.login(credentials); // mock API call
-    return res;
+    return await AuthAPI.login(credentials);
   } catch (error: unknown) {
     return rejectWithValue(getErrorMessage(error, "Login failed"));
   }
 });
 
-// Signup
 export const signup = createAsyncThunk<
-  { user: User; token: string },
-  { name: string; email: string; password: string },
+  AuthResponse,
+  SignupRequest,
   { rejectValue: string }
 >("auth/signup", async (payload, { rejectWithValue }) => {
   try {
-    const res = await AuthAPI.signup(payload); // mock API call
-    return res;
+    return await AuthAPI.signup(payload);
   } catch (error: unknown) {
     return rejectWithValue(getErrorMessage(error, "Signup failed"));
   }
 });
 
-// Logout
-export const logout = createAsyncThunk("auth/logout", async () => {
-  await AuthAPI.logout(); // mock API
-  return;
-});
+export const logout = createAsyncThunk<void, void, { rejectValue: string }>(
+  "auth/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      await AuthAPI.logout();
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, "Logout failed"));
+    }
+  },
+);
 
-// Get current user (e.g., after refresh)
-export const fetchMe = createAsyncThunk<
-  User,
-  void,
-  { rejectValue: string }
->("auth/fetchMe", async (_, { rejectWithValue }) => {
-  try {
-    const user = await AuthAPI.getMe();
-    return user;
-  } catch (error: unknown) {
-    return rejectWithValue(getErrorMessage(error, "Fetch user failed"));
-  }
-});
+export const fetchMe = createAsyncThunk<User, void, { rejectValue: string }>(
+  "auth/fetchMe",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await AuthAPI.getMe();
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error, "Fetch user failed"));
+    }
+  },
+);
 
-// ---------------------------
-// Slice
-// ---------------------------
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    updateProfile(state, action: PayloadAction<Partial<User>>) {
-      if (state.user) {
-        state.user = { ...state.user, ...action.payload };
+    hydrateAuth(state) {
+      if (state.initialized) return;
+      const snapshot = readPersistedAuth();
+      state.token = snapshot.token;
+      state.user = snapshot.user;
+      state.status = snapshot.token ? "authenticated" : "idle";
+      state.initialized = true;
+    },
+    setToken(state, action: PayloadAction<string | null>) {
+      state.token = action.payload;
+      state.status = action.payload ? "authenticated" : "idle";
+      persistAuth({ token: state.token, user: state.user });
+    },
+    clearAuthError(state) {
+      state.error = null;
+      if (state.status === "error") {
+        state.status = state.token ? "authenticated" : "idle";
       }
     },
+    updateProfile(state, action: PayloadAction<Partial<User>>) {
+      if (!state.user) return;
+      state.user = { ...state.user, ...action.payload };
+      persistAuth({ token: state.token, user: state.user });
+    },
     enable2FA(state) {
-      if (state.user) state.user.twoFAEnabled = true;
+      if (!state.user) return;
+      state.user.twoFAEnabled = true;
+      persistAuth({ token: state.token, user: state.user });
     },
     disable2FA(state) {
-      if (state.user) state.user.twoFAEnabled = false;
-    },
-    setToken(state, action: PayloadAction<string>) {
-      state.token = action.payload;
+      if (!state.user) return;
+      state.user.twoFAEnabled = false;
+      persistAuth({ token: state.token, user: state.user });
     },
   },
   extraReducers: (builder) => {
-    // Login
-    builder.addCase(login.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(login.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-    });
-    builder.addCase(login.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload ?? "Login failed";
-    });
-
-    // Signup
-    builder.addCase(signup.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(signup.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-    });
-    builder.addCase(signup.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload ?? "Signup failed";
-    });
-
-    // Logout
-    builder.addCase(logout.fulfilled, (state) => {
-      state.user = null;
-      state.token = null;
-      state.error = null;
-      state.loading = false;
-    });
-
-    // fetchMe
-    builder.addCase(fetchMe.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(fetchMe.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload;
-    });
-    builder.addCase(fetchMe.rejected, (state, action) => {
-      state.loading = false;
-      state.user = null;
-      state.error = action.payload ?? "Failed to fetch user";
-    });
+    builder
+      .addCase(login.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(login.fulfilled, (state, action) => {
+        state.status = "authenticated";
+        state.error = null;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.initialized = true;
+        persistAuth({ token: state.token, user: state.user });
+      })
+      .addCase(login.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action.payload ?? "Login failed";
+      })
+      .addCase(signup.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(signup.fulfilled, (state, action) => {
+        state.status = "authenticated";
+        state.error = null;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.initialized = true;
+        persistAuth({ token: state.token, user: state.user });
+      })
+      .addCase(signup.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action.payload ?? "Signup failed";
+      })
+      .addCase(fetchMe.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(fetchMe.fulfilled, (state, action) => {
+        state.status = "authenticated";
+        state.error = null;
+        state.user = action.payload;
+        state.initialized = true;
+        persistAuth({ token: state.token, user: state.user });
+      })
+      .addCase(fetchMe.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action.payload ?? "Fetch user failed";
+        state.user = null;
+        state.token = null;
+        state.initialized = true;
+        clearPersistedAuth();
+      })
+      .addCase(logout.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.user = null;
+        state.token = null;
+        state.status = "idle";
+        state.error = null;
+        state.initialized = true;
+        clearPersistedAuth();
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action.payload ?? "Logout failed";
+      });
   },
 });
 
-// ---------------------------
-// Selectors
-// ---------------------------
+export const {
+  hydrateAuth,
+  setToken,
+  clearAuthError,
+  updateProfile,
+  enable2FA,
+  disable2FA,
+} = authSlice.actions;
+
 export const selectAuth = (state: RootState) => state.auth;
 export const selectUser = (state: RootState) => state.auth.user;
 export const selectToken = (state: RootState) => state.auth.token;
-export const selectAuthLoading = (state: RootState) => state.auth.loading;
+export const selectAuthStatus = (state: RootState) => state.auth.status;
+export const selectAuthInitialized = (state: RootState) => state.auth.initialized;
+export const selectAuthLoading = (state: RootState) => state.auth.status === "loading";
 export const selectAuthError = (state: RootState) => state.auth.error;
+export const selectIsAuthenticated = (state: RootState) =>
+  Boolean(state.auth.token && state.auth.user);
 
-// ---------------------------
-// Actions
-// ---------------------------
-export const { updateProfile, enable2FA, disable2FA, setToken } =
-  authSlice.actions;
-
-// ---------------------------
-// Export
-// ---------------------------
 export default authSlice.reducer;
