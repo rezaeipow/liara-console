@@ -1,105 +1,184 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
+  Avatar,
   Badge,
   Box,
+  FormControl,
+  IconButton,
   Menu,
   MenuItem,
+  Select,
+  Toolbar,
+  Typography,
+  useMediaQuery,
   useTheme,
+  type SelectChangeEvent,
 } from "@mui/material";
 import {
-  Menu as MenuIcon,
   AccountCircle as AccountCircleIcon,
-  Notifications as NotificationsIcon,
   CreditCard as CreditCardIcon,
+  Menu as MenuIcon,
+  Notifications as NotificationsIcon,
 } from "@mui/icons-material";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
-import { toggleSidebarMode, selectTheme } from "../../app/store/slices/uiSlice";
+import { selectAccounts, selectActiveAccountId, switchAccount } from "../../app/store/slices/accountSlice";
+import { openMobileSidebar, selectSidebarMode, toggleSidebarMode } from "../../app/store/slices/uiSlice";
 
 export default function Topbar() {
   const dispatch = useAppDispatch();
   const theme = useTheme();
-  const themeMode = useAppSelector(selectTheme);
+  const isXs = useMediaQuery(theme.breakpoints.down("sm"));
+  const isLgUp = useMediaQuery(theme.breakpoints.up("lg"));
+  const isSmMd = !isXs && !isLgUp;
+  const sidebarMode = useAppSelector(selectSidebarMode);
+
+  const accounts = useAppSelector(selectAccounts);
+  const activeAccountId = useAppSelector(selectActiveAccountId);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) =>
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
-  const handleMenuClose = () => setAnchorEl(null);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
-  const glassStyles = {
-    backdropFilter: "blur(12px)",
-    backgroundColor:
-      themeMode === "light" ? "rgba(255,255,255,0.8)" : "rgba(30,30,30,0.8)",
-    boxShadow: theme.shadows[1],
+  const accountItems = useMemo(
+    () =>
+      accounts.length > 0
+        ? accounts
+        : [{ id: "default-account", name: "Default Account" }],
+    [accounts],
+  );
+
+  const selectedAccountId = activeAccountId ?? accountItems[0].id;
+
+  const handleAccountChange = (event: SelectChangeEvent) => {
+    dispatch(switchAccount(event.target.value));
+  };
+
+  const handleSidebarToggle = () => {
+    if (isXs) {
+      dispatch(openMobileSidebar());
+      return;
+    }
+    if (!isLgUp) {
+      dispatch(toggleSidebarMode());
+    }
   };
 
   return (
-    <AppBar position="static" sx={glassStyles}>
+    <AppBar
+      position="sticky"
+      elevation={0}
+      sx={{
+        borderRadius: 0,
+        borderBottom: `1px solid ${theme.palette.divider}`,
+      }}
+    >
       <Toolbar
         sx={{
+          minHeight: { xs: 62, sm: 68 },
+          px: { xs: 1, sm: 2, md: 3 },
+          pl:
+            isSmMd && sidebarMode === "collapsed"
+              ? { sm: 3, md: 3.5 }
+              : { xs: 1, sm: 2, md: 3 },
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
-          minHeight: 64,
-          px: 2,
+          gap: { xs: 0.75, sm: 1.5 },
+          overflow: "visible",
         }}
       >
-        {/* Left: Menu + Title */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <IconButton
-            aria-label="Toggle sidebar"
-            onClick={() => dispatch(toggleSidebarMode())}
-            size="large"
-          >
-            <MenuIcon />
-          </IconButton>
+        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.75, sm: 1.5 }, minWidth: 0 }}>
+          {!isLgUp && (
+            <IconButton
+              aria-label="Open sidebar navigation"
+              onClick={handleSidebarToggle}
+              size="large"
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
+
           <Typography
             variant="h6"
-            sx={{ fontWeight: 600, color: theme.palette.text.primary }}
+            sx={{
+              fontWeight: 700,
+              fontSize: { xs: "1rem", sm: "1.25rem" },
+              whiteSpace: "nowrap",
+            }}
           >
-            Console
+            {isXs ? "Console" : "Liara Console"}
           </Typography>
         </Box>
 
-        {/* Right: Credit + Notifications + User */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 0.5,
-              px: 1,
-              py: 0.5,
-              borderRadius: 1,
-              bgcolor:
-                themeMode === "light"
-                  ? "rgba(0,0,0,0.05)"
-                  : "rgba(255,255,255,0.08)",
-              cursor: "pointer",
-            }}
-          >
-            <CreditCardIcon fontSize="small" />
-            <Typography
-              variant="body2"
-              fontWeight={500}
-              color={theme.palette.text.primary}
+        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.25, sm: 1.5 }, minWidth: 0 }}>
+          <FormControl size="small" sx={{ minWidth: { xs: 112, sm: 210 }, maxWidth: { xs: 124, sm: 260 } }}>
+            <Select
+              aria-label="Switch active account"
+              value={selectedAccountId}
+              onChange={handleAccountChange}
+              sx={{
+                "& .MuiSelect-select": {
+                  pr: { xs: 3.5, sm: 4 },
+                  fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                  py: { xs: 0.75, sm: 1 },
+                },
+              }}
             >
-              $120
-            </Typography>
-          </Box>
+              {accountItems.map((account) => (
+                <MenuItem key={account.id} value={account.id}>
+                  {account.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-          <IconButton color="inherit">
-            <Badge badgeContent={3} color="error">
-              <NotificationsIcon sx={{ color: theme.palette.text.primary }} />
+          {!isXs && (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 0.75,
+                px: 1.25,
+                py: 0.75,
+                borderRadius: 2,
+                border: `1px solid ${theme.palette.divider}`,
+                backgroundColor: "rgba(255,255,255,0.52)",
+              }}
+            >
+              <CreditCardIcon fontSize="small" />
+              <Typography variant="body2" fontWeight={600}>
+                750,000 IRR
+              </Typography>
+            </Box>
+          )}
+
+          <IconButton aria-label="Open notifications" size={isXs ? "medium" : "large"} sx={{ p: { xs: 0.75, sm: 1 } }}>
+            <Badge
+              color="error"
+              variant={isXs ? "dot" : "standard"}
+              badgeContent={isXs ? undefined : 3}
+              overlap="circular"
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <NotificationsIcon fontSize={isXs ? "small" : "medium"} />
             </Badge>
           </IconButton>
 
-          <IconButton onClick={handleMenuOpen} color="inherit">
-            <AccountCircleIcon sx={{ color: theme.palette.text.primary }} />
+          <IconButton
+            aria-label="Open user menu"
+            onClick={handleMenuOpen}
+            size={isXs ? "medium" : "large"}
+            sx={{ p: { xs: 0.75, sm: 1 } }}
+          >
+            <Avatar sx={{ width: { xs: 28, sm: 32 }, height: { xs: 28, sm: 32 } }}>
+              <AccountCircleIcon />
+            </Avatar>
           </IconButton>
+
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}

@@ -1,11 +1,8 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-
-export type ThemeMode = "light" | "dark";
 export type SidebarMode = "expanded" | "collapsed";
 export type TableDensity = "compact" | "standard" | "comfortable";
 
 export interface UIPreferences {
-  theme: ThemeMode;
   sidebarMode: SidebarMode; // only for sm/md
   tableDensity: TableDensity;
 }
@@ -30,7 +27,6 @@ function loadPreferences(): UIPreferences {
     return JSON.parse(raw);
   } catch {
     return {
-      theme: "light",
       sidebarMode: "expanded",
       tableDensity: "standard",
     };
@@ -58,19 +54,6 @@ export const uiSlice = createSlice({
   name: "ui",
   initialState,
   reducers: {
-    /* ========= THEME ========= */
-
-    setTheme(state, action: PayloadAction<ThemeMode>) {
-      state.preferences.theme = action.payload;
-      savePreferences(state.preferences);
-    },
-
-    toggleTheme(state) {
-      state.preferences.theme =
-        state.preferences.theme === "light" ? "dark" : "light";
-      savePreferences(state.preferences);
-    },
-
     /* ========= SIDEBAR MODE (sm/md only) ========= */
 
     setSidebarMode(state, action: PayloadAction<SidebarMode>) {
@@ -110,8 +93,6 @@ export const uiSlice = createSlice({
 ------------------------------ */
 
 export const {
-  setTheme,
-  toggleTheme,
   setSidebarMode,
   toggleSidebarMode,
   openMobileSidebar,
@@ -122,9 +103,6 @@ export const {
 /* -----------------------------
    Selectors
 ------------------------------ */
-
-export const selectTheme = (state: { ui: UIState }) =>
-  state.ui.preferences.theme;
 
 export const selectSidebarMode = (state: { ui: UIState }) =>
   state.ui.preferences.sidebarMode;

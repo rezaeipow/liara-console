@@ -1,53 +1,47 @@
-
 import {
+  Box,
+  Divider,
   Drawer,
+  IconButton,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  IconButton,
   Toolbar,
-  Box,
-  Divider,
   Tooltip,
-  useTheme,
+  Typography,
   useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
+  ChevronLeft as ChevronLeftIcon,
+  CreditCard as CreditCardIcon,
   Dashboard as DashboardIcon,
   Folder as FolderIcon,
-  Storage as StorageIcon,
-  CreditCard as CreditCardIcon,
-  Support as SupportIcon,
+  PeopleAlt as PeopleAltIcon,
   Notifications as NotificationsIcon,
   Settings as SettingsIcon,
-  ChevronLeft as ChevronLeftIcon,
-  Menu as MenuIcon,
+  Support as SupportIcon,
 } from "@mui/icons-material";
 import { NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import {
-  selectSidebarMode,
-  selectMobileSidebarOpen,
-  toggleSidebarMode,
-  openMobileSidebar,
   closeMobileSidebar,
+  selectMobileSidebarOpen,
+  selectSidebarMode,
+  toggleSidebarMode,
 } from "../../app/store/slices/uiSlice";
 
-const DRAWER_WIDTH = 240;
-const COLLAPSED_WIDTH = 72;
+const DRAWER_WIDTH = 260;
+const COLLAPSED_WIDTH = 80;
 
 const navItems = [
-  { label: "Dashboard", path: "/console", icon: <DashboardIcon /> },
+  { label: "Overview", path: "/console", icon: <DashboardIcon /> },
+  { label: "Accounts", path: "/console/accounts", icon: <PeopleAltIcon /> },
   { label: "Projects", path: "/console/projects", icon: <FolderIcon /> },
-  { label: "Services", path: "/console/services", icon: <StorageIcon /> },
   { label: "Billing", path: "/console/billing", icon: <CreditCardIcon /> },
   { label: "Support", path: "/console/support/tickets", icon: <SupportIcon /> },
-  {
-    label: "Notifications",
-    path: "/console/notifications",
-    icon: <NotificationsIcon />,
-  },
+  { label: "Notifications", path: "/console/notifications", icon: <NotificationsIcon /> },
   { label: "Settings", path: "/console/settings", icon: <SettingsIcon /> },
 ];
 
@@ -59,85 +53,76 @@ export default function Sidebar() {
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down("sm"));
   const isLgUp = useMediaQuery(theme.breakpoints.up("lg"));
-
-  const isCollapsed = !isXs && !isLgUp && sidebarMode === "collapsed";
+  const isSmMd = !isXs && !isLgUp;
+  const isCollapsed = isSmMd && sidebarMode === "collapsed";
   const drawerWidth = isCollapsed ? COLLAPSED_WIDTH : DRAWER_WIDTH;
 
-  const glassStyles = {
-    backdropFilter: "blur(16px)",
-    backgroundColor:
-      theme.palette.mode === "light"
-        ? "rgba(255,255,255,0.7)"
-        : "rgba(30,30,30,0.65)",
-    borderRight: `1px solid ${
-      theme.palette.mode === "light"
-        ? theme.palette.divider
-        : "rgba(255,255,255,0.08)"
-    }`,
-  };
-
-  const content = (
-    <Box
-      sx={{
-        width: drawerWidth,
-        height: "100%",
-        transition: "width .25s ease",
-        ...glassStyles,
-      }}
-    >
+  const navContent = (
+    <Box sx={{ width: drawerWidth, height: "100%" }}>
       <Toolbar
         sx={{
+          minHeight: 68,
+          px: isCollapsed ? 1 : 2,
           display: "flex",
           justifyContent: isCollapsed ? "center" : "space-between",
-          px: 2,
         }}
       >
-        {!isCollapsed && <Box sx={{ fontWeight: 600 }}>Console</Box>}
+        {!isCollapsed && (
+          <Typography variant="subtitle1" fontWeight={700}>
+            Navigation
+          </Typography>
+        )}
 
-        {!isXs && !isLgUp && (
+        {isSmMd && (
           <IconButton
-            aria-label="Collapse sidebar"
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             onClick={() => dispatch(toggleSidebarMode())}
           >
-            <ChevronLeftIcon />
+            <ChevronLeftIcon
+              sx={{
+                transform: isCollapsed ? "rotate(180deg)" : "none",
+                transition: "transform .2s ease",
+              }}
+            />
           </IconButton>
         )}
       </Toolbar>
 
       <Divider />
 
-      <List>
+      <List sx={{ px: 1, py: 1.5 }}>
         {navItems.map((item) => (
           <Tooltip
-            key={item.label}
+            key={item.path}
             title={isCollapsed ? item.label : ""}
             placement="right"
           >
             <ListItemButton
               component={NavLink}
               to={item.path}
-              onClick={() => isXs && dispatch(closeMobileSidebar())}
+              onClick={() => {
+                if (isXs) {
+                  dispatch(closeMobileSidebar());
+                }
+              }}
               sx={{
-                justifyContent: isCollapsed ? "center" : "flex-start",
-                px: isCollapsed ? 1 : 2,
+                minHeight: 46,
+                mb: 0.5,
                 borderRadius: 2,
-                mx: 1,
-                my: 0.5,
+                justifyContent: isCollapsed ? "center" : "flex-start",
+                px: isCollapsed ? 1 : 1.25,
                 "&.active": {
-                  backgroundColor:
-                    theme.palette.mode === "light"
-                      ? "rgba(0,0,0,0.08)"
-                      : "rgba(255,255,255,0.12)",
+                  backgroundColor: "rgba(31, 111, 235, 0.14)",
+                  border: "1px solid rgba(31, 111, 235, 0.20)",
                 },
-                color: theme.palette.text.primary,
               }}
             >
               <ListItemIcon
                 sx={{
                   minWidth: 0,
-                  mr: isCollapsed ? 0 : 2,
+                  mr: isCollapsed ? 0 : 1.25,
                   justifyContent: "center",
-                  color: theme.palette.text.primary,
+                  color: "inherit",
                 }}
               >
                 {item.icon}
@@ -146,10 +131,7 @@ export default function Sidebar() {
               {!isCollapsed && (
                 <ListItemText
                   primary={item.label}
-                  primaryTypographyProps={{
-                    fontWeight: 500,
-                    color: theme.palette.text.primary,
-                  }}
+                  primaryTypographyProps={{ fontWeight: 600, variant: "body2" }}
                 />
               )}
             </ListItemButton>
@@ -159,68 +141,42 @@ export default function Sidebar() {
     </Box>
   );
 
-  // -------- Mobile Drawer --------
   if (isXs) {
     return (
-      <>
-        {!mobileOpen && (
-          <IconButton
-            aria-label="Open sidebar"
-            onClick={() => dispatch(openMobileSidebar())}
-            sx={{ position: "fixed", top: 16, left: 16, zIndex: 1400 }}
-          >
-            <MenuIcon />
-          </IconButton>
-        )}
-
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={() => dispatch(closeMobileSidebar())}
-          ModalProps={{ keepMounted: true }}
-        >
-          {content}
-        </Drawer>
-      </>
-    );
-  }
-
-  // -------- Large screens --------
-  if (isLgUp) {
-    return (
       <Drawer
-        variant="permanent"
-        open
+        variant="temporary"
+        open={mobileOpen}
+        onClose={() => dispatch(closeMobileSidebar())}
+        ModalProps={{ keepMounted: true }}
         sx={{
-          width: DRAWER_WIDTH,
           "& .MuiDrawer-paper": {
             width: DRAWER_WIDTH,
             boxSizing: "border-box",
-            ...glassStyles,
+            borderRight: `1px solid ${theme.palette.divider}`,
           },
         }}
       >
-        {content}
+        {navContent}
       </Drawer>
     );
   }
 
-  // -------- sm/md screens (collapsible) --------
   return (
     <Drawer
       variant="permanent"
       open
       sx={{
-        width: drawerWidth,
+        width: isLgUp ? DRAWER_WIDTH : drawerWidth,
+        flexShrink: 0,
         "& .MuiDrawer-paper": {
-          width: drawerWidth,
+          width: isLgUp ? DRAWER_WIDTH : drawerWidth,
           boxSizing: "border-box",
-          ...glassStyles,
+          borderRight: `1px solid ${theme.palette.divider}`,
           transition: "width .25s ease",
         },
       }}
     >
-      {content}
+      {navContent}
     </Drawer>
   );
 }

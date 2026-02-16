@@ -1,8 +1,6 @@
 // src/app/store/slices/authSlice.ts
 import { createSlice,type PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { type RootState } from "../../store";
-import { AuthAPI } from "../../api/authApi";
- 
+
 
 // ---------------------------
 // Types
