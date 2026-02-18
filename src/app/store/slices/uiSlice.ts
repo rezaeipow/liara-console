@@ -7,11 +7,20 @@ export interface UIPreferences {
   tableDensity: TableDensity;
 }
 
+type ToastSeverity = "success" | "error" | "info" | "warning";
+
+interface ToastState {
+  open: boolean;
+  message: string;
+  severity: ToastSeverity;
+}
+
 interface UIState {
   preferences: UIPreferences;
 
   // Runtime UI state (not persisted)
   isMobileSidebarOpen: boolean; // for xs drawer only
+  toast: ToastState;
 }
 
 const STORAGE_KEY = "console-ui-preferences";
@@ -44,6 +53,11 @@ function savePreferences(prefs: UIPreferences) {
 const initialState: UIState = {
   preferences: loadPreferences(),
   isMobileSidebarOpen: false,
+  toast: {
+    open: false,
+    message: "",
+    severity: "success",
+  },
 };
 
 /* -----------------------------
@@ -85,6 +99,19 @@ export const uiSlice = createSlice({
       state.preferences.tableDensity = action.payload;
       savePreferences(state.preferences);
     },
+
+    showToast(
+      state,
+      action: PayloadAction<{ message: string; severity?: ToastSeverity }>,
+    ) {
+      state.toast.open = true;
+      state.toast.message = action.payload.message;
+      state.toast.severity = action.payload.severity ?? "success";
+    },
+
+    hideToast(state) {
+      state.toast.open = false;
+    },
   },
 });
 
@@ -98,6 +125,8 @@ export const {
   openMobileSidebar,
   closeMobileSidebar,
   setTableDensity,
+  showToast,
+  hideToast,
 } = uiSlice.actions;
 
 /* -----------------------------
@@ -112,5 +141,7 @@ export const selectTableDensity = (state: { ui: UIState }) =>
 
 export const selectMobileSidebarOpen = (state: { ui: UIState }) =>
   state.ui.isMobileSidebarOpen;
+
+export const selectToast = (state: { ui: UIState }) => state.ui.toast;
 
 export default uiSlice.reducer;

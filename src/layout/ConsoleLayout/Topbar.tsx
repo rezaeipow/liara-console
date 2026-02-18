@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import {
+  Alert,
   AppBar,
   Avatar,
   Badge,
@@ -9,6 +10,7 @@ import {
   Menu,
   MenuItem,
   Select,
+  Snackbar,
   Toolbar,
   Typography,
   useMediaQuery,
@@ -23,17 +25,25 @@ import {
 } from "@mui/icons-material";
 import { useFetcher } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
-import { selectAccounts, selectActiveAccountId, switchAccount } from "../../app/store/slices/accountSlice";
-import { openMobileSidebar, selectSidebarMode, toggleSidebarMode } from "../../app/store/slices/uiSlice";
+import { selectAccounts, selectActiveAccountId } from "../../app/store/slices/accountSlice";
+import {
+  hideToast,
+  openMobileSidebar,
+  selectSidebarMode,
+  selectToast,
+  toggleSidebarMode,
+} from "../../app/store/slices/uiSlice";
 
 export default function Topbar() {
   const dispatch = useAppDispatch();
   const logoutFetcher = useFetcher();
+  const accountSwitchFetcher = useFetcher();
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down("sm"));
   const isLgUp = useMediaQuery(theme.breakpoints.up("lg"));
   const isSmMd = !isXs && !isLgUp;
   const sidebarMode = useAppSelector(selectSidebarMode);
+  const toast = useAppSelector(selectToast);
 
   const accounts = useAppSelector(selectAccounts);
   const activeAccountId = useAppSelector(selectActiveAccountId);
@@ -62,7 +72,10 @@ export default function Topbar() {
   const selectedAccountId = activeAccountId ?? accountItems[0].id;
 
   const handleAccountChange = (event: SelectChangeEvent) => {
-    dispatch(switchAccount(event.target.value));
+    accountSwitchFetcher.submit(
+      { intent: "switch", accountId: event.target.value },
+      { method: "post", action: "/console/accounts" },
+    );
   };
 
   const handleSidebarToggle = () => {
@@ -76,38 +89,39 @@ export default function Topbar() {
   };
 
   return (
-    <AppBar
-      position="sticky"
-      elevation={0}
-      sx={{
-        borderRadius: 0,
-        borderBottom: `1px solid ${theme.palette.divider}`,
-      }}
-    >
-      <Toolbar
+    <>
+      <AppBar
+        position="sticky"
+        elevation={0}
         sx={{
-          minHeight: { xs: 62, sm: 68 },
-          px: { xs: 1, sm: 2, md: 3 },
-          pl:
-            isSmMd && sidebarMode === "collapsed"
-              ? { sm: 3, md: 3.5 }
-              : { xs: 1, sm: 2, md: 3 },
-          display: "flex",
-          justifyContent: "space-between",
-          gap: { xs: 0.75, sm: 1.5 },
-          overflow: "visible",
+          borderRadius: 0,
+          borderBottom: `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.75, sm: 1.5 }, minWidth: 0 }}>
-          {!isLgUp && (
-            <IconButton
-              aria-label="Open sidebar navigation"
-              onClick={handleSidebarToggle}
-              size="large"
-            >
-              <MenuIcon />
-            </IconButton>
-          )}
+        <Toolbar
+          sx={{
+            minHeight: { xs: 62, sm: 68 },
+            px: { xs: 1, sm: 2, md: 3 },
+            pl:
+              isSmMd && sidebarMode === "collapsed"
+                ? { sm: 3, md: 3.5 }
+                : { xs: 1, sm: 2, md: 3 },
+            display: "flex",
+            justifyContent: "space-between",
+            gap: { xs: 0.75, sm: 1.5 },
+            overflow: "visible",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.75, sm: 1.5 }, minWidth: 0 }}>
+            {!isLgUp && (
+              <IconButton
+                aria-label="Open sidebar navigation"
+                onClick={handleSidebarToggle}
+                size="large"
+              >
+                <MenuIcon />
+              </IconButton>
+            )}
 
           <Typography
             variant="h6"
@@ -127,6 +141,7 @@ export default function Topbar() {
               aria-label="Switch active account"
               value={selectedAccountId}
               onChange={handleAccountChange}
+              disabled={accountSwitchFetcher.state !== "idle"}
               sx={{
                 "& .MuiSelect-select": {
                   pr: { xs: 3.5, sm: 4 },
@@ -197,8 +212,29 @@ export default function Topbar() {
             <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
-        </Box>
-      </Toolbar>
-    </AppBar>
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={3000}
+        onClose={() => dispatch(hideToast())}
+        anchorOrigin={
+          isXs
+            ? { vertical: "bottom", horizontal: "center" }
+            : { vertical: "top", horizontal: "right" }
+        }
+        sx={isXs ? { pb: 1 } : { top: { sm: "84px !important" }, right: { sm: 24 } }}
+      >
+        <Alert
+          onClose={() => dispatch(hideToast())}
+          severity={toast.severity}
+          sx={{ width: "100%" }}
+        >
+          {toast.message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }

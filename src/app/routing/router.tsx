@@ -10,6 +10,7 @@ import {
   signupAction,
 } from "./authData";
 import { GuardedConsole } from "./guards";
+import { accountsAction, accountsLoader } from "../../features/pages/accounts/accountsData";
 import {
   AccountsPage,
   AppDeploymentsPage,
@@ -71,7 +72,12 @@ export const router = createBrowserRouter([
     errorElement: <RouteFallback />,
     children: [
       { index: true, element: withSuspense(<ConsoleHomePage />) },
-      { path: "accounts", element: withSuspense(<AccountsPage />) },
+      {
+        path: "accounts",
+        element: withSuspense(<AccountsPage />),
+        loader: accountsLoader,
+        action: accountsAction,
+      },
       { path: "projects", element: withSuspense(<ProjectsPage />) },
       { path: "projects/new", element: withSuspense(<NewProjectPage />) },
       {

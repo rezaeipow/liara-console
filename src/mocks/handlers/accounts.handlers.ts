@@ -31,4 +31,45 @@ export const accountHandlers: HttpHandler[] = [
     db.activeAccountId = body.accountId;
     return HttpResponse.json({ activeAccountId: db.activeAccountId });
   }),
+
+  http.put("/accounts/:accountId", async ({ params, request }) => {
+    const accountId = String(params.accountId ?? "");
+    const body = (await request.json()) as { name?: string };
+
+    if (!accountId) {
+      return HttpResponse.json({ message: "account id is required" }, { status: 400 });
+    }
+
+    if (!body.name || body.name.trim().length < 2) {
+      return HttpResponse.json(
+        { message: "name must be at least 2 characters" },
+        { status: 400 },
+      );
+    }
+
+    const account = db.accounts.find((item) => item.id === accountId);
+    if (!account) {
+      return HttpResponse.json({ message: "account not found" }, { status: 404 });
+    }
+
+    account.name = body.name.trim();
+    return HttpResponse.json(account);
+  }),
+
+  http.delete("/accounts/:accountId", ({ params }) => {
+    const accountId = String(params.accountId ?? "");
+    const targetIndex = db.accounts.findIndex((item) => item.id === accountId);
+
+    if (targetIndex === -1) {
+      return HttpResponse.json({ message: "account not found" }, { status: 404 });
+    }
+
+    db.accounts.splice(targetIndex, 1);
+
+    if (db.activeAccountId === accountId) {
+      db.activeAccountId = db.accounts[0]?.id ?? null;
+    }
+
+    return HttpResponse.json({ id: accountId, activeAccountId: db.activeAccountId });
+  }),
 ];

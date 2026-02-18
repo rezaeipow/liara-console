@@ -1,6 +1,8 @@
 import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router-dom";
+import { AccountsAPI } from "../../api/accountsApi";
 import { store } from "../store/Index";
 import { fetchMe, login, logout, signup } from "../store/slices/authSlice";
+import { setAccounts } from "../store/slices/accountSlice";
 
 type AuthActionResult = {
   fieldErrors?: {
@@ -74,6 +76,18 @@ export async function protectedConsoleLoader({ request }: LoaderFunctionArgs) {
     if (fetchMe.rejected.match(result)) {
       throw redirect(`/login?next=${encodeURIComponent(currentPath)}`);
     }
+  }
+
+  try {
+    const accountsResponse = await AccountsAPI.list();
+    store.dispatch(
+      setAccounts({
+        accounts: accountsResponse.items,
+        activeAccountId: accountsResponse.activeAccountId,
+      }),
+    );
+  } catch {
+    // Keep console available even if accounts fetch fails for this navigation.
   }
 
   return null;

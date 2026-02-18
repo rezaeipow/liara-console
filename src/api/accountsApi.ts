@@ -17,5 +17,15 @@ export const AccountsAPI = {
       method: "POST",
       body: { accountId },
     }),
-};
 
+  update: (accountId: string, payload: { name: string }) =>
+    request<Account>(`/accounts/${accountId}`, {
+      method: "PUT",
+      body: payload,
+    }),
+
+  remove: (accountId: string) =>
+    request<{ id: string; activeAccountId: string | null }>(`/accounts/${accountId}`, {
+      method: "DELETE",
+    }),
+};
