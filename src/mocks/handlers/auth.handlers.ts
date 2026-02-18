@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 import type { HttpHandler } from "msw";
-import { db } from "../data/db";
+import { createId, db } from "../data/db";
 
 export const authHandlers: HttpHandler[] = [
   http.post("/auth/login", async ({ request }) => {
@@ -10,11 +10,21 @@ export const authHandlers: HttpHandler[] = [
       return HttpResponse.json({ message: "Invalid payload" }, { status: 400 });
     }
 
-    if (body.email === "fail@test.com") {
+    const email = body.email.trim().toLowerCase();
+    const account = db.authUsers.find(
+      (user) => user.email.toLowerCase() === email && user.password === body.password,
+    );
+    if (!account) {
       return HttpResponse.json({ message: "Invalid credentials" }, { status: 401 });
     }
 
-    db.user.email = body.email;
+    db.user = {
+      id: account.id,
+      name: account.name,
+      email: account.email,
+      avatar: account.avatar,
+      twoFAEnabled: account.twoFAEnabled,
+    };
     db.token = "mock-token";
 
     return HttpResponse.json({ user: db.user, token: db.token });
@@ -31,11 +41,25 @@ export const authHandlers: HttpHandler[] = [
       return HttpResponse.json({ message: "Invalid payload" }, { status: 400 });
     }
 
-    db.user = {
-      id: "u-2",
+    const email = body.email.trim().toLowerCase();
+    const exists = db.authUsers.some((user) => user.email.toLowerCase() === email);
+    if (exists) {
+      return HttpResponse.json({ message: "Email already exists" }, { status: 409 });
+    }
+
+    const nextUser = {
+      id: createId("u"),
       name: body.name,
-      email: body.email,
+      email,
       twoFAEnabled: false,
+      password: body.password,
+    };
+    db.authUsers.unshift(nextUser);
+    db.user = {
+      id: nextUser.id,
+      name: nextUser.name,
+      email: nextUser.email,
+      twoFAEnabled: nextUser.twoFAEnabled,
     };
     db.token = "mock-token";
 
@@ -55,3 +79,4 @@ export const authHandlers: HttpHandler[] = [
     return HttpResponse.json(db.user);
   }),
 ];
+

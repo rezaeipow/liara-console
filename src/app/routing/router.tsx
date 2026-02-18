@@ -2,7 +2,13 @@ import { Alert } from "@mui/material";
 import { Suspense } from "react";
 import type { ReactNode } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { logoutAction, loginAction, protectedConsoleLoader, publicOnlyLoader, signupAction } from "./authData";
+import {
+  loginAction,
+  logoutAction,
+  protectedConsoleLoader,
+  publicOnlyLoader,
+  signupAction,
+} from "./authData";
 import { GuardedConsole } from "./guards";
 import {
   AccountsPage,

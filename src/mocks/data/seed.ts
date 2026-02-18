@@ -6,6 +6,10 @@ export type User = {
   twoFAEnabled: boolean;
 };
 
+export type AuthUser = User & {
+  password: string;
+};
+
 export type Account = {
   id: string;
   name: string;
@@ -95,6 +99,7 @@ export type Notification = {
 export type MockDb = {
   token: string;
   user: User;
+  authUsers: AuthUser[];
   credit: number;
   activeAccountId: string;
   accounts: Account[];
@@ -120,6 +125,15 @@ export const createSeedData = (): MockDb => {
       email: "mohamad@example.com",
       twoFAEnabled: false,
     },
+    authUsers: [
+      {
+        id: "u-1",
+        name: "Mohamad",
+        email: "mohamad@example.com",
+        twoFAEnabled: false,
+        password: "Password123!",
+      },
+    ],
     credit: 750000,
     activeAccountId: "acc-1",
     accounts: [
@@ -198,3 +212,4 @@ export const createSeedData = (): MockDb => {
     ],
   };
 };
+

@@ -4,6 +4,7 @@ export interface User {
   email: string;
   avatar?: string;
   twoFAEnabled?: boolean;
+  emailVerified?: boolean;
 }
 
 export interface Account {
@@ -98,4 +99,3 @@ export interface PaginatedResponse<T> {
   pageSize: number;
   total: number;
 }
-
