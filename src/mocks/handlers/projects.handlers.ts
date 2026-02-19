@@ -3,12 +3,38 @@ import type { HttpHandler } from "msw";
 import { createId, db, paginate } from "../data/db";
 
 export const projectHandlers: HttpHandler[] = [
+  http.get("/projects/meta", () => {
+    const regions = [
+      "de-fra",
+      "nl-ams",
+      "tr-ist",
+      "ir-thr",
+      "ae-dxb",
+      "gb-lon",
+      "us-nyc",
+      "ca-tor",
+      "sg-sin",
+      "jp-tyo",
+    ];
+    const plans = ["starter", "basic", "pro", "business", "enterprise"];
+
+    return HttpResponse.json({
+      regions,
+      plans,
+    });
+  }),
+
   http.get("/projects", ({ request }) => {
     const url = new URL(request.url);
     const page = Number(url.searchParams.get("page") ?? "1");
     const pageSize = Number(url.searchParams.get("pageSize") ?? "10");
+    const query = (url.searchParams.get("q") ?? "").trim().toLowerCase();
 
-    const projects = db.projects.filter((p) => p.accountId === db.activeAccountId);
+    const projects = db.projects.filter((p) => {
+      if (p.accountId !== db.activeAccountId) return false;
+      if (!query) return true;
+      return p.name.toLowerCase().includes(query);
+    });
     return HttpResponse.json(paginate(projects, page, pageSize));
   }),
 

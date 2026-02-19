@@ -15,16 +15,25 @@ export interface ProjectOverview extends Project {
   }>;
 }
 
+export interface ProjectMeta {
+  regions: string[];
+  plans: string[];
+}
+
 export const ProjectsAPI = {
-  list: (params?: { page?: number; pageSize?: number }) => {
+  list: (params?: { page?: number; pageSize?: number; q?: string }) => {
     const page = params?.page ?? 1;
     const pageSize = params?.pageSize ?? 10;
-    return request<PaginatedResponse<Project>>(`/projects?page=${page}&pageSize=${pageSize}`);
+    const query = params?.q?.trim() ? `&q=${encodeURIComponent(params.q.trim())}` : "";
+    return request<PaginatedResponse<Project>>(
+      `/projects?page=${page}&pageSize=${pageSize}${query}`,
+    );
   },
 
   create: (payload: { name: string; region: string; plan: string }) =>
     request<Project>("/projects", { method: "POST", body: payload }),
 
   getById: (projectId: string) => request<ProjectOverview>(`/projects/${projectId}`),
-};
 
+  getMeta: () => request<ProjectMeta>("/projects/meta"),
+};

@@ -12,6 +12,12 @@ import {
 import { GuardedConsole } from "./guards";
 import { accountsAction, accountsLoader } from "../../features/pages/accounts/accountsData";
 import {
+  projectCreateAction,
+  projectCreateLoader,
+  projectOverviewLoader,
+  projectsLoader,
+} from "../../features/pages/projects/projectsData";
+import {
   AccountsPage,
   AppDeploymentsPage,
   AppEnvPage,
@@ -78,11 +84,21 @@ export const router = createBrowserRouter([
         loader: accountsLoader,
         action: accountsAction,
       },
-      { path: "projects", element: withSuspense(<ProjectsPage />) },
-      { path: "projects/new", element: withSuspense(<NewProjectPage />) },
+      {
+        path: "projects",
+        element: withSuspense(<ProjectsPage />),
+        loader: projectsLoader,
+      },
+      {
+        path: "projects/new",
+        element: withSuspense(<NewProjectPage />),
+        loader: projectCreateLoader,
+        action: projectCreateAction,
+      },
       {
         path: "projects/:projectId",
         element: withSuspense(<ProjectOverviewPage />),
+        loader: projectOverviewLoader,
       },
       {
         path: "projects/:projectId/apps",
