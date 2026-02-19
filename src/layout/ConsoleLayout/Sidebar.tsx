@@ -36,7 +36,7 @@ const DRAWER_WIDTH = 260;
 const COLLAPSED_WIDTH = 80;
 
 const navItems = [
-  { label: "Overview", path: "/console", icon: <DashboardIcon /> },
+  { label: "Dashboard", path: "/console", icon: <DashboardIcon />, end: true },
   { label: "Accounts", path: "/console/accounts", icon: <PeopleAltIcon /> },
   { label: "Projects", path: "/console/projects", icon: <FolderIcon /> },
   { label: "Billing", path: "/console/billing", icon: <CreditCardIcon /> },
@@ -100,6 +100,7 @@ export default function Sidebar() {
             <ListItemButton
               component={NavLink}
               to={item.path}
+              end={item.end}
               onClick={() => {
                 if (isXs) {
                   dispatch(closeMobileSidebar());
