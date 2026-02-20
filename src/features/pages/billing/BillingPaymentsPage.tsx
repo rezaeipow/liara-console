@@ -6,8 +6,10 @@ import {
   Alert,
   Box,
   Chip,
+  LinearProgress,
   MenuItem,
   Paper,
+  Skeleton,
   Stack,
   Table,
   TableBody,
@@ -20,13 +22,17 @@ import {
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { useMemo } from "react";
-import { useLoaderData, useSearchParams } from "react-router-dom";
+import { useLoaderData, useNavigation, useSearchParams } from "react-router-dom";
 import type { BillingPaymentsLoaderData } from "./billingData";
 import { formatDateTime, formatIrr } from "./billingFormat";
 
 export default function BillingPaymentsPage() {
   const { items } = useLoaderData() as BillingPaymentsLoaderData;
+  const navigation = useNavigation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const isRouteLoading =
+    navigation.state === "loading" &&
+    (navigation.location?.pathname ?? "").startsWith("/console/billing/payments");
 
   const status = searchParams.get("status") ?? "all";
   const sort = searchParams.get("sort") ?? "newest";
@@ -115,6 +121,7 @@ export default function BillingPaymentsPage() {
           backdropFilter: "blur(10px)",
         }}
       >
+        {isRouteLoading ? <LinearProgress sx={{ mb: 1.2 }} /> : null}
         <Stack spacing={1.4}>
           <Stack
             direction={{ xs: "column", md: "row" }}
@@ -176,7 +183,13 @@ export default function BillingPaymentsPage() {
             </Stack>
           </Stack>
 
-          {items.length === 0 ? (
+          {isRouteLoading ? (
+            <Stack spacing={1}>
+              {Array.from({ length: 4 }).map((_, index) => (
+                <Skeleton key={`payment-loading-${index}`} variant="rounded" height={52} />
+              ))}
+            </Stack>
+          ) : items.length === 0 ? (
             <Alert severity="info">No payments match the current filters.</Alert>
           ) : (
             <>

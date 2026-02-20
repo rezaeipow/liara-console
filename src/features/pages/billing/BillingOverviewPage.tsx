@@ -7,18 +7,24 @@ import {
   Box,
   Button,
   Chip,
+  LinearProgress,
   Paper,
+  Skeleton,
   Stack,
   Typography,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import type { ReactNode } from "react";
-import { Link, useLoaderData } from "react-router-dom";
+import { Link, useLoaderData, useNavigation } from "react-router-dom";
 import type { BillingOverviewLoaderData } from "./billingData";
 import { formatDateTime, formatIrr } from "./billingFormat";
 
 export default function BillingOverviewPage() {
   const { credit, payments, invoices } = useLoaderData() as BillingOverviewLoaderData;
+  const navigation = useNavigation();
+  const isRouteLoading =
+    navigation.state === "loading" &&
+    (navigation.location?.pathname ?? "").startsWith("/console/billing");
   const successfulPayments = payments.filter((item) => item.status === "success");
   const totalTopup = successfulPayments.reduce((sum, item) => sum + item.amount, 0);
   const unpaidInvoices = invoices.filter((item) => item.status === "unpaid");
@@ -46,6 +52,7 @@ export default function BillingOverviewPage() {
           backdropFilter: "blur(14px)",
         }}
       >
+        {isRouteLoading ? <LinearProgress sx={{ mb: 1.2 }} /> : null}
         <Stack
           direction={{ xs: "column", md: "row" }}
           alignItems={{ xs: "flex-start", md: "center" }}
@@ -125,7 +132,13 @@ export default function BillingOverviewPage() {
           </Button>
         </Stack>
 
-        {recentPayments.length === 0 ? (
+        {isRouteLoading ? (
+          <Stack spacing={0.9}>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton key={`billing-overview-loading-${index}`} variant="rounded" height={48} />
+            ))}
+          </Stack>
+        ) : recentPayments.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
             No payments found. Create your first top-up to see payment history.
           </Typography>

@@ -1,5 +1,6 @@
 ﻿import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router-dom";
 import { BillingAPI } from "../../../api/billingApi";
+import { ApiError } from "../../../api/httpClient";
 import type { Invoice, Payment } from "../../../api/types";
 
 export type BillingOverviewLoaderData = {
@@ -37,30 +38,60 @@ function toPositiveInt(raw: FormDataEntryValue | null): number {
   return Math.floor(value);
 }
 
-export async function billingOverviewLoader(): Promise<BillingOverviewLoaderData> {
-  const [creditRes, paymentsRes, invoicesRes] = await Promise.all([
-    BillingAPI.getCredit(),
-    BillingAPI.getPayments(),
-    BillingAPI.getInvoices(),
-  ]);
+function mapStatusText(status: number): string {
+  if (status === 401) return "Unauthorized";
+  if (status === 403) return "Forbidden";
+  if (status === 404) return "Not Found";
+  if (status >= 500) return "Server Error";
+  return "Request Failed";
+}
 
-  return {
-    credit: creditRes.credit,
-    payments: paymentsRes.items,
-    invoices: invoicesRes.items,
-  };
+function toRouteErrorResponse(error: unknown): Response {
+  if (error instanceof ApiError) {
+    return new Response(error.message, {
+      status: error.status,
+      statusText: mapStatusText(error.status),
+    });
+  }
+
+  return new Response("Unexpected error", {
+    status: 500,
+    statusText: "Server Error",
+  });
+}
+
+export async function billingOverviewLoader(): Promise<BillingOverviewLoaderData> {
+  try {
+    const [creditRes, paymentsRes, invoicesRes] = await Promise.all([
+      BillingAPI.getCredit(),
+      BillingAPI.getPayments(),
+      BillingAPI.getInvoices(),
+    ]);
+
+    return {
+      credit: creditRes.credit,
+      payments: paymentsRes.items,
+      invoices: invoicesRes.items,
+    };
+  } catch (error) {
+    throw toRouteErrorResponse(error);
+  }
 }
 
 export async function billingTopupLoader(): Promise<BillingTopupLoaderData> {
-  const [creditRes, paymentsRes] = await Promise.all([
-    BillingAPI.getCredit(),
-    BillingAPI.getPayments(),
-  ]);
+  try {
+    const [creditRes, paymentsRes] = await Promise.all([
+      BillingAPI.getCredit(),
+      BillingAPI.getPayments(),
+    ]);
 
-  return {
-    credit: creditRes.credit,
-    recentPayments: paymentsRes.items.slice(0, 5),
-  };
+    return {
+      credit: creditRes.credit,
+      recentPayments: paymentsRes.items.slice(0, 5),
+    };
+  } catch (error) {
+    throw toRouteErrorResponse(error);
+  }
 }
 
 export async function billingTopupAction({
@@ -89,6 +120,12 @@ export async function billingTopupAction({
       nextCredit: result.credit,
     };
   } catch (error: unknown) {
+    if (error instanceof ApiError) {
+      return {
+        formError: `${error.message} (${error.status})`,
+      };
+    }
+
     return {
       formError: error instanceof Error ? error.message : "Could not complete top-up.",
     };
@@ -98,51 +135,59 @@ export async function billingTopupAction({
 export async function billingPaymentsLoader({
   request,
 }: LoaderFunctionArgs): Promise<BillingPaymentsLoaderData> {
-  const url = new URL(request.url);
-  const status = url.searchParams.get("status");
-  const sort = url.searchParams.get("sort") ?? "newest";
-  const { items } = await BillingAPI.getPayments();
+  try {
+    const url = new URL(request.url);
+    const status = url.searchParams.get("status");
+    const sort = url.searchParams.get("sort") ?? "newest";
+    const { items } = await BillingAPI.getPayments();
 
-  const filtered =
-    status === "success" || status === "failed"
-      ? items.filter((item) => item.status === status)
-      : items;
+    const filtered =
+      status === "success" || status === "failed"
+        ? items.filter((item) => item.status === status)
+        : items;
 
-  const sorted = [...filtered].sort((left, right) => {
-    if (sort === "oldest") {
-      return new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime();
-    }
-    if (sort === "amount") {
-      return right.amount - left.amount;
-    }
-    return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
-  });
+    const sorted = [...filtered].sort((left, right) => {
+      if (sort === "oldest") {
+        return new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime();
+      }
+      if (sort === "amount") {
+        return right.amount - left.amount;
+      }
+      return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+    });
 
-  return { items: sorted };
+    return { items: sorted };
+  } catch (error) {
+    throw toRouteErrorResponse(error);
+  }
 }
 
 export async function billingInvoicesLoader({
   request,
 }: LoaderFunctionArgs): Promise<BillingInvoicesLoaderData> {
-  const url = new URL(request.url);
-  const status = url.searchParams.get("status");
-  const sort = url.searchParams.get("sort") ?? "newest";
-  const { items } = await BillingAPI.getInvoices();
+  try {
+    const url = new URL(request.url);
+    const status = url.searchParams.get("status");
+    const sort = url.searchParams.get("sort") ?? "newest";
+    const { items } = await BillingAPI.getInvoices();
 
-  const filtered =
-    status === "paid" || status === "unpaid"
-      ? items.filter((item) => item.status === status)
-      : items;
+    const filtered =
+      status === "paid" || status === "unpaid"
+        ? items.filter((item) => item.status === status)
+        : items;
 
-  const sorted = [...filtered].sort((left, right) => {
-    if (sort === "oldest") {
-      return new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime();
-    }
-    if (sort === "amount") {
-      return right.amount - left.amount;
-    }
-    return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
-  });
+    const sorted = [...filtered].sort((left, right) => {
+      if (sort === "oldest") {
+        return new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime();
+      }
+      if (sort === "amount") {
+        return right.amount - left.amount;
+      }
+      return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+    });
 
-  return { items: sorted };
+    return { items: sorted };
+  } catch (error) {
+    throw toRouteErrorResponse(error);
+  }
 }

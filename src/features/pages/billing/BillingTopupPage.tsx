@@ -11,9 +11,11 @@ import {
   FormHelperText,
   InputAdornment,
   InputLabel,
+  LinearProgress,
   OutlinedInput,
   Paper,
   Snackbar,
+  Skeleton,
   Stack,
   Typography,
 } from "@mui/material";
@@ -42,6 +44,9 @@ export default function BillingTopupPage() {
   const [amountInput, setAmountInput] = useState(String(topupSuggestions[1]));
   const [dismissedNoticeKey, setDismissedNoticeKey] = useState<string | null>(null);
   const isSubmitting = navigation.state === "submitting";
+  const isRouteLoading =
+    navigation.state === "loading" &&
+    (navigation.location?.pathname ?? "").startsWith("/console/billing/topup");
 
   const noticeMessage = actionData?.formError ?? actionData?.successMessage;
   const noticeKey = actionData?.successAt
@@ -143,6 +148,7 @@ export default function BillingTopupPage() {
               backdropFilter: "blur(10px)",
             }}
           >
+            {isRouteLoading ? <LinearProgress sx={{ mb: 1.2 }} /> : null}
             <Stack spacing={1.6}>
               <Stack direction="row" spacing={1} alignItems="center">
                 <AddCardOutlinedIcon fontSize="small" />
@@ -226,7 +232,13 @@ export default function BillingTopupPage() {
           >
             <Stack spacing={1.2}>
               <Typography fontWeight={800}>Recent Payments</Typography>
-              {recentPayments.length === 0 ? (
+              {isRouteLoading ? (
+                <Stack spacing={1}>
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <Skeleton key={`topup-loading-${index}`} variant="rounded" height={52} />
+                  ))}
+                </Stack>
+              ) : recentPayments.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
                   You do not have recent payments yet.
                 </Typography>

@@ -5,25 +5,31 @@ import {
   Box,
   Button,
   Chip,
+  LinearProgress,
   MenuItem,
   Paper,
   Snackbar,
+  Skeleton,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { useMemo, useState } from "react";
-import { useLoaderData, useSearchParams } from "react-router-dom";
+import { useLoaderData, useNavigation, useSearchParams } from "react-router-dom";
 import { BillingAPI } from "../../../api/billingApi";
 import type { BillingInvoicesLoaderData } from "./billingData";
 import { formatDateTime, formatIrr } from "./billingFormat";
 
 export default function BillingInvoicesPage() {
   const { items } = useLoaderData() as BillingInvoicesLoaderData;
+  const navigation = useNavigation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [notice, setNotice] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const isRouteLoading =
+    navigation.state === "loading" &&
+    (navigation.location?.pathname ?? "").startsWith("/console/billing/invoices");
 
   const status = searchParams.get("status") ?? "all";
   const sort = searchParams.get("sort") ?? "newest";
@@ -101,6 +107,7 @@ export default function BillingInvoicesPage() {
             backdropFilter: "blur(10px)",
           }}
         >
+          {isRouteLoading ? <LinearProgress sx={{ mb: 1.2 }} /> : null}
           <Stack spacing={1.3}>
             <Stack
               direction={{ xs: "column", sm: "row" }}
@@ -137,7 +144,13 @@ export default function BillingInvoicesPage() {
               </Stack>
             </Stack>
 
-            {items.length === 0 ? (
+            {isRouteLoading ? (
+              <Stack spacing={1}>
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <Skeleton key={`invoice-loading-${index}`} variant="rounded" height={64} />
+                ))}
+              </Stack>
+            ) : items.length === 0 ? (
               <Alert severity="info">No invoices match current filters.</Alert>
             ) : (
               <Box

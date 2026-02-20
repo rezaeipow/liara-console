@@ -50,7 +50,7 @@ import {
   VmOverviewPage,
   VmSettingsPage,
 } from "./pages";
-import { RouteFallback } from "./routeElements";
+import { AppInitialFallback, RouteFallback } from "./routeElements";
 import { appSettingsAction } from "../../features/pages/apps/appSettingsData";
 import { vmSettingsAction } from "../../features/pages/vms/vmSettingsData";
 import {
@@ -62,7 +62,7 @@ import {
 } from "../../features/pages/billing/billingData";
 
 function withSuspense(node: ReactNode) {
-  return <Suspense fallback={null}>{node}</Suspense>;
+  return <Suspense fallback={<AppInitialFallback />}>{node}</Suspense>;
 }
 
 export function createAppRouter() {
