@@ -47,6 +47,19 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
     return undefined as T;
   }
 
-  return (await response.json()) as T;
+  const clone = response.clone();
+  try {
+    return (await response.json()) as T;
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      const text = await clone.text();
+      // eslint-disable-next-line no-console
+      console.error("Failed to parse JSON response", {
+        url: response.url,
+        status: response.status,
+        preview: text.slice(0, 200),
+      });
+    }
+    throw error;
+  }
 }
-

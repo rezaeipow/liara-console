@@ -11,6 +11,7 @@ import {
   Chip,
   Divider,
   InputAdornment,
+  MenuItem,
   Paper,
   Skeleton,
   Stack,
@@ -30,6 +31,12 @@ const planSummary: Record<string, string> = {
   enterprise: "Enterprise-scale capacity",
 };
 
+type SortMode = "created-desc" | "created-asc" | "name-asc" | "name-desc";
+type HealthFilter = "all" | "healthy" | "provisioning";
+
+const sortOptions: SortMode[] = ["created-desc", "created-asc", "name-asc", "name-desc"];
+const healthOptions: HealthFilter[] = ["all", "healthy", "provisioning"];
+
 export default function ProjectsPage() {
   const data = useLoaderData() as ProjectsLoaderData;
   const navigation = useNavigation();
@@ -37,6 +44,8 @@ export default function ProjectsPage() {
   const isLoading = navigation.state !== "idle";
   const [searchInput, setSearchInput] = useState(data.query);
   const searchDebounceRef = useRef<number | null>(null);
+  const rawSort = searchParams.get("sort");
+  const rawHealth = searchParams.get("health");
 
   const pageSummary = useMemo(() => {
     return `Showing ${data.items.length} of ${data.total}`;
@@ -58,6 +67,14 @@ export default function ProjectsPage() {
     } else {
       next.delete("q");
     }
+    next.set("page", "1");
+    setSearchParams(next, { replace: true });
+  };
+
+  const updateSearchParam = (key: string, value: string, removeWhen: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (!value || value === removeWhen) next.delete(key);
+    else next.set(key, value);
     next.set("page", "1");
     setSearchParams(next, { replace: true });
   };
@@ -95,6 +112,30 @@ export default function ProjectsPage() {
     },
     [],
   );
+
+  const sortMode: SortMode =
+    rawSort && sortOptions.includes(rawSort as SortMode) ? (rawSort as SortMode) : "created-desc";
+  const healthFilter: HealthFilter =
+    rawHealth && healthOptions.includes(rawHealth as HealthFilter)
+      ? (rawHealth as HealthFilter)
+      : "all";
+
+  const visibleItems = useMemo(() => {
+    const next = data.items.filter((project) => {
+      if (healthFilter === "all") return true;
+      return project.healthStatus === healthFilter;
+    });
+
+    next.sort((left, right) => {
+      if (sortMode === "name-asc") return left.name.localeCompare(right.name);
+      if (sortMode === "name-desc") return right.name.localeCompare(left.name);
+      const leftTime = new Date(left.createdAt).getTime();
+      const rightTime = new Date(right.createdAt).getTime();
+      return sortMode === "created-asc" ? leftTime - rightTime : rightTime - leftTime;
+    });
+
+    return next;
+  }, [data.items, healthFilter, sortMode]);
 
   return (
     <Stack
@@ -192,6 +233,70 @@ export default function ProjectsPage() {
 
           <Divider sx={{ opacity: 0.4 }} />
 
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            alignItems={{ xs: "stretch", sm: "center" }}
+            justifyContent="space-between"
+            spacing={1}
+          >
+            <Stack direction="row" spacing={0.6} flexWrap="wrap" useFlexGap>
+              <Chip
+                label="All"
+                clickable
+                variant={healthFilter === "all" ? "filled" : "outlined"}
+                color={healthFilter === "all" ? "primary" : "default"}
+                onClick={() => updateSearchParam("health", "all", "all")}
+              />
+              <Chip
+                label="Healthy"
+                clickable
+                variant={healthFilter === "healthy" ? "filled" : "outlined"}
+                color="default"
+                onClick={() => updateSearchParam("health", "healthy", "all")}
+                sx={
+                  healthFilter === "healthy"
+                    ? {
+                        backgroundColor: "#1d4ed8",
+                        color: "#ffffff",
+                        borderColor: "#1e40af",
+                        "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+                      }
+                    : undefined
+                }
+              />
+              <Chip
+                label="Provisioning"
+                clickable
+                variant={healthFilter === "provisioning" ? "filled" : "outlined"}
+                color="default"
+                onClick={() => updateSearchParam("health", "provisioning", "all")}
+                sx={
+                  healthFilter === "provisioning"
+                    ? {
+                        backgroundColor: "#92400e",
+                        color: "#ffffff",
+                        borderColor: "#78350f",
+                        "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+                      }
+                    : undefined
+                }
+              />
+            </Stack>
+            <TextField
+              select
+              size="small"
+              label="Sort"
+              value={sortMode}
+              onChange={(event) => updateSearchParam("sort", event.target.value, "created-desc")}
+              sx={{ minWidth: { xs: "100%", sm: 180 } }}
+            >
+              <MenuItem value="created-desc">Newest first</MenuItem>
+              <MenuItem value="created-asc">Oldest first</MenuItem>
+              <MenuItem value="name-asc">Name A-Z</MenuItem>
+              <MenuItem value="name-desc">Name Z-A</MenuItem>
+            </TextField>
+          </Stack>
+
           {isLoading ? (
             <Box
               sx={{
@@ -226,10 +331,34 @@ export default function ProjectsPage() {
               ))}
             </Box>
           ) : data.items.length === 0 ? (
-            <Alert severity="info">
+            <Alert
+              severity="info"
+              action={
+                data.query ? (
+                  <Button size="small" color="inherit" onClick={() => onChangeQuery("")}>
+                    Clear search
+                  </Button>
+                ) : (
+                  <Button size="small" color="inherit" component={Link} to="/console/projects/new">
+                    Create Project
+                  </Button>
+                )
+              }
+            >
               {data.query
                 ? "No project matches this search."
                 : "No projects yet. Create your first project to get started."}
+            </Alert>
+          ) : visibleItems.length === 0 ? (
+            <Alert
+              severity="info"
+              action={
+                <Button size="small" color="inherit" onClick={() => updateSearchParam("health", "all", "all")}>
+                  Clear filters
+                </Button>
+              }
+            >
+              No projects match the selected filters.
             </Alert>
           ) : (
             <Box
@@ -239,7 +368,7 @@ export default function ProjectsPage() {
                 gap: 1.5,
               }}
             >
-              {data.items.map((project) => (
+              {visibleItems.map((project) => (
                 <Paper
                   key={project.id}
                   variant="outlined"
@@ -384,11 +513,32 @@ export default function ProjectsPage() {
                       sx={{ alignSelf: "flex-start" }}
                     />
 
+                    <Stack direction="row" spacing={0.75}>
+                      <Button
+                        component={Link}
+                        to={`/console/projects/${project.id}/apps`}
+                        size="small"
+                        variant="outlined"
+                        sx={{ flex: 1, minHeight: 34 }}
+                      >
+                        Apps
+                      </Button>
+                      <Button
+                        component={Link}
+                        to={`/console/projects/${project.id}/vms`}
+                        size="small"
+                        variant="outlined"
+                        sx={{ flex: 1, minHeight: 34 }}
+                      >
+                        VMs
+                      </Button>
+                    </Stack>
+
                     <Button
                       component={Link}
                       to={`/console/projects/${project.id}`}
                       size="small"
-                      variant="outlined"
+                      variant="contained"
                       sx={{
                         mt: 0,
                         alignSelf: "stretch",
@@ -412,7 +562,7 @@ export default function ProjectsPage() {
             <Typography variant="caption" color="text.secondary">
               {pageSummary}
             </Typography>
-            {data.items.length < data.total ? (
+            {data.items.length < data.total && !data.query ? (
               <Button
                 size="small"
                 variant="outlined"

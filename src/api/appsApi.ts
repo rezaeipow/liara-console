@@ -19,6 +19,9 @@ export const AppsAPI = {
   getDeployments: (appId: string) =>
     request<{ items: Deployment[] }>(`/apps/${appId}/deployments`),
 
+  getDeploymentsByProject: (projectId: string) =>
+    request<{ items: Deployment[] }>(`/projects/${projectId}/deployments`),
+
   getEnvVars: (appId: string) =>
     request<{ items: EnvVar[] }>(`/apps/${appId}/env`),
 
@@ -40,9 +43,14 @@ export const AppsAPI = {
       method: "POST",
     }),
 
+  rename: (appId: string, payload: { name: string }) =>
+    request<AppService>(`/apps/${appId}`, {
+      method: "PATCH",
+      body: payload,
+    }),
+
   remove: (appId: string) =>
     request<void>(`/apps/${appId}`, {
       method: "DELETE",
     }),
 };
-

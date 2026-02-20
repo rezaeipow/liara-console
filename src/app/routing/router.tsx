@@ -14,9 +14,12 @@ import { accountsAction, accountsLoader } from "../../features/pages/accounts/ac
 import {
   projectCreateAction,
   projectCreateLoader,
+  projectOverviewAction,
   projectOverviewLoader,
   projectsLoader,
 } from "../../features/pages/projects/projectsData";
+import { projectAppsAction, projectAppsLoader } from "../../features/pages/apps/appsData";
+import { projectVmsAction, projectVmsLoader } from "../../features/pages/vms/vmsData";
 import {
   AccountsPage,
   AppDeploymentsPage,
@@ -48,12 +51,15 @@ import {
   VmSettingsPage,
 } from "./pages";
 import { RouteFallback } from "./routeElements";
+import { appSettingsAction } from "../../features/pages/apps/appSettingsData";
+import { vmSettingsAction } from "../../features/pages/vms/vmSettingsData";
 
 function withSuspense(node: ReactNode) {
   return <Suspense fallback={null}>{node}</Suspense>;
 }
 
-export const router = createBrowserRouter([
+export function createAppRouter() {
+  return createBrowserRouter([
   {
     path: "/",
     element: <Navigate to="/console" replace />,
@@ -88,25 +94,33 @@ export const router = createBrowserRouter([
         path: "projects",
         element: withSuspense(<ProjectsPage />),
         loader: projectsLoader,
+        errorElement: <RouteFallback />,
       },
       {
         path: "projects/new",
         element: withSuspense(<NewProjectPage />),
         loader: projectCreateLoader,
         action: projectCreateAction,
+        errorElement: <RouteFallback />,
       },
       {
         path: "projects/:projectId",
         element: withSuspense(<ProjectOverviewPage />),
         loader: projectOverviewLoader,
+        action: projectOverviewAction,
+        errorElement: <RouteFallback />,
       },
       {
         path: "projects/:projectId/apps",
         element: withSuspense(<ProjectAppsPage />),
+        loader: projectAppsLoader,
+        action: projectAppsAction,
+        errorElement: <RouteFallback />,
       },
       {
-        path: "apps/:appId",
+        path: "projects/:projectId/apps/:appId",
         element: withSuspense(<AppLayoutPage />),
+        errorElement: <RouteFallback />,
         children: [
           { index: true, element: <Navigate to="overview" replace /> },
           { path: "overview", element: withSuspense(<AppOverviewPage />) },
@@ -116,21 +130,53 @@ export const router = createBrowserRouter([
           },
           { path: "env", element: withSuspense(<AppEnvPage />) },
           { path: "logs", element: withSuspense(<AppLogsPage />) },
-          { path: "settings", element: withSuspense(<AppSettingsPage />) },
+          {
+            path: "settings",
+            element: withSuspense(<AppSettingsPage />),
+            action: appSettingsAction,
+          },
+        ],
+      },
+      {
+        path: "apps/:appId",
+        element: withSuspense(<AppLayoutPage />),
+        errorElement: <RouteFallback />,
+        children: [
+          { index: true, element: <Navigate to="overview" replace /> },
+          { path: "overview", element: withSuspense(<AppOverviewPage />) },
+          {
+            path: "deployments",
+            element: withSuspense(<AppDeploymentsPage />),
+          },
+          { path: "env", element: withSuspense(<AppEnvPage />) },
+          { path: "logs", element: withSuspense(<AppLogsPage />) },
+          {
+            path: "settings",
+            element: withSuspense(<AppSettingsPage />),
+            action: appSettingsAction,
+          },
         ],
       },
       {
         path: "projects/:projectId/vms",
         element: withSuspense(<ProjectVmsPage />),
+        loader: projectVmsLoader,
+        action: projectVmsAction,
+        errorElement: <RouteFallback />,
       },
       {
         path: "vms/:vmId",
         element: withSuspense(<VmLayoutPage />),
+        errorElement: <RouteFallback />,
         children: [
           { index: true, element: <Navigate to="overview" replace /> },
           { path: "overview", element: withSuspense(<VmOverviewPage />) },
           { path: "metrics", element: withSuspense(<VmMetricsPage />) },
-          { path: "settings", element: withSuspense(<VmSettingsPage />) },
+          {
+            path: "settings",
+            element: withSuspense(<VmSettingsPage />),
+            action: vmSettingsAction,
+          },
         ],
       },
       { path: "billing", element: withSuspense(<BillingOverviewPage />) },
@@ -157,4 +203,5 @@ export const router = createBrowserRouter([
       },
     ],
   },
-]);
+  ]);
+}

@@ -1,9 +1,31 @@
-import { Alert, Box } from "@mui/material";
+ï»¿import { Alert, Box, Typography } from "@mui/material";
+import { isRouteErrorResponse, useRouteError } from "react-router-dom";
 
 export default function RouteErrorPage() {
+  const error = useRouteError();
+  let details = "";
+
+  if (isRouteErrorResponse(error)) {
+    details = `${error.status} ${error.statusText}`;
+  } else if (error instanceof Error) {
+    details = error.message;
+  }
+
+  if (import.meta.env.DEV && details) {
+    // eslint-disable-next-line no-console
+    console.error("Route error:", details);
+  }
+
   return (
     <Box sx={{ p: 3 }}>
-      <Alert severity="error">ãÔ˜áí ÏÑ ÈÇÑĞÇÑí Çíä ãÓíÑ ÑÎ ÏÇÏå ÇÓÊ.</Alert>
+      <Alert severity="error">
+        Ù…Ø´Ú©Ù„ÙŠ Ø¯Ø± Ø¨Ø§Ø±Ú¯Ø°Ø§Ø±ÙŠ Ø§ÙŠÙ† Ù…Ø³ÙŠØ± Ø±Ø® Ø¯Ø§Ø¯Ù‡ Ø§Ø³Øª.
+        {details ? (
+          <Typography variant="caption" display="block">
+            {details}
+          </Typography>
+        ) : null}
+      </Alert>
     </Box>
   );
 }

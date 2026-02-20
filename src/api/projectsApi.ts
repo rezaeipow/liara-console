@@ -12,6 +12,7 @@ export interface ProjectOverview extends Project {
   activity: Array<{
     id: string;
     title: string;
+    createdAt: string;
   }>;
 }
 
@@ -34,6 +35,11 @@ export const ProjectsAPI = {
     request<Project>("/projects", { method: "POST", body: payload }),
 
   getById: (projectId: string) => request<ProjectOverview>(`/projects/${projectId}`),
+
+  rename: (projectId: string, payload: { name: string }) =>
+    request<Project>(`/projects/${projectId}`, { method: "PATCH", body: payload }),
+
+  remove: (projectId: string) => request<{ id: string }>(`/projects/${projectId}`, { method: "DELETE" }),
 
   getMeta: () => request<ProjectMeta>("/projects/meta"),
 };
