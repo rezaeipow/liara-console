@@ -75,9 +75,10 @@ export default function BillingTopupPage() {
 
   return (
     <>
-      <Stack
-        spacing={2.2}
-        sx={{
+    <Stack
+      spacing={2.2}
+      aria-busy={isRouteLoading}
+      sx={{
           width: "100%",
           maxWidth: { xs: "100%", sm: 980, lg: 1080 },
           mx: { xs: 0, sm: "auto" },
@@ -115,12 +116,14 @@ export default function BillingTopupPage() {
                 label={`Available: ${formatIrr(displayedCredit)}`}
                 color="success"
                 variant="outlined"
+                aria-live="polite"
               />
               <Chip
                 icon={<PaymentsOutlinedIcon fontSize="small" />}
                 label={`After top-up: ${formatIrr(projectedCredit)}`}
                 color={parsedAmount > 0 ? "primary" : "default"}
                 variant="outlined"
+                aria-live="polite"
               />
             </Stack>
           </Stack>
@@ -155,7 +158,7 @@ export default function BillingTopupPage() {
                 <Typography fontWeight={800}>Top-up Form</Typography>
               </Stack>
 
-              <Form method="post" replace>
+              <Form method="post" replace aria-label="Billing top-up form">
                 <Stack spacing={1.4}>
                   <FormControl
                     size="small"
@@ -189,6 +192,7 @@ export default function BillingTopupPage() {
                         variant={parsedAmount === value ? "contained" : "outlined"}
                         disabled={isSubmitting}
                         onClick={() => setAmountInput(String(value))}
+                        aria-label={`Set top-up amount to ${formatIrr(value)}`}
                       >
                         {formatIrr(value)}
                       </Button>
@@ -201,6 +205,7 @@ export default function BillingTopupPage() {
                       variant="contained"
                       disabled={isSubmitting || parsedAmount < minimumTopup}
                       sx={{ minWidth: 180 }}
+                      aria-label="Submit top-up payment"
                     >
                       {isSubmitting ? "Processing..." : "Proceed to top-up"}
                     </Button>
@@ -209,6 +214,7 @@ export default function BillingTopupPage() {
                       to="/console/billing/payments"
                       variant="outlined"
                       endIcon={<ArrowOutwardIcon fontSize="small" />}
+                      aria-label="Open billing payments history"
                     >
                       Payment history
                     </Button>
@@ -258,7 +264,7 @@ export default function BillingTopupPage() {
             <Stack spacing={1.2}>
               <Typography fontWeight={800}>Recent Payments</Typography>
               {isRouteLoading ? (
-                <Stack spacing={1}>
+                <Stack spacing={1} role="list" aria-label="Recent top-up payments">
                   {Array.from({ length: 3 }).map((_, index) => (
                     <Skeleton key={`topup-loading-${index}`} variant="rounded" height={52} />
                   ))}
@@ -271,6 +277,7 @@ export default function BillingTopupPage() {
                 recentPayments.map((payment) => (
                   <Stack
                     key={payment.id}
+                    role="listitem"
                     direction={{ xs: "column", sm: "row" }}
                     justifyContent="space-between"
                     alignItems={{ xs: "flex-start", sm: "center" }}

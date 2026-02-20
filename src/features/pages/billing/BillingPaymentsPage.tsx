@@ -64,6 +64,7 @@ export default function BillingPaymentsPage() {
   return (
     <Stack
       spacing={2.2}
+      aria-busy={isRouteLoading}
       sx={{
         width: "100%",
         maxWidth: { xs: "100%", sm: 980, lg: 1080 },
@@ -136,6 +137,7 @@ export default function BillingPaymentsPage() {
                 color={status === "all" ? "primary" : "default"}
                 variant={status === "all" ? "filled" : "outlined"}
                 onClick={() => updateParam("status", "all", "all")}
+                aria-label="Show all payments"
               />
               <Chip
                 label="Success"
@@ -143,6 +145,7 @@ export default function BillingPaymentsPage() {
                 color={status === "success" ? "success" : "default"}
                 variant={status === "success" ? "filled" : "outlined"}
                 onClick={() => updateParam("status", "success", "all")}
+                aria-label="Filter successful payments"
               />
               <Chip
                 label="Failed"
@@ -150,6 +153,7 @@ export default function BillingPaymentsPage() {
                 color={status === "failed" ? "error" : "default"}
                 variant={status === "failed" ? "filled" : "outlined"}
                 onClick={() => updateParam("status", "failed", "all")}
+                aria-label="Filter failed payments"
               />
             </Stack>
 
@@ -194,10 +198,11 @@ export default function BillingPaymentsPage() {
           ) : (
             <>
               <Box sx={{ display: { xs: "block", lg: "none" } }}>
-                <Stack spacing={1}>
+                <Stack spacing={1} role="list" aria-label="Payments list">
                   {items.map((payment) => (
                     <Paper
                       key={payment.id}
+                      role="listitem"
                       variant="outlined"
                       sx={{
                         p: 1.25,
@@ -246,6 +251,9 @@ export default function BillingPaymentsPage() {
                 }}
               >
                 <Table size="small" aria-label="Payments table">
+                  <caption style={{ textAlign: "left", padding: "8px 16px" }}>
+                    Billing payments with amount, status, and creation time
+                  </caption>
                   <TableHead>
                     <TableRow>
                       <TableCell>Amount</TableCell>
@@ -307,6 +315,9 @@ function SummaryCard({ label, value, tone = "default" }: SummaryCardProps) {
   return (
     <Paper
       variant="outlined"
+      role="status"
+      aria-live="polite"
+      aria-label={`${label}: ${value}`}
       sx={{
         px: 1.2,
         py: 1,

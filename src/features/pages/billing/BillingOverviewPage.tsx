@@ -34,6 +34,7 @@ export default function BillingOverviewPage() {
   return (
     <Stack
       spacing={2.2}
+      aria-busy={isRouteLoading}
       sx={{
         width: "100%",
         maxWidth: { xs: "100%", sm: 980, lg: 1080 },
@@ -71,7 +72,13 @@ export default function BillingOverviewPage() {
             <Button component={Link} to="/console/billing/topup" variant="contained" startIcon={<CreditCardOutlinedIcon />}>
               Top up credit
             </Button>
-            <Button component={Link} to="/console/billing/payments" variant="outlined" endIcon={<ArrowOutwardIcon />}>
+            <Button
+              component={Link}
+              to="/console/billing/payments"
+              variant="outlined"
+              endIcon={<ArrowOutwardIcon />}
+              aria-label="View full payment history"
+            >
               View payments
             </Button>
           </Stack>
@@ -127,7 +134,14 @@ export default function BillingOverviewPage() {
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.2 }}>
           <Typography fontWeight={800}>Recent Payments</Typography>
-          <Button component={Link} to="/console/billing/payments" size="small" variant="text" endIcon={<ArrowOutwardIcon fontSize="small" />}>
+          <Button
+            component={Link}
+            to="/console/billing/payments"
+            size="small"
+            variant="text"
+            endIcon={<ArrowOutwardIcon fontSize="small" />}
+            aria-label="Open all billing payments"
+          >
             Open all
           </Button>
         </Stack>
@@ -143,10 +157,11 @@ export default function BillingOverviewPage() {
             No payments found. Create your first top-up to see payment history.
           </Typography>
         ) : (
-          <Stack spacing={0.9}>
+          <Stack spacing={0.9} role="list" aria-label="Recent billing payments">
             {recentPayments.map((payment) => (
               <Stack
                 key={payment.id}
+                role="listitem"
                 direction={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
                 alignItems={{ xs: "flex-start", sm: "center" }}
@@ -192,6 +207,8 @@ function GlassStatCard({ title, value, hint, icon }: GlassStatCardProps) {
   return (
     <Paper
       variant="outlined"
+      role="group"
+      aria-label={`${title}: ${value}`}
       sx={{
         p: 1.65,
         borderRadius: 1.5,

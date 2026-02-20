@@ -93,9 +93,10 @@ export default function BillingInvoicesPage() {
 
   return (
     <>
-      <Stack
-        spacing={2.2}
-        sx={{
+    <Stack
+      spacing={2.2}
+      aria-busy={isRouteLoading}
+      sx={{
           width: "100%",
           maxWidth: { xs: "100%", sm: 980, lg: 1080 },
           mx: { xs: 0, sm: "auto" },
@@ -157,6 +158,7 @@ export default function BillingInvoicesPage() {
                   value={status}
                   onChange={(event) => updateParam("status", event.target.value, "all")}
                   sx={{ minWidth: { xs: "100%", sm: 150 } }}
+                  slotProps={{ htmlInput: { "aria-label": "Invoice status filter" } }}
                 >
                   <MenuItem value="all">All</MenuItem>
                   <MenuItem value="paid">Paid</MenuItem>
@@ -169,6 +171,7 @@ export default function BillingInvoicesPage() {
                   value={sort}
                   onChange={(event) => updateParam("sort", event.target.value, "newest")}
                   sx={{ minWidth: { xs: "100%", sm: 150 } }}
+                  slotProps={{ htmlInput: { "aria-label": "Invoice sort" } }}
                 >
                   <MenuItem value="newest">Newest</MenuItem>
                   <MenuItem value="oldest">Oldest</MenuItem>
@@ -187,6 +190,8 @@ export default function BillingInvoicesPage() {
               <Alert severity="info">No invoices match current filters.</Alert>
             ) : (
               <Box
+                role="list"
+                aria-label="Invoices list"
                 sx={{
                   display: "grid",
                   gridTemplateColumns: { xs: "1fr", lg: "repeat(2, minmax(0, 1fr))" },
@@ -196,6 +201,7 @@ export default function BillingInvoicesPage() {
                 {items.map((invoice) => (
                   <Paper
                     key={invoice.id}
+                    role="listitem"
                     variant="outlined"
                     sx={{
                       p: 1.25,
@@ -229,6 +235,7 @@ export default function BillingInvoicesPage() {
                         }}
                         disabled={downloadingId === invoice.id}
                         sx={{ alignSelf: "flex-start" }}
+                        aria-label={`Download invoice ${invoice.id}`}
                       >
                         {downloadingId === invoice.id ? "Preparing..." : "Download mock"}
                       </Button>
@@ -251,6 +258,7 @@ export default function BillingInvoicesPage() {
           severity={notice?.severity ?? "success"}
           variant="filled"
           onClose={() => setNotice(null)}
+          aria-live="assertive"
         >
           <Stack spacing={0.25}>
             <Typography variant="body2">{notice?.message}</Typography>
