@@ -30,6 +30,7 @@ type InvoiceNotice = {
 };
 
 function getStatusHint(status: number): string {
+  if (status === 408) return "Request timed out. Please retry.";
   if (status === 401) return "Please login again and retry.";
   if (status === 403) return "You do not have permission to download this invoice.";
   if (status === 404) return "Invoice file was not found. Try refreshing the list.";
@@ -106,13 +107,13 @@ export default function BillingInvoicesPage() {
       >
         <Paper
           sx={{
-            p: { xs: 2, sm: 2.5 },
-            borderRadius: { xs: 1.5, sm: 2 },
-            border: "1px solid rgba(31,111,235,0.24)",
-            background:
-              "linear-gradient(120deg, rgba(31,111,235,0.16), rgba(14,165,164,0.10))",
-            backdropFilter: "blur(14px)",
-          }}
+          p: { xs: 2, sm: 2.5 },
+          borderRadius: { xs: 1.5, sm: 2 },
+          border: "1px solid rgba(31,111,235,0.32)",
+          background:
+            "linear-gradient(120deg, rgba(31,111,235,0.20), rgba(14,165,164,0.14))",
+          backdropFilter: "blur(14px)",
+        }}
         >
           <Stack spacing={1}>
             <Stack direction="row" spacing={1} alignItems="center">
@@ -133,13 +134,13 @@ export default function BillingInvoicesPage() {
 
         <Paper
           sx={{
-            p: { xs: 2, sm: 2.5 },
-            borderRadius: { xs: 1.5, sm: 2 },
-            border: `1px solid ${alpha("#1f6feb", 0.18)}`,
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,255,255,0.56))",
-            backdropFilter: "blur(10px)",
-          }}
+          p: { xs: 2, sm: 2.5 },
+          borderRadius: { xs: 1.5, sm: 2 },
+          border: `1px solid ${alpha("#1f6feb", 0.24)}`,
+          background:
+            "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
+          backdropFilter: "blur(10px)",
+        }}
         >
           {isRouteLoading ? <LinearProgress sx={{ mb: 1.2 }} /> : null}
           <Stack spacing={1.3}>

@@ -77,9 +77,9 @@ export default function BillingPaymentsPage() {
         sx={{
           p: { xs: 2, sm: 2.5 },
           borderRadius: { xs: 1.5, sm: 2 },
-          border: "1px solid rgba(31,111,235,0.24)",
+          border: "1px solid rgba(31,111,235,0.32)",
           background:
-            "linear-gradient(120deg, rgba(31,111,235,0.16), rgba(14,165,164,0.10))",
+            "linear-gradient(120deg, rgba(31,111,235,0.20), rgba(14,165,164,0.14))",
           backdropFilter: "blur(14px)",
         }}
       >
@@ -116,9 +116,9 @@ export default function BillingPaymentsPage() {
         sx={{
           p: { xs: 2, sm: 2.5 },
           borderRadius: { xs: 1.5, sm: 2 },
-          border: `1px solid ${alpha("#1f6feb", 0.18)}`,
+          border: `1px solid ${alpha("#1f6feb", 0.24)}`,
           background:
-            "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,255,255,0.56))",
+            "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
           backdropFilter: "blur(10px)",
         }}
       >
@@ -323,7 +323,7 @@ function SummaryCard({ label, value, tone = "default" }: SummaryCardProps) {
         py: 1,
         borderRadius: 1.3,
         borderColor: alpha(color, 0.25),
-        backgroundColor: alpha("#ffffff", 0.58),
+        backgroundColor: alpha("#ffffff", 0.82),
       }}
     >
       <Typography variant="caption" color="text.secondary">

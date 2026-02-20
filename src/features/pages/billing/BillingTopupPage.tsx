@@ -88,13 +88,13 @@ export default function BillingTopupPage() {
       >
         <Paper
           sx={{
-            p: { xs: 2, sm: 2.5 },
-            borderRadius: { xs: 1.5, sm: 2 },
-            border: "1px solid rgba(31,111,235,0.24)",
-            background:
-              "linear-gradient(130deg, rgba(31,111,235,0.16), rgba(14,165,164,0.10))",
-            backdropFilter: "blur(14px)",
-          }}
+          p: { xs: 2, sm: 2.5 },
+          borderRadius: { xs: 1.5, sm: 2 },
+          border: "1px solid rgba(31,111,235,0.32)",
+          background:
+            "linear-gradient(130deg, rgba(31,111,235,0.20), rgba(14,165,164,0.14))",
+          backdropFilter: "blur(14px)",
+        }}
         >
           <Stack
             direction={{ xs: "column", md: "row" }}
@@ -145,9 +145,9 @@ export default function BillingTopupPage() {
             sx={{
               p: { xs: 2, sm: 2.5 },
               borderRadius: { xs: 1.5, sm: 2 },
-              border: `1px solid ${alpha("#1f6feb", 0.18)}`,
+              border: `1px solid ${alpha("#1f6feb", 0.24)}`,
               background:
-                "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,255,255,0.56))",
+                "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
               backdropFilter: "blur(10px)",
             }}
           >
@@ -255,9 +255,9 @@ export default function BillingTopupPage() {
             sx={{
               p: { xs: 2, sm: 2.5 },
               borderRadius: { xs: 1.5, sm: 2 },
-              border: `1px solid ${alpha("#1f6feb", 0.18)}`,
+              border: `1px solid ${alpha("#1f6feb", 0.24)}`,
               background:
-                "linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.54))",
+                "linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.74))",
               backdropFilter: "blur(10px)",
             }}
           >

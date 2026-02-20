@@ -41,6 +41,7 @@ function toPositiveInt(raw: FormDataEntryValue | null): number {
 }
 
 function mapStatusText(status: number): string {
+  if (status === 408) return "Request Timeout";
   if (status === 401) return "Unauthorized";
   if (status === 403) return "Forbidden";
   if (status === 404) return "Not Found";
@@ -49,6 +50,7 @@ function mapStatusText(status: number): string {
 }
 
 function mapStatusHint(status: number): string {
+  if (status === 408) return "The request timed out. Please retry.";
   if (status === 401) return "Your session may be expired. Please login again.";
   if (status === 403) return "You do not have permission to perform this top-up.";
   if (status === 404) return "Billing endpoint not found. Please retry shortly.";

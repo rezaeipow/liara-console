@@ -1,4 +1,5 @@
 const BASE_URL = "";
+const DEFAULT_TIMEOUT_MS = 12000;
 
 export interface ApiErrorPayload {
   message?: string;
@@ -20,15 +21,28 @@ interface RequestOptions extends Omit<RequestInit, "body"> {
 
 export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { body, headers, ...rest } = options;
+  const timeoutController = new AbortController();
+  const timeoutId = setTimeout(() => timeoutController.abort(), DEFAULT_TIMEOUT_MS);
 
-  const response = await fetch(`${BASE_URL}${path}`, {
-    ...rest,
-    headers: {
-      "Content-Type": "application/json",
-      ...headers,
-    },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${BASE_URL}${path}`, {
+      ...rest,
+      signal: rest.signal ?? timeoutController.signal,
+      headers: {
+        "Content-Type": "application/json",
+        ...headers,
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch (error: unknown) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new ApiError(408, "Request timed out. Please try again.");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (!response.ok) {
     let message = `Request failed with status ${response.status}`;
