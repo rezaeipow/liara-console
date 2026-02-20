@@ -216,7 +216,32 @@ export default function BillingTopupPage() {
                 </Stack>
               </Form>
 
-              {actionData?.formError ? <Alert severity="error">{actionData.formError}</Alert> : null}
+              {actionData?.formError ? (
+                <Alert
+                  severity="error"
+                  action={
+                    <Button
+                      size="small"
+                      color="inherit"
+                      onClick={() => {
+                        setDismissedNoticeKey(null);
+                      }}
+                    >
+                      Retry
+                    </Button>
+                  }
+                >
+                  <Stack spacing={0.25}>
+                    <Typography variant="body2">{actionData.formError}</Typography>
+                    {actionData.errorStatus ? (
+                      <Typography variant="caption">Error code: {actionData.errorStatus}</Typography>
+                    ) : null}
+                    {actionData.errorHint ? (
+                      <Typography variant="caption">{actionData.errorHint}</Typography>
+                    ) : null}
+                  </Stack>
+                </Alert>
+              ) : null}
             </Stack>
           </Paper>
 

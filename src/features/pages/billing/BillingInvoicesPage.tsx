@@ -18,14 +18,30 @@ import { alpha } from "@mui/material/styles";
 import { useMemo, useState } from "react";
 import { useLoaderData, useNavigation, useSearchParams } from "react-router-dom";
 import { BillingAPI } from "../../../api/billingApi";
+import { ApiError } from "../../../api/httpClient";
 import type { BillingInvoicesLoaderData } from "./billingData";
 import { formatDateTime, formatIrr } from "./billingFormat";
+
+type InvoiceNotice = {
+  message: string;
+  severity: "success" | "error";
+  hint?: string;
+  status?: number;
+};
+
+function getStatusHint(status: number): string {
+  if (status === 401) return "Please login again and retry.";
+  if (status === 403) return "You do not have permission to download this invoice.";
+  if (status === 404) return "Invoice file was not found. Try refreshing the list.";
+  if (status >= 500) return "Server error occurred. Please retry in a few moments.";
+  return "Please retry.";
+}
 
 export default function BillingInvoicesPage() {
   const { items } = useLoaderData() as BillingInvoicesLoaderData;
   const navigation = useNavigation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<InvoiceNotice | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const isRouteLoading =
     navigation.state === "loading" &&
@@ -50,9 +66,26 @@ export default function BillingInvoicesPage() {
     setDownloadingId(invoiceId);
     try {
       const payload = await BillingAPI.downloadInvoice(invoiceId);
-      setNotice(`Mock download ready: ${payload.filename}`);
+      setNotice({
+        message: `Mock download ready: ${payload.filename}`,
+        severity: "success",
+      });
     } catch (error: unknown) {
-      setNotice(error instanceof Error ? error.message : "Could not download invoice.");
+      if (error instanceof ApiError) {
+        setNotice({
+          message: error.message,
+          severity: "error",
+          hint: getStatusHint(error.status),
+          status: error.status,
+        });
+      } else {
+        setNotice({
+          message: error instanceof Error ? error.message : "Could not download invoice.",
+          severity: "error",
+          hint: getStatusHint(500),
+          status: 500,
+        });
+      }
     } finally {
       setDownloadingId(null);
     }
@@ -215,11 +248,17 @@ export default function BillingInvoicesPage() {
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert
-          severity={notice?.startsWith("Mock download") ? "success" : "error"}
+          severity={notice?.severity ?? "success"}
           variant="filled"
           onClose={() => setNotice(null)}
         >
-          {notice}
+          <Stack spacing={0.25}>
+            <Typography variant="body2">{notice?.message}</Typography>
+            {notice?.status ? (
+              <Typography variant="caption">Error code: {notice.status}</Typography>
+            ) : null}
+            {notice?.hint ? <Typography variant="caption">{notice.hint}</Typography> : null}
+          </Stack>
         </Alert>
       </Snackbar>
     </>

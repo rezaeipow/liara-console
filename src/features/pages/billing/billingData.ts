@@ -18,6 +18,8 @@ export type BillingTopupActionData = {
   successMessage?: string;
   successAt?: number;
   formError?: string;
+  errorStatus?: number;
+  errorHint?: string;
   fieldErrors?: {
     amount?: string;
   };
@@ -44,6 +46,14 @@ function mapStatusText(status: number): string {
   if (status === 404) return "Not Found";
   if (status >= 500) return "Server Error";
   return "Request Failed";
+}
+
+function mapStatusHint(status: number): string {
+  if (status === 401) return "Your session may be expired. Please login again.";
+  if (status === 403) return "You do not have permission to perform this top-up.";
+  if (status === 404) return "Billing endpoint not found. Please retry shortly.";
+  if (status >= 500) return "Server problem detected. Retry in a few moments.";
+  return "Please check your request and try again.";
 }
 
 function toRouteErrorResponse(error: unknown): Response {
@@ -122,12 +132,16 @@ export async function billingTopupAction({
   } catch (error: unknown) {
     if (error instanceof ApiError) {
       return {
-        formError: `${error.message} (${error.status})`,
+        formError: error.message,
+        errorStatus: error.status,
+        errorHint: mapStatusHint(error.status),
       };
     }
 
     return {
       formError: error instanceof Error ? error.message : "Could not complete top-up.",
+      errorStatus: 500,
+      errorHint: mapStatusHint(500),
     };
   }
 }
