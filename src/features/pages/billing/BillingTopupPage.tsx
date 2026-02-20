@@ -1,6 +1,7 @@
 ﻿import AddCardOutlinedIcon from "@mui/icons-material/AddCardOutlined";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import {
   Alert,
   Box,
@@ -17,7 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ChangeEvent } from "react";
 import {
   Form,
   Link,
@@ -32,11 +33,13 @@ import type {
 import { formatDateTime, formatIrr } from "./billingFormat";
 
 const topupSuggestions = [100000, 300000, 500000, 1000000];
+const minimumTopup = 10000;
 
 export default function BillingTopupPage() {
   const { credit, recentPayments } = useLoaderData() as BillingTopupLoaderData;
   const actionData = useActionData() as BillingTopupActionData | undefined;
   const navigation = useNavigation();
+  const [amountInput, setAmountInput] = useState(String(topupSuggestions[1]));
   const [dismissedNoticeKey, setDismissedNoticeKey] = useState<string | null>(null);
   const isSubmitting = navigation.state === "submitting";
 
@@ -52,6 +55,18 @@ export default function BillingTopupPage() {
     if (actionData?.nextCredit != null) return actionData.nextCredit;
     return credit;
   }, [actionData?.nextCredit, credit]);
+
+  const parsedAmount = useMemo(() => {
+    const next = Number(amountInput);
+    if (!Number.isFinite(next) || next <= 0) return 0;
+    return Math.floor(next);
+  }, [amountInput]);
+  const projectedCredit = displayedCredit + parsedAmount;
+  const amountInvalid = parsedAmount > 0 && parsedAmount < minimumTopup;
+
+  const onChangeAmount = (event: ChangeEvent<HTMLInputElement>) => {
+    setAmountInput(event.target.value);
+  };
 
   return (
     <>
@@ -89,19 +104,32 @@ export default function BillingTopupPage() {
                 Add balance instantly and continue using services without interruption.
               </Typography>
             </Stack>
-            <Chip
-              icon={<CheckCircleOutlineIcon fontSize="small" />}
-              label={`Available: ${formatIrr(displayedCredit)}`}
-              color="success"
-              variant="outlined"
-            />
+            <Stack spacing={0.8}>
+              <Chip
+                icon={<CheckCircleOutlineIcon fontSize="small" />}
+                label={`Available: ${formatIrr(displayedCredit)}`}
+                color="success"
+                variant="outlined"
+              />
+              <Chip
+                icon={<PaymentsOutlinedIcon fontSize="small" />}
+                label={`After top-up: ${formatIrr(projectedCredit)}`}
+                color={parsedAmount > 0 ? "primary" : "default"}
+                variant="outlined"
+              />
+            </Stack>
           </Stack>
         </Paper>
 
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1.5fr) minmax(0, 1fr)" },
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "1fr",
+              md: "1.2fr 0.8fr",
+              lg: "minmax(0, 1.5fr) minmax(0, 1fr)",
+            },
             gap: 1.5,
           }}
         >
@@ -123,19 +151,26 @@ export default function BillingTopupPage() {
 
               <Form method="post" replace>
                 <Stack spacing={1.4}>
-                  <FormControl size="small" error={Boolean(actionData?.fieldErrors?.amount)}>
+                  <FormControl
+                    size="small"
+                    error={Boolean(actionData?.fieldErrors?.amount) || amountInvalid}
+                  >
                     <InputLabel htmlFor="billing-topup-amount">Amount</InputLabel>
                     <OutlinedInput
                       id="billing-topup-amount"
                       name="amount"
                       type="number"
-                      defaultValue={topupSuggestions[1]}
+                      value={amountInput}
+                      onChange={onChangeAmount}
                       inputProps={{ min: 10000, step: 1000, "aria-label": "Top-up amount" }}
                       startAdornment={<InputAdornment position="start">IRR</InputAdornment>}
                       label="Amount"
                     />
                     <FormHelperText>
-                      {actionData?.fieldErrors?.amount ?? "Minimum amount: 10,000 IRR"}
+                      {actionData?.fieldErrors?.amount ??
+                        (amountInvalid
+                          ? "Minimum amount: 10,000 IRR"
+                          : "Choose an amount and continue to top-up")}
                     </FormHelperText>
                   </FormControl>
 
@@ -143,12 +178,11 @@ export default function BillingTopupPage() {
                     {topupSuggestions.map((value) => (
                       <Button
                         key={value}
-                        type="submit"
-                        name="amount"
-                        value={value}
+                        type="button"
                         size="small"
-                        variant="outlined"
+                        variant={parsedAmount === value ? "contained" : "outlined"}
                         disabled={isSubmitting}
+                        onClick={() => setAmountInput(String(value))}
                       >
                         {formatIrr(value)}
                       </Button>
@@ -156,10 +190,20 @@ export default function BillingTopupPage() {
                   </Stack>
 
                   <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
-                    <Button type="submit" variant="contained" disabled={isSubmitting} sx={{ minWidth: 180 }}>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={isSubmitting || parsedAmount < minimumTopup}
+                      sx={{ minWidth: 180 }}
+                    >
                       {isSubmitting ? "Processing..." : "Proceed to top-up"}
                     </Button>
-                    <Button component={Link} to="/console/billing/payments" variant="outlined" endIcon={<ArrowOutwardIcon fontSize="small" />}>
+                    <Button
+                      component={Link}
+                      to="/console/billing/payments"
+                      variant="outlined"
+                      endIcon={<ArrowOutwardIcon fontSize="small" />}
+                    >
                       Payment history
                     </Button>
                   </Stack>
@@ -190,9 +234,9 @@ export default function BillingTopupPage() {
                 recentPayments.map((payment) => (
                   <Stack
                     key={payment.id}
-                    direction="row"
+                    direction={{ xs: "column", sm: "row" }}
                     justifyContent="space-between"
-                    alignItems="center"
+                    alignItems={{ xs: "flex-start", sm: "center" }}
                     spacing={1}
                     sx={{
                       p: 1,
