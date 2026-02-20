@@ -41,6 +41,12 @@ export const appHandlers: HttpHandler[] = [
     return HttpResponse.json({ items });
   }),
 
+  http.get("/projects/:projectId/deployments", ({ params }) => {
+    const appIds = db.apps.filter((app) => app.projectId === params.projectId).map((app) => app.id);
+    const items = db.deployments.filter((deployment) => appIds.includes(deployment.appId));
+    return HttpResponse.json({ items });
+  }),
+
   http.get("/apps/:appId/env", ({ params }) => {
     const env = db.envByAppId[String(params.appId)] ?? [];
     return HttpResponse.json({ items: env });
@@ -75,6 +81,26 @@ export const appHandlers: HttpHandler[] = [
 
     app.status = "deploying";
     return HttpResponse.json({ success: true });
+  }),
+
+  http.patch("/apps/:appId", async ({ params, request }) => {
+    const appId = String(params.appId ?? "").trim();
+    const body = (await request.json()) as { name?: string };
+    const name = String(body.name ?? "").trim();
+
+    const app = db.apps.find((item) => item.id === appId);
+    if (!app) {
+      return HttpResponse.json({ message: "app not found" }, { status: 404 });
+    }
+    if (name.length < 3 || name.length > 32) {
+      return HttpResponse.json(
+        { message: "Name must be between 3 and 32 characters." },
+        { status: 400 },
+      );
+    }
+
+    app.name = name;
+    return HttpResponse.json(app);
   }),
 
   http.delete("/apps/:appId", ({ params }) => {

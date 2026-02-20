@@ -1,15 +1,15 @@
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import {
-  toggleSidebar,
-  selectSidebarOpen,
-} from "@/store/uiSlice";
+  toggleSidebarMode,
+  selectSidebarMode,
+} from "../../app/store/slices/uiSlice";
 
 export function useSidebarToggle() {
   const dispatch = useAppDispatch();
-  const isOpen = useAppSelector(selectSidebarOpen);
+  const isOpen = useAppSelector(selectSidebarMode) === "expanded";
 
   function toggle() {
-    dispatch(toggleSidebar());
+    dispatch(toggleSidebarMode());
   }
 
   return {

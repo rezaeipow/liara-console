@@ -70,12 +70,70 @@ export const projectHandlers: HttpHandler[] = [
 
     const appCount = db.apps.filter((a) => a.projectId === project.id).length;
     const vmCount = db.vms.filter((v) => v.projectId === project.id).length;
+    const now = Date.now();
+    const activity = [
+      {
+        id: `${project.id}-act-1`,
+        title: "Project created",
+        createdAt: project.createdAt,
+      },
+      {
+        id: `${project.id}-act-2`,
+        title:
+          appCount > 0
+            ? `${appCount} app service${appCount > 1 ? "s" : ""} configured`
+            : "No apps configured yet",
+        createdAt: new Date(now - 1000 * 60 * 60 * 6).toISOString(),
+      },
+      {
+        id: `${project.id}-act-3`,
+        title:
+          vmCount > 0
+            ? `${vmCount} VM instance${vmCount > 1 ? "s" : ""} attached`
+            : "No VM instances attached",
+        createdAt: new Date(now - 1000 * 60 * 60 * 2).toISOString(),
+      },
+    ];
 
     return HttpResponse.json({
       ...project,
       servicesSummary: { apps: appCount, vms: vmCount },
       billingSnapshot: { credit: db.credit },
-      activity: [{ id: "act-1", title: "Project created" }],
+      activity,
     });
+  }),
+
+  http.patch("/projects/:projectId", async ({ params, request }) => {
+    const projectId = String(params.projectId ?? "").trim();
+    const name = String(((await request.json()) as { name?: string }).name ?? "").trim();
+    const project = db.projects.find((item) => item.id === projectId);
+
+    if (!project) {
+      return HttpResponse.json({ message: "project not found" }, { status: 404 });
+    }
+    if (name.length < 3) {
+      return HttpResponse.json(
+        { message: "Project name must be at least 3 characters." },
+        { status: 400 },
+      );
+    }
+
+    project.name = name;
+    return HttpResponse.json(project);
+  }),
+
+  http.delete("/projects/:projectId", ({ params }) => {
+    const projectId = String(params.projectId ?? "").trim();
+    const index = db.projects.findIndex((item) => item.id === projectId);
+
+    if (index === -1) {
+      return HttpResponse.json({ message: "project not found" }, { status: 404 });
+    }
+
+    db.projects.splice(index, 1);
+    db.apps = db.apps.filter((item) => item.projectId !== projectId);
+    db.vms = db.vms.filter((item) => item.projectId !== projectId);
+
+    return HttpResponse.json({ id: projectId });
   }),
 ];
