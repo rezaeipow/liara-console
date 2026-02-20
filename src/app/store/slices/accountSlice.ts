@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "../Index";
+import type { RootState } from "../index";
 
 export interface Account {
   id: string;

@@ -1,5 +1,5 @@
-import { AccountsAPI } from "../../../api/accountsApi";
-import { store } from "../../../app/store/Index";
+﻿import { AccountsAPI } from "../../../api/accountsApi";
+import { store } from "../../../app/store/index";
 import {
   addAccount,
   removeAccount,
@@ -132,3 +132,4 @@ export async function accountsAction({
     formError: "Unsupported action.",
   };
 }
+

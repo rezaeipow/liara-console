@@ -1,9 +1,9 @@
-import { render, screen } from "@testing-library/react";
+﻿import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
-import { store } from "../../../app/store/Index";
+import { store } from "../../../app/store/index";
 import ProjectOverviewPage from "./ProjectOverviewPage";
 import type { ProjectOverviewLoaderData } from "./projectsData";
 
@@ -109,3 +109,4 @@ describe("ProjectOverviewPage integration", () => {
     expect(saveButton).toBeEnabled();
   });
 });
+

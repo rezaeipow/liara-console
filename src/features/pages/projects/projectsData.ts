@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router-dom";
+﻿import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router-dom";
 import { redirect } from "react-router-dom";
 import {
   ProjectsAPI,
@@ -6,7 +6,7 @@ import {
   type ProjectOverview,
 } from "../../../api/projectsApi";
 import type { Project } from "../../../api/types";
-import { store } from "../../../app/store/Index";
+import { store } from "../../../app/store/index";
 import { api } from "../../../app/store/api";
 
 export type ProjectHealthStatus = "healthy" | "provisioning";
@@ -220,3 +220,4 @@ export async function projectOverviewAction({
 
   return { formError: "Unsupported action." };
 }
+

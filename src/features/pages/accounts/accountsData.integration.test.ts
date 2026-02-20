@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+﻿import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ActionFunctionArgs } from "react-router-dom";
 import { AccountsAPI } from "../../../api/accountsApi";
-import { store } from "../../../app/store/Index";
+import { store } from "../../../app/store/index";
 import { setAccounts } from "../../../app/store/slices/accountSlice";
 import { accountsAction } from "./accountsData";
 
@@ -89,3 +89,4 @@ describe("accountsAction integration", () => {
     expect(store.getState().account.activeAccountId).toBe("acc-2");
   });
 });
+

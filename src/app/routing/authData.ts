@@ -1,6 +1,6 @@
-import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router-dom";
+﻿import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router-dom";
 import { AccountsAPI } from "../../api/accountsApi";
-import { store } from "../store/Index";
+import { store } from "../store/index";
 import { fetchMe, login, logout, signup } from "../store/slices/authSlice";
 import { setAccounts } from "../store/slices/accountSlice";
 
@@ -148,3 +148,4 @@ export async function logoutAction() {
 }
 
 export type { AuthActionResult };
+

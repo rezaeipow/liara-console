@@ -1,9 +1,9 @@
-import { render, screen, waitFor, waitForElementToBeRemoved } from "@testing-library/react";
+﻿import { render, screen, waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { RouterProvider, createMemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
-import { store } from "../../../app/store/Index";
+import { store } from "../../../app/store/index";
 import ProjectVmsPage from "./ProjectVmsPage";
 import { projectVmsAction } from "./vmsData";
 
@@ -70,3 +70,4 @@ describe("ProjectVmsPage integration", () => {
     });
   });
 });
+
