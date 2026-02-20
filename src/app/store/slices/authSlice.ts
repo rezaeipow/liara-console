@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { AuthAPI, type AuthResponse, type LoginRequest, type SignupRequest } from "../../../api/authApi";
 import type { User } from "../../../api/types";
-import type { RootState } from "../Index";
+import type { RootState } from "../index";
 
 type AuthStatus = "idle" | "loading" | "authenticated" | "error";
 

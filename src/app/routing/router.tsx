@@ -53,6 +53,13 @@ import {
 import { RouteFallback } from "./routeElements";
 import { appSettingsAction } from "../../features/pages/apps/appSettingsData";
 import { vmSettingsAction } from "../../features/pages/vms/vmSettingsData";
+import {
+  billingInvoicesLoader,
+  billingOverviewLoader,
+  billingPaymentsLoader,
+  billingTopupAction,
+  billingTopupLoader,
+} from "../../features/pages/billing/billingData";
 
 function withSuspense(node: ReactNode) {
   return <Suspense fallback={null}>{node}</Suspense>;
@@ -179,15 +186,30 @@ export function createAppRouter() {
           },
         ],
       },
-      { path: "billing", element: withSuspense(<BillingOverviewPage />) },
-      { path: "billing/topup", element: withSuspense(<BillingTopupPage />) },
+      {
+        path: "billing",
+        element: withSuspense(<BillingOverviewPage />),
+        loader: billingOverviewLoader,
+        errorElement: <RouteFallback />,
+      },
+      {
+        path: "billing/topup",
+        element: withSuspense(<BillingTopupPage />),
+        loader: billingTopupLoader,
+        action: billingTopupAction,
+        errorElement: <RouteFallback />,
+      },
       {
         path: "billing/payments",
         element: withSuspense(<BillingPaymentsPage />),
+        loader: billingPaymentsLoader,
+        errorElement: <RouteFallback />,
       },
       {
         path: "billing/invoices",
         element: withSuspense(<BillingInvoicesPage />),
+        loader: billingInvoicesLoader,
+        errorElement: <RouteFallback />,
       },
       { path: "support/tickets", element: withSuspense(<TicketsPage />) },
       { path: "support/tickets/new", element: withSuspense(<NewTicketPage />) },

@@ -1,5 +1,214 @@
-import { PagePlaceholder } from "../PagePlaceholder";
+﻿import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  MenuItem,
+  Paper,
+  Snackbar,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { alpha } from "@mui/material/styles";
+import { useMemo, useState } from "react";
+import { useLoaderData, useSearchParams } from "react-router-dom";
+import { BillingAPI } from "../../../api/billingApi";
+import type { BillingInvoicesLoaderData } from "./billingData";
+import { formatDateTime, formatIrr } from "./billingFormat";
 
 export default function BillingInvoicesPage() {
-  return <PagePlaceholder title="Billing Invoices" description="/console/billing/invoices" />;
+  const { items } = useLoaderData() as BillingInvoicesLoaderData;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [notice, setNotice] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  const status = searchParams.get("status") ?? "all";
+  const sort = searchParams.get("sort") ?? "newest";
+
+  const unpaidCount = useMemo(
+    () => items.filter((item) => item.status === "unpaid").length,
+    [items],
+  );
+
+  const updateParam = (key: string, value: string, defaultValue: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (value === defaultValue) next.delete(key);
+    else next.set(key, value);
+    setSearchParams(next, { replace: true });
+  };
+
+  const handleDownload = async (invoiceId: string) => {
+    setDownloadingId(invoiceId);
+    try {
+      const payload = await BillingAPI.downloadInvoice(invoiceId);
+      setNotice(`Mock download ready: ${payload.filename}`);
+    } catch (error: unknown) {
+      setNotice(error instanceof Error ? error.message : "Could not download invoice.");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
+  return (
+    <>
+      <Stack
+        spacing={2.2}
+        sx={{
+          width: "100%",
+          maxWidth: { xs: "100%", sm: 980, lg: 1080 },
+          mx: { xs: 0, sm: "auto" },
+          mt: { xs: 1.25, sm: 1.5 },
+          px: { xs: 1.25, sm: 1.5, md: 2, lg: 2 },
+        }}
+      >
+        <Paper
+          sx={{
+            p: { xs: 2, sm: 2.5 },
+            borderRadius: { xs: 1.5, sm: 2 },
+            border: "1px solid rgba(31,111,235,0.24)",
+            background:
+              "linear-gradient(120deg, rgba(31,111,235,0.16), rgba(14,165,164,0.10))",
+            backdropFilter: "blur(14px)",
+          }}
+        >
+          <Stack spacing={1}>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <ReceiptLongOutlinedIcon fontSize="small" />
+              <Typography variant="h5" fontWeight={800}>Invoices</Typography>
+            </Stack>
+            <Typography variant="body2" color="text.secondary">
+              Review billing documents and download mock PDFs.
+            </Typography>
+            <Chip
+              variant="outlined"
+              color={unpaidCount > 0 ? "warning" : "success"}
+              label={unpaidCount > 0 ? `${unpaidCount} unpaid invoices` : "All invoices are paid"}
+              sx={{ alignSelf: "flex-start" }}
+            />
+          </Stack>
+        </Paper>
+
+        <Paper
+          sx={{
+            p: { xs: 2, sm: 2.5 },
+            borderRadius: { xs: 1.5, sm: 2 },
+            border: `1px solid ${alpha("#1f6feb", 0.18)}`,
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,255,255,0.56))",
+            backdropFilter: "blur(10px)",
+          }}
+        >
+          <Stack spacing={1.3}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1}
+              justifyContent="space-between"
+              alignItems={{ xs: "stretch", sm: "center" }}
+            >
+              <Typography fontWeight={800}>Invoice List</Typography>
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+                <TextField
+                  select
+                  size="small"
+                  label="Status"
+                  value={status}
+                  onChange={(event) => updateParam("status", event.target.value, "all")}
+                  sx={{ minWidth: { xs: "100%", sm: 150 } }}
+                >
+                  <MenuItem value="all">All</MenuItem>
+                  <MenuItem value="paid">Paid</MenuItem>
+                  <MenuItem value="unpaid">Unpaid</MenuItem>
+                </TextField>
+                <TextField
+                  select
+                  size="small"
+                  label="Sort"
+                  value={sort}
+                  onChange={(event) => updateParam("sort", event.target.value, "newest")}
+                  sx={{ minWidth: { xs: "100%", sm: 150 } }}
+                >
+                  <MenuItem value="newest">Newest</MenuItem>
+                  <MenuItem value="oldest">Oldest</MenuItem>
+                  <MenuItem value="amount">Highest amount</MenuItem>
+                </TextField>
+              </Stack>
+            </Stack>
+
+            {items.length === 0 ? (
+              <Alert severity="info">No invoices match current filters.</Alert>
+            ) : (
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", lg: "repeat(2, minmax(0, 1fr))" },
+                  gap: 1,
+                }}
+              >
+                {items.map((invoice) => (
+                  <Paper
+                    key={invoice.id}
+                    variant="outlined"
+                    sx={{
+                      p: 1.25,
+                      borderRadius: 1.4,
+                      borderColor: alpha("#0f172a", 0.12),
+                      backgroundColor: alpha("#ffffff", 0.62),
+                    }}
+                  >
+                    <Stack spacing={0.8}>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
+                        <Stack spacing={0.2}>
+                          <Typography fontWeight={700}>{formatIrr(invoice.amount)}</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {formatDateTime(invoice.createdAt)}
+                          </Typography>
+                        </Stack>
+                        <Chip
+                          size="small"
+                          color={invoice.status === "paid" ? "success" : "warning"}
+                          variant="outlined"
+                          label={invoice.status === "paid" ? "Paid" : "Unpaid"}
+                        />
+                      </Stack>
+                      <Button
+                        type="button"
+                        variant="outlined"
+                        size="small"
+                        startIcon={<DownloadOutlinedIcon fontSize="small" />}
+                        onClick={() => {
+                          void handleDownload(invoice.id);
+                        }}
+                        disabled={downloadingId === invoice.id}
+                        sx={{ alignSelf: "flex-start" }}
+                      >
+                        {downloadingId === invoice.id ? "Preparing..." : "Download mock"}
+                      </Button>
+                    </Stack>
+                  </Paper>
+                ))}
+              </Box>
+            )}
+          </Stack>
+        </Paper>
+      </Stack>
+
+      <Snackbar
+        open={Boolean(notice)}
+        autoHideDuration={3000}
+        onClose={() => setNotice(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          severity={notice?.startsWith("Mock download") ? "success" : "error"}
+          variant="filled"
+          onClose={() => setNotice(null)}
+        >
+          {notice}
+        </Alert>
+      </Snackbar>
+    </>
+  );
 }
