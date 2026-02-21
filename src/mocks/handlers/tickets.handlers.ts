@@ -60,6 +60,16 @@ export const ticketHandlers: HttpHandler[] = [
     };
 
     ticket.replies.push(reply);
+    ticket.status = "pending";
+
+    const supportReply = {
+      id: createId("rep"),
+      body: "Support received your message. We are reviewing the details.",
+      createdAt: new Date().toISOString(),
+      author: "support" as const,
+    };
+
+    ticket.replies.push(supportReply);
     return HttpResponse.json(reply, { status: 201 });
   }),
 ];

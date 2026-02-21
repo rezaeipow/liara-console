@@ -60,6 +60,13 @@ import {
   billingTopupAction,
   billingTopupLoader,
 } from "../../features/pages/billing/billingData";
+import {
+  newTicketAction,
+  newTicketLoader,
+  ticketDetailAction,
+  ticketDetailLoader,
+  ticketsLoader,
+} from "../../features/pages/support/supportData";
 
 function withSuspense(node: ReactNode) {
   return <Suspense fallback={<AppInitialFallback />}>{node}</Suspense>;
@@ -211,11 +218,25 @@ export function createAppRouter() {
         loader: billingInvoicesLoader,
         errorElement: <RouteFallback />,
       },
-      { path: "support/tickets", element: withSuspense(<TicketsPage />) },
-      { path: "support/tickets/new", element: withSuspense(<NewTicketPage />) },
+      {
+        path: "support/tickets",
+        element: withSuspense(<TicketsPage />),
+        loader: ticketsLoader,
+        errorElement: <RouteFallback />,
+      },
+      {
+        path: "support/tickets/new",
+        element: withSuspense(<NewTicketPage />),
+        loader: newTicketLoader,
+        action: newTicketAction,
+        errorElement: <RouteFallback />,
+      },
       {
         path: "support/tickets/:ticketId",
         element: withSuspense(<TicketDetailPage />),
+        loader: ticketDetailLoader,
+        action: ticketDetailAction,
+        errorElement: <RouteFallback />,
       },
       { path: "notifications", element: withSuspense(<NotificationsPage />) },
       { path: "settings", element: withSuspense(<SettingsPage />) },
