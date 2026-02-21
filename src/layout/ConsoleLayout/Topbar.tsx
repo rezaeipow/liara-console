@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Alert,
   AppBar,
@@ -23,12 +23,15 @@ import {
   Menu as MenuIcon,
   Notifications as NotificationsIcon,
 } from "@mui/icons-material";
-import { useFetcher } from "react-router-dom";
+import { Link, useFetcher, useLocation } from "react-router-dom";
+import { NotificationsAPI } from "../../api/notificationsApi";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import { selectAccounts, selectActiveAccountId } from "../../app/store/slices/accountSlice";
 import {
   hideToast,
   openMobileSidebar,
+  selectUnreadNotificationsCount,
+  setUnreadNotificationsCount,
   selectSidebarMode,
   selectToast,
   toggleSidebarMode,
@@ -44,6 +47,8 @@ export default function Topbar() {
   const isSmMd = !isXs && !isLgUp;
   const sidebarMode = useAppSelector(selectSidebarMode);
   const toast = useAppSelector(selectToast);
+  const unreadNotificationsCount = useAppSelector(selectUnreadNotificationsCount);
+  const location = useLocation();
 
   const accounts = useAppSelector(selectAccounts);
   const activeAccountId = useAppSelector(selectActiveAccountId);
@@ -87,6 +92,20 @@ export default function Topbar() {
       dispatch(toggleSidebarMode());
     }
   };
+
+  const refreshUnreadCount = useCallback(async () => {
+    try {
+      const response = await NotificationsAPI.list();
+      const unread = response.items.filter((item) => !item.read).length;
+      dispatch(setUnreadNotificationsCount(unread));
+    } catch {
+      // Keep previous count on transient failures.
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    void refreshUnreadCount();
+  }, [refreshUnreadCount, location.pathname]);
 
   return (
     <>
@@ -178,11 +197,17 @@ export default function Topbar() {
             </Box>
           )}
 
-          <IconButton aria-label="Open notifications" size={isXs ? "medium" : "large"} sx={{ p: { xs: 0.75, sm: 1 } }}>
+          <IconButton
+            component={Link}
+            to="/console/notifications"
+            aria-label="Open notifications"
+            size={isXs ? "medium" : "large"}
+            sx={{ p: { xs: 0.75, sm: 1 } }}
+          >
             <Badge
               color="error"
-              variant={isXs ? "dot" : "standard"}
-              badgeContent={isXs ? undefined : 3}
+              variant={isXs ? (unreadNotificationsCount > 0 ? "dot" : "standard") : "standard"}
+              badgeContent={isXs ? undefined : unreadNotificationsCount}
               overlap="circular"
               anchorOrigin={{ vertical: "top", horizontal: "right" }}
             >

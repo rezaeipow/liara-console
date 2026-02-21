@@ -67,6 +67,10 @@ import {
   ticketDetailLoader,
   ticketsLoader,
 } from "../../features/pages/support/supportData";
+import {
+  notificationsAction,
+  notificationsLoader,
+} from "../../features/pages/notifications/notificationsData";
 
 function withSuspense(node: ReactNode) {
   return <Suspense fallback={<AppInitialFallback />}>{node}</Suspense>;
@@ -238,7 +242,13 @@ export function createAppRouter() {
         action: ticketDetailAction,
         errorElement: <RouteFallback />,
       },
-      { path: "notifications", element: withSuspense(<NotificationsPage />) },
+      {
+        path: "notifications",
+        element: withSuspense(<NotificationsPage />),
+        loader: notificationsLoader,
+        action: notificationsAction,
+        errorElement: <RouteFallback />,
+      },
       { path: "settings", element: withSuspense(<SettingsPage />) },
       {
         path: "*",

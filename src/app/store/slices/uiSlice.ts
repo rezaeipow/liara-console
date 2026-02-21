@@ -21,6 +21,7 @@ interface UIState {
   // Runtime UI state (not persisted)
   isMobileSidebarOpen: boolean; // for xs drawer only
   toast: ToastState;
+  unreadNotificationsCount: number;
 }
 
 const STORAGE_KEY = "console-ui-preferences";
@@ -58,6 +59,7 @@ const initialState: UIState = {
     message: "",
     severity: "success",
   },
+  unreadNotificationsCount: 0,
 };
 
 /* -----------------------------
@@ -112,6 +114,10 @@ export const uiSlice = createSlice({
     hideToast(state) {
       state.toast.open = false;
     },
+
+    setUnreadNotificationsCount(state, action: PayloadAction<number>) {
+      state.unreadNotificationsCount = action.payload >= 0 ? action.payload : 0;
+    },
   },
 });
 
@@ -127,6 +133,7 @@ export const {
   setTableDensity,
   showToast,
   hideToast,
+  setUnreadNotificationsCount,
 } = uiSlice.actions;
 
 /* -----------------------------
@@ -143,5 +150,7 @@ export const selectMobileSidebarOpen = (state: { ui: UIState }) =>
   state.ui.isMobileSidebarOpen;
 
 export const selectToast = (state: { ui: UIState }) => state.ui.toast;
+export const selectUnreadNotificationsCount = (state: { ui: UIState }) =>
+  state.ui.unreadNotificationsCount;
 
 export default uiSlice.reducer;
