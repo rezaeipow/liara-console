@@ -23,6 +23,8 @@ import {
 import { alpha } from "@mui/material/styles";
 import { useMemo } from "react";
 import { useLoaderData, useNavigation, useSearchParams } from "react-router-dom";
+import { useAppSelector } from "../../../app/store/hooks";
+import { selectTableDensity } from "../../../app/store/slices/uiSlice";
 import type { BillingPaymentsLoaderData } from "./billingData";
 import { formatDateTime, formatIrr } from "./billingFormat";
 
@@ -30,6 +32,12 @@ export default function BillingPaymentsPage() {
   const { items } = useLoaderData() as BillingPaymentsLoaderData;
   const navigation = useNavigation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const tableDensity = useAppSelector(selectTableDensity);
+  const listSpacing = tableDensity === "comfortable" ? 1.6 : tableDensity === "compact" ? 0.8 : 1;
+  const itemPaddingX = tableDensity === "comfortable" ? 2 : tableDensity === "compact" ? 1 : 1.25;
+  const itemPaddingY = tableDensity === "comfortable" ? 2 : tableDensity === "compact" ? 1 : 1.25;
+  const itemInnerSpacing =
+    tableDensity === "comfortable" ? 1.25 : tableDensity === "compact" ? 0.625 : 0.8;
   const isRouteLoading =
     navigation.state === "loading" &&
     (navigation.location?.pathname ?? "").startsWith("/console/billing/payments");
@@ -105,9 +113,19 @@ export default function BillingPaymentsPage() {
               gap: 1,
             }}
           >
-            <SummaryCard label="Transactions" value={String(items.length)} />
-            <SummaryCard label="Successful" value={String(summary.successCount)} tone="success" />
-            <SummaryCard label="Successful Total" value={formatIrr(summary.totalSuccessAmount)} tone="primary" />
+            <SummaryCard label="Transactions" value={String(items.length)} density={tableDensity} />
+            <SummaryCard
+              label="Successful"
+              value={String(summary.successCount)}
+              tone="success"
+              density={tableDensity}
+            />
+            <SummaryCard
+              label="Successful Total"
+              value={formatIrr(summary.totalSuccessAmount)}
+              tone="primary"
+              density={tableDensity}
+            />
           </Box>
         </Stack>
       </Paper>
@@ -198,20 +216,21 @@ export default function BillingPaymentsPage() {
           ) : (
             <>
               <Box sx={{ display: { xs: "block", lg: "none" } }}>
-                <Stack spacing={1} role="list" aria-label="Payments list">
+                <Stack spacing={listSpacing} role="list" aria-label="Payments list">
                   {items.map((payment) => (
                     <Paper
                       key={payment.id}
                       role="listitem"
                       variant="outlined"
                       sx={{
-                        p: 1.25,
+                        px: itemPaddingX,
+                        py: itemPaddingY,
                         borderRadius: 1.4,
                         borderColor: alpha("#0f172a", 0.12),
                         backgroundColor: alpha("#ffffff", 0.6),
                       }}
                     >
-                      <Stack spacing={0.8}>
+                      <Stack spacing={itemInnerSpacing}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
                           <Typography fontWeight={700}>{formatIrr(payment.amount)}</Typography>
                           <Chip
@@ -250,7 +269,7 @@ export default function BillingPaymentsPage() {
                   backgroundColor: alpha("#ffffff", 0.66),
                 }}
               >
-                <Table size="small" aria-label="Payments table">
+                <Table size="medium" aria-label="Payments table">
                   <caption style={{ textAlign: "left", padding: "8px 16px" }}>
                     Billing payments with amount, status, and creation time
                   </caption>
@@ -306,11 +325,14 @@ type SummaryCardProps = {
   label: string;
   value: string;
   tone?: "default" | "primary" | "success";
+  density: "compact" | "standard" | "comfortable";
 };
 
-function SummaryCard({ label, value, tone = "default" }: SummaryCardProps) {
+function SummaryCard({ label, value, tone = "default", density }: SummaryCardProps) {
   const color =
     tone === "success" ? "#16a34a" : tone === "primary" ? "#2563eb" : "#475569";
+  const paddingX = density === "comfortable" ? 1.6 : density === "compact" ? 0.8 : 1.2;
+  const paddingY = density === "comfortable" ? 1.6 : density === "compact" ? 0.8 : 1;
 
   return (
     <Paper
@@ -319,8 +341,8 @@ function SummaryCard({ label, value, tone = "default" }: SummaryCardProps) {
       aria-live="polite"
       aria-label={`${label}: ${value}`}
       sx={{
-        px: 1.2,
-        py: 1,
+        px: paddingX,
+        py: paddingY,
         borderRadius: 1.3,
         borderColor: alpha(color, 0.25),
         backgroundColor: alpha("#ffffff", 0.82),

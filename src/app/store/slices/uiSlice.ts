@@ -1,8 +1,10 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 export type SidebarMode = "expanded" | "collapsed";
 export type TableDensity = "compact" | "standard" | "comfortable";
+export type ThemeMode = "system" | "light" | "dark";
 
 export interface UIPreferences {
+  themeMode: ThemeMode;
   sidebarMode: SidebarMode; // only for sm/md
   tableDensity: TableDensity;
 }
@@ -34,9 +36,23 @@ function loadPreferences(): UIPreferences {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) throw new Error();
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw) as Partial<UIPreferences>;
+    return {
+      themeMode:
+        parsed.themeMode === "light" || parsed.themeMode === "dark" || parsed.themeMode === "system"
+          ? parsed.themeMode
+          : "system",
+      sidebarMode: parsed.sidebarMode === "collapsed" ? "collapsed" : "expanded",
+      tableDensity:
+        parsed.tableDensity === "comfortable" ||
+        parsed.tableDensity === "compact" ||
+        parsed.tableDensity === "standard"
+          ? parsed.tableDensity
+          : "standard",
+    };
   } catch {
     return {
+      themeMode: "system",
       sidebarMode: "expanded",
       tableDensity: "standard",
     };
@@ -70,6 +86,11 @@ export const uiSlice = createSlice({
   name: "ui",
   initialState,
   reducers: {
+    setThemeMode(state, action: PayloadAction<ThemeMode>) {
+      state.preferences.themeMode = action.payload;
+      savePreferences(state.preferences);
+    },
+
     /* ========= SIDEBAR MODE (sm/md only) ========= */
 
     setSidebarMode(state, action: PayloadAction<SidebarMode>) {
@@ -126,6 +147,7 @@ export const uiSlice = createSlice({
 ------------------------------ */
 
 export const {
+  setThemeMode,
   setSidebarMode,
   toggleSidebarMode,
   openMobileSidebar,
@@ -145,6 +167,12 @@ export const selectSidebarMode = (state: { ui: UIState }) =>
 
 export const selectTableDensity = (state: { ui: UIState }) =>
   state.ui.preferences.tableDensity;
+
+export const selectThemeMode = (state: { ui: UIState }) =>
+  state.ui.preferences.themeMode;
+
+export const selectUIPreferences = (state: { ui: UIState }) =>
+  state.ui.preferences;
 
 export const selectMobileSidebarOpen = (state: { ui: UIState }) =>
   state.ui.isMobileSidebarOpen;

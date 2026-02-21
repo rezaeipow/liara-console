@@ -19,6 +19,8 @@ import { useMemo, useState } from "react";
 import { useLoaderData, useNavigation, useSearchParams } from "react-router-dom";
 import { BillingAPI } from "../../../api/billingApi";
 import { ApiError } from "../../../api/httpClient";
+import { useAppSelector } from "../../../app/store/hooks";
+import { selectTableDensity } from "../../../app/store/slices/uiSlice";
 import type { BillingInvoicesLoaderData } from "./billingData";
 import { formatDateTime, formatIrr } from "./billingFormat";
 
@@ -44,6 +46,13 @@ export default function BillingInvoicesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [notice, setNotice] = useState<InvoiceNotice | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const tableDensity = useAppSelector(selectTableDensity);
+  const gridColumnGap = tableDensity === "comfortable" ? 1.8 : tableDensity === "compact" ? 0.9 : 1;
+  const gridRowGap = tableDensity === "comfortable" ? 1.8 : tableDensity === "compact" ? 0.9 : 1;
+  const itemPaddingX = tableDensity === "comfortable" ? 2 : tableDensity === "compact" ? 1 : 1.25;
+  const itemPaddingY = tableDensity === "comfortable" ? 2 : tableDensity === "compact" ? 1 : 1.25;
+  const itemInnerSpacing =
+    tableDensity === "comfortable" ? 1.25 : tableDensity === "compact" ? 0.625 : 0.8;
   const isRouteLoading =
     navigation.state === "loading" &&
     (navigation.location?.pathname ?? "").startsWith("/console/billing/invoices");
@@ -205,7 +214,8 @@ export default function BillingInvoicesPage() {
                 sx={{
                   display: "grid",
                   gridTemplateColumns: { xs: "1fr", lg: "repeat(2, minmax(0, 1fr))" },
-                  gap: 1,
+                  columnGap: gridColumnGap,
+                  rowGap: gridRowGap,
                 }}
               >
                 {items.map((invoice) => (
@@ -214,13 +224,14 @@ export default function BillingInvoicesPage() {
                     role="listitem"
                     variant="outlined"
                     sx={{
-                      p: 1.25,
+                      px: itemPaddingX,
+                      py: itemPaddingY,
                       borderRadius: 1.4,
                       borderColor: alpha("#0f172a", 0.12),
                       backgroundColor: alpha("#ffffff", 0.62),
                     }}
                   >
-                    <Stack spacing={0.8}>
+                    <Stack spacing={itemInnerSpacing}>
                       <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
                         <Stack spacing={0.2}>
                           <Typography fontWeight={700}>{formatIrr(invoice.amount)}</Typography>

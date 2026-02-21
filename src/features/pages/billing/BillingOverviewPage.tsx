@@ -81,6 +81,15 @@ export default function BillingOverviewPage() {
             >
               View payments
             </Button>
+            <Button
+              component={Link}
+              to="/console/billing/invoices"
+              variant="outlined"
+              endIcon={<ArrowOutwardIcon />}
+              aria-label="View full invoices list"
+            >
+              View invoices
+            </Button>
           </Stack>
         </Stack>
       </Paper>

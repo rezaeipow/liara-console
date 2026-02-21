@@ -22,6 +22,8 @@ import {
   useNavigation,
   useSearchParams,
 } from "react-router-dom";
+import { useAppSelector } from "../../../app/store/hooks";
+import { selectTableDensity } from "../../../app/store/slices/uiSlice";
 import { formatDateTime } from "../billing/billingFormat";
 import type { TicketActionData, TicketDetailLoaderData } from "./supportData";
 
@@ -52,6 +54,9 @@ export default function TicketDetailPage() {
   const actionData = useActionData() as TicketActionData | undefined;
   const navigation = useNavigation();
   const [searchParams] = useSearchParams();
+  const tableDensity = useAppSelector(selectTableDensity);
+  const isCompact = tableDensity === "compact";
+  const actionButtonSize = isCompact ? "small" : "medium";
   const isSubmitting = navigation.state === "submitting";
   const isRouteLoading =
     navigation.state === "loading" &&
@@ -105,7 +110,7 @@ export default function TicketDetailPage() {
   return (
     <>
       <Stack
-        spacing={2.2}
+        spacing={isCompact ? 1.2 : 2.2}
         aria-busy={isRouteLoading}
         sx={{
           width: "100%",
@@ -117,35 +122,45 @@ export default function TicketDetailPage() {
       >
         <Paper
           sx={{
-            p: { xs: 2, sm: 2.5 },
-            borderRadius: { xs: 1.5, sm: 2 },
+            p: isCompact ? { xs: 1.2, sm: 1.4 } : { xs: 2, sm: 2.5 },
+            borderRadius: isCompact ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
             border: "1px solid rgba(31,111,235,0.32)",
             background:
               "linear-gradient(120deg, rgba(31,111,235,0.20), rgba(14,165,164,0.14))",
             backdropFilter: "blur(14px)",
           }}
         >
-          <Stack spacing={1.1}>
+          <Stack spacing={isCompact ? 0.55 : 1.1}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
               <Stack direction="row" spacing={0.9} alignItems="center">
                 <ForumOutlinedIcon fontSize="small" />
-                <Typography variant="h5" fontWeight={800}>
+                <Typography variant={isCompact ? "h6" : "h5"} fontWeight={800}>
                   {ticket.subject}
                 </Typography>
               </Stack>
-              <Chip size="small" color={statusTone(ticket.status)} variant="outlined" label={ticket.status} />
+              <Chip
+                size="small"
+                color={statusTone(ticket.status)}
+                variant="outlined"
+                label={ticket.status}
+                sx={isCompact ? { borderRadius: 0.7, height: 20, fontSize: "0.66rem" } : undefined}
+              />
             </Stack>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={isCompact ? { fontSize: "0.76rem", lineHeight: 1.25 } : undefined}
+            >
               Ticket ID: {ticket.id} | Category: {ticket.category.toUpperCase()} | Created: {formatDateTime(ticket.createdAt)}
             </Typography>
             <Button
               component={Link}
               to="/console/support/tickets"
-              variant="text"
               size="small"
               startIcon={<ArrowBackIcon fontSize="small" />}
               sx={{ alignSelf: "flex-start" }}
               aria-label="Back to support tickets"
+              variant={isCompact ? "outlined" : "text"}
             >
               Back to tickets
             </Button>
@@ -154,8 +169,8 @@ export default function TicketDetailPage() {
 
         <Paper
           sx={{
-            p: { xs: 2, sm: 2.5 },
-            borderRadius: { xs: 1.5, sm: 2 },
+            p: isCompact ? { xs: 0.85, sm: 1 } : { xs: 2, sm: 2.5 },
+            borderRadius: isCompact ? { xs: 0.55, sm: 0.7 } : { xs: 1.5, sm: 2 },
             border: `1px solid ${alpha("#1f6feb", 0.24)}`,
             background:
               "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
@@ -163,26 +178,42 @@ export default function TicketDetailPage() {
           }}
         >
           {isRouteLoading ? <LinearProgress sx={{ mb: 1.2 }} /> : null}
-          <Stack spacing={1.2}>
-            <Typography fontWeight={800}>Conversation</Typography>
+          <Stack spacing={isCompact ? 0.45 : 1.2}>
+            <Typography
+              fontWeight={800}
+              sx={isCompact ? { fontSize: "0.82rem", lineHeight: 1.1 } : undefined}
+            >
+              Conversation
+            </Typography>
 
             {messages.length === 0 ? (
-              <Alert severity="info">No messages yet.</Alert>
+              <Alert
+                severity="info"
+                sx={isCompact ? { py: 0.15, "& .MuiAlert-message": { py: 0.2, fontSize: "0.74rem" } } : undefined}
+              >
+                No messages yet.
+              </Alert>
             ) : (
-              <Stack spacing={1} role="list" aria-label="Ticket replies">
+              <Stack spacing={isCompact ? 0.25 : 1} role="list" aria-label="Ticket replies">
                 {messages.map((message, index) => {
                   const currentDay = formatDayLabel(message.timestamp);
                   const previousDay = index > 0 ? formatDayLabel(messages[index - 1].timestamp) : "";
                   const showDay = index === 0 || currentDay !== previousDay;
 
                   return (
-                    <Stack key={message.id} spacing={0.8}>
+                    <Stack key={message.id} spacing={isCompact ? 0.2 : 0.8}>
                       {showDay ? (
                         <Chip
                           size="small"
                           label={currentDay}
                           variant="outlined"
-                          sx={{ alignSelf: "center", backgroundColor: alpha("#ffffff", 0.8) }}
+                          sx={{
+                            alignSelf: "center",
+                            backgroundColor: alpha("#ffffff", 0.8),
+                            ...(isCompact
+                              ? { borderRadius: 0.45, height: 16, fontSize: "0.58rem", px: 0.25 }
+                              : undefined),
+                          }}
                         />
                       ) : null}
                       <MessageBubble
@@ -190,6 +221,7 @@ export default function TicketDetailPage() {
                         body={message.body}
                         timestamp={message.timestamp}
                         tone={message.tone}
+                        density={tableDensity}
                       />
                     </Stack>
                   );
@@ -202,6 +234,7 @@ export default function TicketDetailPage() {
                     timestamp={new Date().toISOString()}
                     tone="user"
                     pending
+                    density={tableDensity}
                   />
                 ) : null}
               </Stack>
@@ -211,27 +244,32 @@ export default function TicketDetailPage() {
 
         <Paper
           sx={{
-            p: { xs: 2, sm: 2.5 },
-            borderRadius: { xs: 1.5, sm: 2 },
+            p: isCompact ? { xs: 1.2, sm: 1.4 } : { xs: 2, sm: 2.5 },
+            borderRadius: isCompact ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
             border: `1px solid ${alpha("#1f6feb", 0.24)}`,
             background:
               "linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.74))",
             backdropFilter: "blur(10px)",
           }}
         >
-          <Stack spacing={1.2}>
+          <Stack spacing={isCompact ? 0.7 : 1.2}>
             <Typography fontWeight={800}>Add Reply</Typography>
             <Form method="post" replace aria-label="Reply to support ticket">
-              <Stack spacing={1}>
+              <Stack spacing={isCompact ? 0.6 : 1}>
                 <OutlinedInput
                   name="replyBody"
                   multiline
-                  minRows={4}
+                  minRows={isCompact ? 3 : 4}
                   value={replyBody}
                   onChange={(event) => setReplyBody(event.target.value)}
                   placeholder="Write your update or response..."
                   aria-label="Reply body"
                   error={Boolean(actionData?.fieldErrors?.replyBody)}
+                  sx={
+                    isCompact
+                      ? { "& .MuiInputBase-inputMultiline": { py: 0.7, fontSize: "0.8rem" } }
+                      : undefined
+                  }
                 />
                 <Typography variant="caption" color="text.secondary">
                   {replyBody.length}/2000
@@ -261,6 +299,7 @@ export default function TicketDetailPage() {
                   disabled={isSubmitting}
                   sx={{ alignSelf: "flex-start" }}
                   aria-label="Submit reply"
+                  size={actionButtonSize}
                 >
                   {isSubmitting ? "Sending..." : "Send reply"}
                 </Button>
@@ -294,11 +333,13 @@ type MessageBubbleProps = {
   body: string;
   timestamp: string;
   tone: "user" | "support";
+  density: "compact" | "standard" | "comfortable";
   pending?: boolean;
 };
 
-function MessageBubble({ label, body, timestamp, tone, pending = false }: MessageBubbleProps) {
+function MessageBubble({ label, body, timestamp, tone, density, pending = false }: MessageBubbleProps) {
   const leftAligned = tone === "support";
+  const isCompact = density === "compact";
   return (
     <Stack
       role="listitem"
@@ -311,17 +352,24 @@ function MessageBubble({ label, body, timestamp, tone, pending = false }: Messag
         variant="outlined"
         sx={{
           maxWidth: { xs: "100%", sm: "82%" },
-          px: 1.2,
-          py: 0.9,
-          borderRadius: 1.4,
+          px: isCompact ? 0.45 : 1.2,
+          py: isCompact ? 0.35 : 0.9,
+          borderRadius: isCompact ? 0.45 : 1.4,
           borderColor: leftAligned ? alpha("#0ea5e9", 0.24) : alpha("#1f6feb", 0.24),
           backgroundColor: leftAligned ? alpha("#f0f9ff", 0.86) : alpha("#eff6ff", 0.86),
         }}
       >
-        <Typography variant="caption" color="text.secondary">
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={isCompact ? { fontSize: "0.58rem", lineHeight: 1.1 } : undefined}
+        >
           {label} | {formatDateTime(timestamp)}{pending ? " | Sending" : ""}
         </Typography>
-        <Typography variant="body2" sx={{ mt: 0.4, lineHeight: 1.5 }}>
+        <Typography
+          variant="body2"
+          sx={isCompact ? { mt: 0.2, lineHeight: 1.15, fontSize: "0.68rem" } : { mt: 0.4, lineHeight: 1.5 }}
+        >
           {body}
         </Typography>
       </Paper>

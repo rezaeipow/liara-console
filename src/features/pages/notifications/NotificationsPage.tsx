@@ -23,8 +23,8 @@ import {
   useNavigation,
   useSearchParams,
 } from "react-router-dom";
-import { useAppDispatch } from "../../../app/store/hooks";
-import { setUnreadNotificationsCount } from "../../../app/store/slices/uiSlice";
+import { useAppDispatch, useAppSelector } from "../../../app/store/hooks";
+import { selectTableDensity, setUnreadNotificationsCount } from "../../../app/store/slices/uiSlice";
 import { formatDateTime } from "../billing/billingFormat";
 import type { NotificationsActionData, NotificationsLoaderData } from "./notificationsData";
 
@@ -43,8 +43,14 @@ export default function NotificationsPage() {
   const dispatch = useAppDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const [dismissedNoticeKey, setDismissedNoticeKey] = useState<string | null>(null);
+  const tableDensity = useAppSelector(selectTableDensity);
   const filter = toFilterMode(searchParams.get("filter"));
   const search = searchParams.get("q") ?? "";
+  const listSpacing = tableDensity === "comfortable" ? 1.8 : tableDensity === "compact" ? 0.18 : 1;
+  const itemPaddingX = tableDensity === "comfortable" ? 2.2 : tableDensity === "compact" ? 0.5 : 1.3;
+  const itemPaddingY = tableDensity === "comfortable" ? 2.2 : tableDensity === "compact" ? 0.35 : 1.3;
+  const itemInnerSpacing =
+    tableDensity === "comfortable" ? 1.4 : tableDensity === "compact" ? 0.12 : 0.8;
 
   const isRouteLoading =
     navigation.state === "loading" &&
@@ -102,7 +108,7 @@ export default function NotificationsPage() {
         <Paper
           sx={{
             p: { xs: 2, sm: 2.5 },
-            borderRadius: { xs: 1.5, sm: 2 },
+            borderRadius: tableDensity === "compact" ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
             border: "1px solid rgba(31,111,235,0.32)",
             background:
               "linear-gradient(120deg, rgba(31,111,235,0.20), rgba(14,165,164,0.14))",
@@ -156,25 +162,28 @@ export default function NotificationsPage() {
             value={String(items.length)}
             icon={<NotificationsActiveOutlinedIcon fontSize="small" />}
             color="#2563eb"
+            density={tableDensity}
           />
           <SummaryCard
             label="Unread"
             value={String(unreadCount)}
             icon={<NotificationsNoneOutlinedIcon fontSize="small" />}
             color="#f59e0b"
+            density={tableDensity}
           />
           <SummaryCard
             label="Read"
             value={String(readCount)}
             icon={<DoneAllOutlinedIcon fontSize="small" />}
             color="#16a34a"
+            density={tableDensity}
           />
         </Box>
 
         <Paper
           sx={{
             p: { xs: 2, sm: 2.5 },
-            borderRadius: { xs: 1.5, sm: 2 },
+            borderRadius: tableDensity === "compact" ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
             border: `1px solid ${alpha("#1f6feb", 0.24)}`,
             background:
               "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
@@ -250,7 +259,7 @@ export default function NotificationsPage() {
                 variant="outlined"
                 sx={{
                   p: 2,
-                  borderRadius: 1.4,
+                  borderRadius: tableDensity === "compact" ? 0.7 : 1.4,
                   borderColor: alpha("#0f172a", 0.12),
                   backgroundColor: alpha("#ffffff", 0.62),
                 }}
@@ -261,22 +270,28 @@ export default function NotificationsPage() {
                 </Typography>
               </Paper>
             ) : (
-              <Stack spacing={1} role="list" aria-label="Notifications list">
+              <Stack spacing={listSpacing} role="list" aria-label="Notifications list">
                 {filteredItems.map((item) => (
                   <Paper
                     key={item.id}
                     role="listitem"
                     variant="outlined"
                     sx={{
-                      p: 1.3,
-                      borderRadius: 1.4,
+                      px: itemPaddingX,
+                      py: itemPaddingY,
+                      borderRadius: tableDensity === "compact" ? 0.7 : 1.4,
                       borderColor: alpha("#0f172a", item.read ? 0.12 : 0.2),
                       backgroundColor: item.read ? alpha("#ffffff", 0.6) : alpha("#eff6ff", 0.78),
                     }}
                   >
-                    <Stack spacing={0.8}>
+                    <Stack spacing={itemInnerSpacing}>
                       <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
-                        <Typography fontWeight={800}>{item.title}</Typography>
+                        <Typography
+                          fontWeight={800}
+                          sx={tableDensity === "compact" ? { fontSize: "0.82rem", lineHeight: 1.2 } : undefined}
+                        >
+                          {item.title}
+                        </Typography>
                         <Chip
                           size="small"
                           color={item.read ? "success" : "warning"}
@@ -284,11 +299,19 @@ export default function NotificationsPage() {
                           label={item.read ? "Read" : "Unread"}
                         />
                       </Stack>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={tableDensity === "compact" ? { fontSize: "0.73rem", lineHeight: 1.25 } : undefined}
+                      >
                         {item.body}
                       </Typography>
                       <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={tableDensity === "compact" ? { fontSize: "0.64rem", lineHeight: 1.15 } : undefined}
+                        >
                           {formatDateTime(item.createdAt)}
                         </Typography>
 
@@ -345,20 +368,26 @@ type SummaryCardProps = {
   value: string;
   icon: ReactNode;
   color: string;
+  density: "compact" | "standard" | "comfortable";
 };
 
-function SummaryCard({ label, value, icon, color }: SummaryCardProps) {
+function SummaryCard({ label, value, icon, color, density }: SummaryCardProps) {
+  const paddingX = density === "comfortable" ? 2.1 : density === "compact" ? 0.35 : 1.3;
+  const paddingY = density === "comfortable" ? 2.1 : density === "compact" ? 0.35 : 1.3;
+  const spacing = density === "comfortable" ? 1.2 : density === "compact" ? 0.12 : 0.6;
+
   return (
     <Paper
       variant="outlined"
       sx={{
-        p: 1.3,
-        borderRadius: 1.4,
+        px: paddingX,
+        py: paddingY,
+        borderRadius: density === "compact" ? 0.7 : 1.4,
         borderColor: alpha(color, 0.25),
         backgroundColor: alpha("#ffffff", 0.82),
       }}
     >
-      <Stack spacing={0.6}>
+      <Stack spacing={spacing}>
         <Stack direction="row" alignItems="center" spacing={0.7}>
           {icon}
           <Typography variant="body2" color="text.secondary">

@@ -26,6 +26,8 @@ import {
   useNavigation,
   useSearchParams,
 } from "react-router-dom";
+import { useAppSelector } from "../../../app/store/hooks";
+import { selectTableDensity } from "../../../app/store/slices/uiSlice";
 import type { NewTicketLoaderData, TicketActionData } from "./supportData";
 
 const DRAFT_KEY = "support-ticket-draft";
@@ -56,6 +58,9 @@ export default function NewTicketPage() {
   const actionData = useActionData() as TicketActionData | undefined;
   const navigation = useNavigation();
   const [searchParams] = useSearchParams();
+  const tableDensity = useAppSelector(selectTableDensity);
+  const isCompact = tableDensity === "compact";
+  const actionButtonSize = isCompact ? "small" : "medium";
   const isSubmitting = navigation.state === "submitting";
   const isRouteLoading =
     navigation.state === "loading" &&
@@ -99,7 +104,7 @@ export default function NewTicketPage() {
   return (
     <>
       <Stack
-        spacing={2.2}
+        spacing={isCompact ? 1.2 : 2.2}
         aria-busy={isRouteLoading}
         sx={{
           width: "100%",
@@ -111,8 +116,8 @@ export default function NewTicketPage() {
       >
         <Paper
           sx={{
-            p: { xs: 2, sm: 2.5 },
-            borderRadius: { xs: 1.5, sm: 2 },
+            p: isCompact ? { xs: 1.2, sm: 1.4 } : { xs: 2, sm: 2.5 },
+            borderRadius: isCompact ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
             border: "1px solid rgba(31,111,235,0.32)",
             background:
               "linear-gradient(120deg, rgba(31,111,235,0.20), rgba(14,165,164,0.14))",
@@ -121,25 +126,30 @@ export default function NewTicketPage() {
         >
           <Stack
             direction={{ xs: "column", md: "row" }}
-            spacing={1.4}
+            spacing={isCompact ? 0.8 : 1.4}
             justifyContent="space-between"
             alignItems={{ xs: "flex-start", md: "center" }}
           >
-            <Stack spacing={0.5}>
-              <Typography variant="h5" fontWeight={800}>
+            <Stack spacing={isCompact ? 0.3 : 0.5}>
+              <Typography variant={isCompact ? "h6" : "h5"} fontWeight={800}>
                 Create Support Ticket
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={isCompact ? { fontSize: "0.78rem", lineHeight: 1.25 } : undefined}
+              >
                 Share issue details and the support team will follow up in this thread.
               </Typography>
             </Stack>
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={isCompact ? 0.55 : 1}>
               <Button
                 type="button"
                 variant="outlined"
                 color="inherit"
                 startIcon={<DeleteOutlineIcon fontSize="small" />}
                 onClick={clearDraft}
+                size={actionButtonSize}
               >
                 Discard draft
               </Button>
@@ -149,6 +159,7 @@ export default function NewTicketPage() {
                 variant="outlined"
                 startIcon={<ArrowBackIcon fontSize="small" />}
                 aria-label="Back to tickets list"
+                size={actionButtonSize}
               >
                 Back to list
               </Button>
@@ -158,8 +169,8 @@ export default function NewTicketPage() {
 
         <Paper
           sx={{
-            p: { xs: 2, sm: 2.5 },
-            borderRadius: { xs: 1.5, sm: 2 },
+            p: isCompact ? { xs: 1.2, sm: 1.4 } : { xs: 2, sm: 2.5 },
+            borderRadius: isCompact ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
             border: `1px solid ${alpha("#1f6feb", 0.24)}`,
             background:
               "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
@@ -167,9 +178,9 @@ export default function NewTicketPage() {
           }}
         >
           {isRouteLoading ? <LinearProgress sx={{ mb: 1.2 }} /> : null}
-          <Stack spacing={1.6}>
+          <Stack spacing={isCompact ? 0.9 : 1.6}>
             <Form method="post" aria-label="Create support ticket form">
-              <Stack spacing={1.4}>
+              <Stack spacing={isCompact ? 0.7 : 1.4}>
                 <FormControl size="small" error={Boolean(actionData?.fieldErrors?.subject)}>
                   <InputLabel htmlFor="support-ticket-subject">Subject</InputLabel>
                   <OutlinedInput
@@ -180,6 +191,11 @@ export default function NewTicketPage() {
                     onChange={(event) => setSubject(event.target.value)}
                     placeholder="Example: Deployment failed after pushing commit"
                     inputProps={{ "aria-label": "Ticket subject", maxLength: 120 }}
+                    sx={
+                      isCompact
+                        ? { "& .MuiInputBase-input": { py: 0.85, fontSize: "0.82rem" } }
+                        : undefined
+                    }
                   />
                   <FormHelperText>
                     {actionData?.fieldErrors?.subject ??
@@ -197,6 +213,7 @@ export default function NewTicketPage() {
                     onChange={(event) => setCategory(event.target.value)}
                     label="Category"
                     inputProps={{ "aria-label": "Ticket category" }}
+                    sx={isCompact ? { "& .MuiSelect-select": { py: 0.85, fontSize: "0.82rem" } } : undefined}
                   >
                     {categoryOptions.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -218,9 +235,14 @@ export default function NewTicketPage() {
                     value={body}
                     onChange={(event) => setBody(event.target.value)}
                     multiline
-                    minRows={6}
+                    minRows={isCompact ? 4 : 6}
                     placeholder="What happened? What did you expect? Include key details."
                     inputProps={{ "aria-label": "Ticket description", maxLength: 2000 }}
+                    sx={
+                      isCompact
+                        ? { "& .MuiInputBase-inputMultiline": { py: 0.7, fontSize: "0.8rem" } }
+                        : undefined
+                    }
                   />
                   <FormHelperText>
                     {actionData?.fieldErrors?.body ??
@@ -242,17 +264,18 @@ export default function NewTicketPage() {
                   </Alert>
                 ) : null}
 
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={isCompact ? 0.6 : 1}>
                   <Button
                     type="submit"
                     variant="contained"
                     startIcon={<SendOutlinedIcon />}
                     disabled={isSubmitting}
                     aria-label="Submit support ticket"
+                    size={actionButtonSize}
                   >
                     {isSubmitting ? "Submitting..." : "Submit ticket"}
                   </Button>
-                  <Button component={Link} to="/console/support/tickets" variant="text">
+                  <Button component={Link} to="/console/support/tickets" variant="text" size={actionButtonSize}>
                     Cancel
                   </Button>
                 </Stack>

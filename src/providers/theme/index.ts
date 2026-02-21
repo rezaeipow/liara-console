@@ -1,4 +1,5 @@
-import { alpha, createTheme } from "@mui/material/styles";
+import { alpha, createTheme, type PaletteMode } from "@mui/material/styles";
+import type { TableDensity } from "../../app/store/slices/uiSlice";
 
 const glass = {
   base: "rgba(255, 255, 255, 0.72)",
@@ -8,31 +9,110 @@ const glass = {
   highlight: "rgba(255, 255, 255, 0.92)",
 };
 
-export const Theme = createTheme({
-  palette: {
-    mode: "light",
-    primary: {
-      main: "#1f6feb",
-      dark: "#1158c7",
-      light: "#5f95ff",
-      contrastText: "#ffffff",
+export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "standard") {
+  const isDark = mode === "dark";
+  const isCompact = tableDensity === "compact";
+  const densityTokens =
+    tableDensity === "comfortable"
+      ? {
+          cellPaddingY: 16,
+          cellPaddingX: 18,
+          smallCellPaddingY: 14,
+          bodyFontSize: "0.93rem",
+          headFontSize: "0.84rem",
+          lineHeight: 1.55,
+          rowMinHeight: 62,
+          headRowMinHeight: 54,
+        }
+      : tableDensity === "compact"
+        ? {
+            cellPaddingY: 8,
+            cellPaddingX: 9,
+            smallCellPaddingY: 7,
+            bodyFontSize: "0.78rem",
+            headFontSize: "0.72rem",
+            lineHeight: 1.25,
+            rowMinHeight: 31,
+            headRowMinHeight: 27,
+          }
+        : {
+            cellPaddingY: 11,
+            cellPaddingX: 14,
+            smallCellPaddingY: 9,
+            bodyFontSize: "0.86rem",
+            headFontSize: "0.78rem",
+            lineHeight: 1.4,
+            rowMinHeight: 46,
+            headRowMinHeight: 40,
+          };
+  const uiDensityTokens =
+    tableDensity === "comfortable"
+      ? {
+          radius: 18,
+          controlMinHeight: 42,
+          controlPaddingX: 1.55,
+          controlPaddingY: 1.1,
+          listItemPaddingY: 1.2,
+          listItemPaddingX: 1.2,
+          contentGap: 1.1,
+          bodyFontSize: "0.95rem",
+          bodyLineHeight: 1.58,
+          captionFontSize: "0.8rem",
+          chipHeight: 30,
+        }
+      : tableDensity === "compact"
+        ? {
+            radius: 9,
+            controlMinHeight: 30,
+            controlPaddingX: 0.8,
+            controlPaddingY: 0.32,
+            listItemPaddingY: 0.34,
+            listItemPaddingX: 0.58,
+            contentGap: 0.46,
+            bodyFontSize: "0.82rem",
+            bodyLineHeight: 1.3,
+            captionFontSize: "0.66rem",
+            chipHeight: 20,
+          }
+        : {
+            radius: 14,
+            controlMinHeight: 36,
+            controlPaddingX: 1.1,
+            controlPaddingY: 0.62,
+            listItemPaddingY: 0.72,
+            listItemPaddingX: 0.9,
+            contentGap: 0.74,
+            bodyFontSize: "0.88rem",
+            bodyLineHeight: 1.42,
+            captionFontSize: "0.72rem",
+            chipHeight: 24,
+          };
+
+  return createTheme({
+    palette: {
+      mode,
+      primary: {
+        main: "#1f6feb",
+        dark: "#1158c7",
+        light: "#5f95ff",
+        contrastText: "#ffffff",
+      },
+      secondary: {
+        main: "#0ea5a4",
+        contrastText: "#ffffff",
+      },
+      background: {
+        default: isDark ? "#081225" : "#eaf2ff",
+        paper: isDark ? alpha("#0f172a", 0.72) : glass.base,
+      },
+      text: {
+        primary: isDark ? "#e5edf8" : "#0f172a",
+        secondary: isDark ? "#b9c5d8" : "#334155",
+      },
+      divider: isDark ? alpha("#dbeafe", 0.18) : alpha("#ffffff", 0.45),
     },
-    secondary: {
-      main: "#0ea5a4",
-      contrastText: "#ffffff",
-    },
-    background: {
-      default: "#eaf2ff",
-      paper: glass.base,
-    },
-    text: {
-      primary: "#0f172a",
-      secondary: "#334155",
-    },
-    divider: alpha("#ffffff", 0.45),
-  },
   shape: {
-    borderRadius: 18,
+    borderRadius: uiDensityTokens.radius,
   },
   typography: {
     fontFamily: `"Vazirmatn", "Segoe UI", "Tahoma", sans-serif`,
@@ -42,6 +122,18 @@ export const Theme = createTheme({
     h4: { fontWeight: 700 },
     h5: { fontWeight: 700 },
     h6: { fontWeight: 700 },
+    body1: {
+      fontSize: uiDensityTokens.bodyFontSize,
+      lineHeight: uiDensityTokens.bodyLineHeight,
+    },
+    body2: {
+      fontSize: isCompact ? "0.78rem" : tableDensity === "comfortable" ? "0.9rem" : "0.84rem",
+      lineHeight: isCompact ? 1.24 : tableDensity === "comfortable" ? 1.5 : 1.35,
+    },
+    caption: {
+      fontSize: uiDensityTokens.captionFontSize,
+      lineHeight: isCompact ? 1.15 : 1.25,
+    },
     button: {
       fontWeight: 600,
       letterSpacing: 0.2,
@@ -80,8 +172,9 @@ export const Theme = createTheme({
       styleOverrides: {
         body: {
           minHeight: "100vh",
-          background:
-            "radial-gradient(1100px circle at 5% -10%, rgba(96, 165, 250, 0.26), transparent 55%), radial-gradient(1100px circle at 95% -15%, rgba(20, 184, 166, 0.20), transparent 50%), linear-gradient(180deg, #f6f9ff 0%, #eaf2ff 45%, #f5f9ff 100%)",
+          background: isDark
+            ? "radial-gradient(1200px circle at 5% -10%, rgba(37, 99, 235, 0.30), transparent 52%), radial-gradient(1200px circle at 95% -15%, rgba(20, 184, 166, 0.22), transparent 48%), linear-gradient(180deg, #030712 0%, #081225 46%, #0b1830 100%)"
+            : "radial-gradient(1100px circle at 5% -10%, rgba(96, 165, 250, 0.26), transparent 55%), radial-gradient(1100px circle at 95% -15%, rgba(20, 184, 166, 0.20), transparent 50%), linear-gradient(180deg, #f6f9ff 0%, #eaf2ff 45%, #f5f9ff 100%)",
           backgroundAttachment: "fixed",
         },
       },
@@ -90,32 +183,34 @@ export const Theme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: "none",
-          backgroundColor: glass.base,
-          border: `1px solid ${glass.border}`,
+          backgroundColor: isDark ? alpha("#0f172a", 0.72) : glass.base,
+          border: `1px solid ${isDark ? alpha("#dbeafe", 0.18) : glass.border}`,
           backdropFilter: "blur(18px) saturate(160%)",
           WebkitBackdropFilter: "blur(18px) saturate(160%)",
           boxShadow: "0 10px 28px rgba(15, 23, 42, 0.12)",
           position: "relative",
           overflow: "hidden",
+          borderRadius: uiDensityTokens.radius,
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          backgroundColor: glass.soft,
-          border: `1px solid ${glass.border}`,
+          backgroundColor: isDark ? alpha("#0f172a", 0.64) : glass.soft,
+          border: `1px solid ${isDark ? alpha("#dbeafe", 0.18) : glass.border}`,
           backdropFilter: "blur(16px) saturate(150%)",
           boxShadow: "0 12px 30px rgba(15, 23, 42, 0.10)",
+          borderRadius: uiDensityTokens.radius,
         },
       },
     },
     MuiAppBar: {
       styleOverrides: {
         root: {
-          color: "#0f172a",
-          backgroundColor: glass.strong,
-          borderBottom: `1px solid ${glass.border}`,
+          color: isDark ? "#e5edf8" : "#0f172a",
+          backgroundColor: isDark ? alpha("#0f172a", 0.84) : glass.strong,
+          borderBottom: `1px solid ${isDark ? alpha("#dbeafe", 0.18) : glass.border}`,
           backdropFilter: "blur(14px) saturate(145%)",
           boxShadow: "0 8px 24px rgba(15, 23, 42, 0.10)",
           overflow: "visible",
@@ -125,8 +220,8 @@ export const Theme = createTheme({
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: glass.strong,
-          borderRight: `1px solid ${glass.border}`,
+          backgroundColor: isDark ? alpha("#0f172a", 0.84) : glass.strong,
+          borderRight: `1px solid ${isDark ? alpha("#dbeafe", 0.18) : glass.border}`,
           backdropFilter: "blur(16px) saturate(150%)",
         },
       },
@@ -134,15 +229,31 @@ export const Theme = createTheme({
     MuiDialog: {
       styleOverrides: {
         paper: {
-          backgroundColor: glass.strong,
-          border: `1px solid ${glass.border}`,
+          backgroundColor: isDark ? alpha("#0f172a", 0.84) : glass.strong,
+          border: `1px solid ${isDark ? alpha("#dbeafe", 0.18) : glass.border}`,
           backdropFilter: "blur(20px) saturate(155%)",
           boxShadow: "0 20px 44px rgba(15, 23, 42, 0.18)",
         },
       },
     },
     MuiButton: {
+      defaultProps: {
+        size: isCompact ? "small" : "medium",
+      },
       styleOverrides: {
+        root: {
+          minHeight: `${uiDensityTokens.controlMinHeight}px`,
+          padding: `${uiDensityTokens.controlPaddingY}rem ${uiDensityTokens.controlPaddingX}rem`,
+          borderRadius: uiDensityTokens.radius * (isCompact ? 0.52 : 0.68),
+        },
+        sizeSmall: {
+          minHeight: `${Math.max(26, uiDensityTokens.controlMinHeight - 4)}px`,
+          padding: isCompact
+            ? "0.22rem 0.62rem"
+            : tableDensity === "comfortable"
+              ? "0.46rem 0.98rem"
+              : "0.34rem 0.82rem",
+        },
         containedPrimary: {
           boxShadow: "0 10px 24px rgba(31, 111, 235, 0.28)",
           "&:hover": {
@@ -150,11 +261,11 @@ export const Theme = createTheme({
           },
         },
         outlined: {
-          borderColor: alpha("#0f172a", 0.16),
-          backgroundColor: alpha("#ffffff", 0.44),
+          borderColor: isDark ? alpha("#dbeafe", 0.2) : alpha("#0f172a", 0.16),
+          backgroundColor: isDark ? alpha("#0f172a", 0.5) : alpha("#ffffff", 0.44),
           "&:hover": {
-            borderColor: alpha("#0f172a", 0.28),
-            backgroundColor: alpha("#ffffff", 0.62),
+            borderColor: isDark ? alpha("#dbeafe", 0.34) : alpha("#0f172a", 0.28),
+            backgroundColor: isDark ? alpha("#0f172a", 0.68) : alpha("#ffffff", 0.62),
           },
         },
       },
@@ -162,14 +273,19 @@ export const Theme = createTheme({
     MuiDivider: {
       styleOverrides: {
         root: {
-          borderColor: alpha("#ffffff", 0.7),
+          borderColor: isDark ? alpha("#dbeafe", 0.2) : alpha("#ffffff", 0.7),
         },
       },
     },
     MuiListItemButton: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
+          borderRadius: uiDensityTokens.radius * (isCompact ? 0.55 : 0.72),
+          paddingTop: `${uiDensityTokens.listItemPaddingY}rem`,
+          paddingBottom: `${uiDensityTokens.listItemPaddingY}rem`,
+          paddingLeft: `${uiDensityTokens.listItemPaddingX}rem`,
+          paddingRight: `${uiDensityTokens.listItemPaddingX}rem`,
+          gap: `${uiDensityTokens.contentGap}rem`,
           "&.Mui-selected": {
             backgroundColor: alpha("#1f6feb", 0.12),
             border: `1px solid ${alpha("#1f6feb", 0.2)}`,
@@ -183,8 +299,8 @@ export const Theme = createTheme({
     MuiTableContainer: {
       styleOverrides: {
         root: {
-          backgroundColor: glass.soft,
-          border: `1px solid ${glass.border}`,
+          backgroundColor: isDark ? alpha("#0f172a", 0.64) : glass.soft,
+          border: `1px solid ${isDark ? alpha("#dbeafe", 0.18) : glass.border}`,
           backdropFilter: "blur(14px) saturate(140%)",
           boxShadow: "0 10px 24px rgba(15, 23, 42, 0.08)",
         },
@@ -193,16 +309,101 @@ export const Theme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         root: {
-          borderBottom: `1px solid ${alpha("#ffffff", 0.64)}`,
+          borderBottom: `1px solid ${isDark ? alpha("#dbeafe", 0.16) : alpha("#ffffff", 0.64)}`,
+          paddingTop: `${densityTokens.cellPaddingY}px`,
+          paddingBottom: `${densityTokens.cellPaddingY}px`,
+          paddingLeft: `${densityTokens.cellPaddingX}px`,
+          paddingRight: `${densityTokens.cellPaddingX}px`,
+          fontSize: densityTokens.bodyFontSize,
+          lineHeight: densityTokens.lineHeight,
+          transition: "padding .18s ease, font-size .18s ease, line-height .18s ease",
+        },
+        sizeSmall: {
+          paddingTop: `${densityTokens.smallCellPaddingY}px`,
+          paddingBottom: `${densityTokens.smallCellPaddingY}px`,
+          paddingLeft: `${densityTokens.cellPaddingX}px`,
+          paddingRight: `${densityTokens.cellPaddingX}px`,
+          fontSize: densityTokens.bodyFontSize,
+          lineHeight: densityTokens.lineHeight,
+        },
+        head: {
+          fontSize: densityTokens.headFontSize,
+          fontWeight: 700,
+          letterSpacing: "0.01em",
+        },
+      },
+    },
+    MuiTableRow: {
+      styleOverrides: {
+        root: {
+          minHeight: `${densityTokens.rowMinHeight}px`,
+          transition: "min-height .18s ease",
+        },
+        head: {
+          minHeight: `${densityTokens.headRowMinHeight}px`,
         },
       },
     },
     MuiChip: {
+      defaultProps: {
+        size: isCompact ? "small" : "medium",
+      },
       styleOverrides: {
         root: {
-          backgroundColor: alpha("#ffffff", 0.62),
-          border: `1px solid ${alpha("#ffffff", 0.74)}`,
+          height: `${uiDensityTokens.chipHeight}px`,
+          backgroundColor: isDark ? alpha("#0f172a", 0.58) : alpha("#ffffff", 0.62),
+          border: `1px solid ${isDark ? alpha("#dbeafe", 0.22) : alpha("#ffffff", 0.74)}`,
           backdropFilter: "blur(10px) saturate(130%)",
+          borderRadius: uiDensityTokens.radius * (isCompact ? 0.5 : 0.66),
+          "& .MuiChip-label": {
+            paddingInline: isCompact ? 6 : 10,
+            fontSize: isCompact ? "0.66rem" : tableDensity === "comfortable" ? "0.82rem" : "0.74rem",
+            lineHeight: isCompact ? 1.05 : 1.2,
+          },
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          minHeight: `${uiDensityTokens.controlMinHeight}px`,
+          borderRadius: uiDensityTokens.radius * (isCompact ? 0.52 : 0.68),
+        },
+        input: {
+          paddingTop: `${uiDensityTokens.controlPaddingY}rem`,
+          paddingBottom: `${uiDensityTokens.controlPaddingY}rem`,
+          paddingLeft: `${uiDensityTokens.controlPaddingX}rem`,
+          paddingRight: `${uiDensityTokens.controlPaddingX}rem`,
+          fontSize: uiDensityTokens.bodyFontSize,
+          lineHeight: uiDensityTokens.bodyLineHeight,
+        },
+        inputMultiline: {
+          paddingTop: isCompact ? "0.38rem" : tableDensity === "comfortable" ? "0.95rem" : "0.65rem",
+          paddingBottom: isCompact ? "0.38rem" : tableDensity === "comfortable" ? "0.95rem" : "0.65rem",
+          paddingLeft: isCompact ? "0.62rem" : tableDensity === "comfortable" ? "1rem" : "0.8rem",
+          paddingRight: isCompact ? "0.62rem" : tableDensity === "comfortable" ? "1rem" : "0.8rem",
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          fontSize: isCompact ? "0.8rem" : tableDensity === "comfortable" ? "0.94rem" : "0.86rem",
+        },
+      },
+    },
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          borderRadius: uiDensityTokens.radius * (isCompact ? 0.5 : 0.66),
+          paddingTop: isCompact ? "0.2rem" : undefined,
+          paddingBottom: isCompact ? "0.2rem" : undefined,
+        },
+        message: {
+          paddingTop: isCompact ? "0.18rem" : undefined,
+          paddingBottom: isCompact ? "0.18rem" : undefined,
+          fontSize: isCompact ? "0.76rem" : undefined,
+          lineHeight: isCompact ? 1.2 : undefined,
         },
       },
     },
@@ -217,3 +418,6 @@ export const Theme = createTheme({
     },
   },
 });
+}
+
+export const Theme = buildTheme("light");
