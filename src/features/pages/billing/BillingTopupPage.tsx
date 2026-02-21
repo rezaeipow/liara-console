@@ -274,37 +274,39 @@ export default function BillingTopupPage() {
                   You do not have recent payments yet.
                 </Typography>
               ) : (
-                recentPayments.map((payment) => (
-                  <Stack
-                    key={payment.id}
-                    role="listitem"
-                    direction={{ xs: "column", sm: "row" }}
-                    justifyContent="space-between"
-                    alignItems={{ xs: "flex-start", sm: "center" }}
-                    spacing={1}
-                    sx={{
-                      p: 1,
-                      borderRadius: 1.2,
-                      border: `1px solid ${alpha("#0f172a", 0.1)}`,
-                      backgroundColor: alpha("#ffffff", 0.56),
-                    }}
-                  >
-                    <Stack spacing={0.15}>
-                      <Typography variant="body2" fontWeight={700}>
-                        {formatIrr(payment.amount)}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {formatDateTime(payment.createdAt)}
-                      </Typography>
+                <Stack spacing={1} role="list" aria-label="Recent top-up payments">
+                  {recentPayments.map((payment) => (
+                    <Stack
+                      key={payment.id}
+                      role="listitem"
+                      direction={{ xs: "column", sm: "row" }}
+                      justifyContent="space-between"
+                      alignItems={{ xs: "flex-start", sm: "center" }}
+                      spacing={1}
+                      sx={{
+                        p: 1,
+                        borderRadius: 1.2,
+                        border: `1px solid ${alpha("#0f172a", 0.1)}`,
+                        backgroundColor: alpha("#ffffff", 0.56),
+                      }}
+                    >
+                      <Stack spacing={0.15}>
+                        <Typography variant="body2" fontWeight={700}>
+                          {formatIrr(payment.amount)}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {formatDateTime(payment.createdAt)}
+                        </Typography>
+                      </Stack>
+                      <Chip
+                        size="small"
+                        color={payment.status === "success" ? "success" : "error"}
+                        variant="outlined"
+                        label={payment.status === "success" ? "Success" : "Failed"}
+                      />
                     </Stack>
-                    <Chip
-                      size="small"
-                      color={payment.status === "success" ? "success" : "error"}
-                      variant="outlined"
-                      label={payment.status === "success" ? "Success" : "Failed"}
-                    />
-                  </Stack>
-                ))
+                  ))}
+                </Stack>
               )}
             </Stack>
           </Paper>

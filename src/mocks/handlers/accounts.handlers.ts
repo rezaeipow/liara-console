@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 import type { HttpHandler } from "msw";
-import { createId, db } from "../data/db";
+import { createId, db, getBillingByAccountId } from "../data/db";
 
 export const accountHandlers: HttpHandler[] = [
   http.get("/accounts", () => {
@@ -18,6 +18,7 @@ export const accountHandlers: HttpHandler[] = [
 
     const account = { id: createId("acc"), name: body.name };
     db.accounts.unshift(account);
+    getBillingByAccountId(account.id);
 
     return HttpResponse.json(account, { status: 201 });
   }),
@@ -65,6 +66,7 @@ export const accountHandlers: HttpHandler[] = [
     }
 
     db.accounts.splice(targetIndex, 1);
+    delete db.billingByAccountId[accountId];
 
     if (db.activeAccountId === accountId) {
       db.activeAccountId = db.accounts[0]?.id ?? null;

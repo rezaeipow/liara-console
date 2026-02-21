@@ -67,6 +67,15 @@ export default function BillingInvoicesPage() {
     setDownloadingId(invoiceId);
     try {
       const payload = await BillingAPI.downloadInvoice(invoiceId);
+      const link = document.createElement("a");
+      link.href = payload.url;
+      link.download = payload.filename;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      document.body.append(link);
+      link.click();
+      link.remove();
+
       setNotice({
         message: `Mock download ready: ${payload.filename}`,
         severity: "success",

@@ -96,20 +96,24 @@ export type Notification = {
   createdAt: string;
 };
 
+export type BillingState = {
+  credit: number;
+  payments: Payment[];
+  invoices: Invoice[];
+};
+
 export type MockDb = {
   token: string;
   user: User;
   authUsers: AuthUser[];
-  credit: number;
-  activeAccountId: string;
+  activeAccountId: string | null;
   accounts: Account[];
+  billingByAccountId: Record<string, BillingState>;
   projects: Project[];
   apps: App[];
   deployments: Deployment[];
   envByAppId: Record<string, EnvVar[]>;
   vms: Vm[];
-  payments: Payment[];
-  invoices: Invoice[];
   tickets: Ticket[];
   notifications: Notification[];
 };
@@ -134,12 +138,26 @@ export const createSeedData = (): MockDb => {
         password: "Password123!",
       },
     ],
-    credit: 750000,
     activeAccountId: "acc-1",
     accounts: [
       { id: "acc-1", name: "Main Account" },
       { id: "acc-2", name: "Team Account" },
     ],
+    billingByAccountId: {
+      "acc-1": {
+        credit: 750000,
+        payments: [],
+        invoices: [{ id: "inv-1", amount: 150000, createdAt: now, status: "paid" }],
+      },
+      "acc-2": {
+        credit: 230000,
+        payments: [
+          { id: "pay-seed-1", amount: 50000, createdAt: now, status: "success" },
+          { id: "pay-seed-2", amount: 30000, createdAt: now, status: "failed" },
+        ],
+        invoices: [{ id: "inv-2", amount: 90000, createdAt: now, status: "unpaid" }],
+      },
+    },
     projects: [
       {
         id: "prj-1",
@@ -186,10 +204,6 @@ export const createSeedData = (): MockDb => {
         disk: 40,
       },
     ],
-    payments: [],
-    invoices: [
-      { id: "inv-1", amount: 150000, createdAt: now, status: "paid" },
-    ],
     tickets: [
       {
         id: "t-1",
@@ -212,4 +226,3 @@ export const createSeedData = (): MockDb => {
     ],
   };
 };
-

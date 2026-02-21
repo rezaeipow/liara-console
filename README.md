@@ -1,73 +1,85 @@
-# React + TypeScript + Vite
+# Liara Console Clone
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Mock implementation of Liara dashboard/console using React, React Router 7 data APIs, TypeScript, MUI, Redux Toolkit, and MSW.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 19 + React Router 7
+- TypeScript
+- MUI
+- Redux Toolkit
+- MSW (mock API)
+- Vitest + React Testing Library
+- Playwright
 
-## React Compiler
+## Prerequisites
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js 20+
+- npm 10+
+- Google Chrome installed at:
+  - `C:\Program Files\Google\Chrome\Application\chrome.exe`
+  - Or set `PLAYWRIGHT_CHROME_PATH`
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Run
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+App runs at `http://localhost:5173`.
+
+## Scripts
+
+- `npm run dev`: start Vite dev server
+- `npm run build`: type-check and build production assets
+- `npm run lint`: run ESLint
+- `npm run test:unit`: run unit tests
+- `npm run test:integration`: run integration tests
+- `npm run test:e2e`: run Playwright e2e tests
+
+## Mock API (MSW)
+
+Handlers are in `src/mocks/handlers`.
+
+Billing endpoints:
+
+- `GET /billing/credit`
+- `POST /billing/topup`
+- `GET /billing/payments`
+- `GET /billing/invoices`
+- `GET /billing/invoices/:id/download`
+
+Billing data is scoped by `activeAccountId` in mock DB:
+
+- `src/mocks/data/seed.ts`
+- `src/mocks/data/db.ts`
+
+### Mock error/timeout controls (Billing)
+
+For deterministic testing, billing handlers support forcing failures:
+
+- query param: `?mockStatus=401|403|404|500|timeout`
+- header: `x-mock-status: 401|403|404|500|timeout`
+
+Example:
+
+```bash
+curl "http://localhost:5173/billing/credit?mockStatus=500"
+```
+
+`timeout` intentionally delays longer than HTTP client timeout, so UI should receive a `408` timeout error from the client layer.
+
+## Project Docs
+
+- Architecture details: `ARCHITECTURE.md`
+
+## Known Limitations
+
+- Test coverage and scenario count are still in progress against final task requirements.
+- Some flows are intentionally mock-only (for example invoice download target is mock path).

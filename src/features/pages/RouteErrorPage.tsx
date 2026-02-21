@@ -10,6 +10,7 @@ export default function RouteErrorPage() {
 
   if (isRouteErrorResponse(error)) {
     details = `${error.status} ${error.statusText}`;
+    if (error.status === 408) statusHint = "The request timed out. Please retry.";
     if (error.status === 401) statusHint = "Please login again and retry.";
     if (error.status === 403) statusHint = "You do not have permission for this resource.";
     if (error.status === 404) statusHint = "The requested data was not found.";
@@ -27,7 +28,7 @@ export default function RouteErrorPage() {
     <Box sx={{ p: 3 }}>
       <Alert severity="error">
         <Stack spacing={1}>
-          <Typography variant="body2">مشکلي در بارگذاري اين مسير رخ داده است.</Typography>
+          <Typography variant="body2">Something went wrong while loading this route.</Typography>
           {details ? (
             <Typography variant="caption" display="block">
               {details}

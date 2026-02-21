@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 import type { HttpHandler } from "msw";
-import { createId, db, paginate } from "../data/db";
+import { createId, db, getActiveBilling, paginate } from "../data/db";
 
 export const projectHandlers: HttpHandler[] = [
   http.get("/projects/meta", () => {
@@ -48,10 +48,14 @@ export const projectHandlers: HttpHandler[] = [
     if (!body.name || !body.region || !body.plan) {
       return HttpResponse.json({ message: "Invalid payload" }, { status: 400 });
     }
+    const activeAccountId = db.activeAccountId ?? db.accounts[0]?.id;
+    if (!activeAccountId) {
+      return HttpResponse.json({ message: "No account available" }, { status: 400 });
+    }
 
     const project = {
       id: createId("prj"),
-      accountId: db.activeAccountId,
+      accountId: activeAccountId,
       name: body.name,
       region: body.region,
       plan: body.plan,
@@ -94,11 +98,12 @@ export const projectHandlers: HttpHandler[] = [
         createdAt: new Date(now - 1000 * 60 * 60 * 2).toISOString(),
       },
     ];
+    const billing = getActiveBilling();
 
     return HttpResponse.json({
       ...project,
       servicesSummary: { apps: appCount, vms: vmCount },
-      billingSnapshot: { credit: db.credit },
+      billingSnapshot: { credit: billing.credit },
       activity,
     });
   }),
