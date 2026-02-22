@@ -368,6 +368,12 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
         root: {
           minHeight: `${uiDensityTokens.controlMinHeight}px`,
           borderRadius: uiDensityTokens.radius * (isCompact ? 0.52 : 0.68),
+          "& .MuiInputAdornment-positionStart": {
+            marginRight: isCompact ? 4 : 6,
+          },
+          "& .MuiInputAdornment-positionEnd": {
+            marginLeft: isCompact ? 4 : 6,
+          },
         },
         input: {
           paddingTop: `${uiDensityTokens.controlPaddingY}rem`,
@@ -376,6 +382,12 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
           paddingRight: `${uiDensityTokens.controlPaddingX}rem`,
           fontSize: uiDensityTokens.bodyFontSize,
           lineHeight: uiDensityTokens.bodyLineHeight,
+          "&.MuiInputBase-inputAdornedStart": {
+            paddingLeft: 0,
+          },
+          "&.MuiInputBase-inputAdornedEnd": {
+            paddingRight: 0,
+          },
         },
         inputMultiline: {
           paddingTop: isCompact ? "0.38rem" : tableDensity === "comfortable" ? "0.95rem" : "0.65rem",

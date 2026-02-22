@@ -37,6 +37,7 @@ import {
   NewProjectPage,
   NewTicketPage,
   NotificationsPage,
+  ProfilePage,
   ProjectAppsPage,
   ProjectOverviewPage,
   ProjectsPage,
@@ -249,6 +250,7 @@ export function createAppRouter() {
         action: notificationsAction,
         errorElement: <RouteFallback />,
       },
+      { path: "profile", element: withSuspense(<ProfilePage />) },
       { path: "settings", element: withSuspense(<SettingsPage />) },
       {
         path: "*",

@@ -73,6 +73,9 @@ export const TicketDetailPage = lazy(
 export const NotificationsPage = lazy(
   () => import("../../features/pages/notifications/NotificationsPage"),
 );
+export const ProfilePage = lazy(
+  () => import("../../features/pages/profile/ProfilePage"),
+);
 export const SettingsPage = lazy(
   () => import("../../features/pages/settings/SettingsPage"),
 );

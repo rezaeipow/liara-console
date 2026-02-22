@@ -26,6 +26,7 @@ import {
 import { Link, useFetcher, useLocation } from "react-router-dom";
 import { NotificationsAPI } from "../../api/notificationsApi";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
+import { selectUser } from "../../app/store/slices/authSlice";
 import { selectAccounts, selectActiveAccountId } from "../../app/store/slices/accountSlice";
 import {
   hideToast,
@@ -48,6 +49,7 @@ export default function Topbar() {
   const sidebarMode = useAppSelector(selectSidebarMode);
   const toast = useAppSelector(selectToast);
   const unreadNotificationsCount = useAppSelector(selectUnreadNotificationsCount);
+  const user = useAppSelector(selectUser);
   const location = useLocation();
 
   const accounts = useAppSelector(selectAccounts);
@@ -221,8 +223,11 @@ export default function Topbar() {
             size={isXs ? "medium" : "large"}
             sx={{ p: { xs: 0.75, sm: 1 } }}
           >
-            <Avatar sx={{ width: { xs: 28, sm: 32 }, height: { xs: 28, sm: 32 } }}>
-              <AccountCircleIcon />
+            <Avatar
+              src={user?.avatar}
+              sx={{ width: { xs: 28, sm: 32 }, height: { xs: 28, sm: 32 } }}
+            >
+              {user?.name?.trim()?.[0]?.toUpperCase() ?? <AccountCircleIcon />}
             </Avatar>
           </IconButton>
 
@@ -233,8 +238,12 @@ export default function Topbar() {
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             transformOrigin={{ vertical: "top", horizontal: "right" }}
           >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
+            <MenuItem component={Link} to="/console/profile" onClick={handleMenuClose}>
+              Profile
+            </MenuItem>
+            <MenuItem component={Link} to="/console/settings" onClick={handleMenuClose}>
+              Settings
+            </MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
           </Box>
