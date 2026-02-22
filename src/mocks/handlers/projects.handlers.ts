@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 import type { HttpHandler } from "msw";
-import { createId, db, getActiveBilling, paginate } from "../data/db";
+import { createId, db, getActiveBilling, paginate, persistRuntimeState } from "../data/db";
 
 export const projectHandlers: HttpHandler[] = [
   http.get("/projects/meta", () => {
@@ -63,6 +63,7 @@ export const projectHandlers: HttpHandler[] = [
     };
 
     db.projects.unshift(project);
+    persistRuntimeState();
     return HttpResponse.json(project, { status: 201 });
   }),
 
@@ -124,6 +125,7 @@ export const projectHandlers: HttpHandler[] = [
     }
 
     project.name = name;
+    persistRuntimeState();
     return HttpResponse.json(project);
   }),
 
@@ -138,6 +140,7 @@ export const projectHandlers: HttpHandler[] = [
     db.projects.splice(index, 1);
     db.apps = db.apps.filter((item) => item.projectId !== projectId);
     db.vms = db.vms.filter((item) => item.projectId !== projectId);
+    persistRuntimeState();
 
     return HttpResponse.json({ id: projectId });
   }),

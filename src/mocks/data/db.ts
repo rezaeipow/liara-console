@@ -1,10 +1,135 @@
 import { createSeedData } from "./seed";
+import type { BillingState, MockDb, Notification, Project, Ticket } from "./seed";
 
-export const db = createSeedData();
+const ACCOUNTS_STORAGE_KEY = "mock-accounts-state";
+const RUNTIME_STORAGE_KEY = "mock-runtime-state";
+
+type PersistedAccountsState = {
+  accounts: MockDb["accounts"];
+  activeAccountId: string | null;
+};
+
+type PersistedRuntimeState = {
+  projects: Project[];
+  billingByAccountId: Record<string, BillingState>;
+  tickets: Ticket[];
+  notifications: Notification[];
+};
+
+function canUseStorage() {
+  return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+}
+
+function readPersistedAccountsState(): PersistedAccountsState | null {
+  if (!canUseStorage()) return null;
+  try {
+    const raw = window.localStorage.getItem(ACCOUNTS_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<PersistedAccountsState>;
+    if (!Array.isArray(parsed.accounts)) return null;
+    const accounts = parsed.accounts
+      .filter(
+        (item): item is MockDb["accounts"][number] =>
+          Boolean(item) &&
+          typeof item.id === "string" &&
+          item.id.trim().length > 0 &&
+          typeof item.name === "string" &&
+          item.name.trim().length > 0,
+      )
+      .map((item) => ({ id: item.id.trim(), name: item.name.trim() }));
+    if (accounts.length === 0) return null;
+
+    return {
+      accounts,
+      activeAccountId:
+        typeof parsed.activeAccountId === "string" ? parsed.activeAccountId : null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function applyPersistedAccountsState(target: MockDb) {
+  const persisted = readPersistedAccountsState();
+  if (!persisted) return;
+  target.accounts = persisted.accounts;
+  target.activeAccountId =
+    persisted.activeAccountId &&
+    persisted.accounts.some((item) => item.id === persisted.activeAccountId)
+      ? persisted.activeAccountId
+      : persisted.accounts[0]?.id ?? null;
+}
+
+function readPersistedRuntimeState(): PersistedRuntimeState | null {
+  if (!canUseStorage()) return null;
+  try {
+    const raw = window.localStorage.getItem(RUNTIME_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<PersistedRuntimeState>;
+    if (!Array.isArray(parsed.projects)) return null;
+    if (!parsed.billingByAccountId || typeof parsed.billingByAccountId !== "object") return null;
+    if (!Array.isArray(parsed.tickets)) return null;
+    if (!Array.isArray(parsed.notifications)) return null;
+
+    return {
+      projects: parsed.projects,
+      billingByAccountId: parsed.billingByAccountId,
+      tickets: parsed.tickets,
+      notifications: parsed.notifications,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function applyPersistedRuntimeState(target: MockDb) {
+  const persisted = readPersistedRuntimeState();
+  if (!persisted) return;
+  target.projects = persisted.projects;
+  target.billingByAccountId = persisted.billingByAccountId;
+  target.tickets = persisted.tickets;
+  target.notifications = persisted.notifications;
+}
+
+const initialDb = createSeedData();
+applyPersistedAccountsState(initialDb);
+applyPersistedRuntimeState(initialDb);
+
+export const db = initialDb;
 
 export const resetDb = () => {
   const next = createSeedData();
+  applyPersistedAccountsState(next);
+  applyPersistedRuntimeState(next);
   Object.assign(db, next);
+};
+
+export const persistAccountsState = () => {
+  if (!canUseStorage()) return;
+  try {
+    const payload: PersistedAccountsState = {
+      accounts: db.accounts.map((item) => ({ id: item.id, name: item.name })),
+      activeAccountId: db.activeAccountId,
+    };
+    window.localStorage.setItem(ACCOUNTS_STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+    // ignore storage errors
+  }
+};
+
+export const persistRuntimeState = () => {
+  if (!canUseStorage()) return;
+  try {
+    const payload: PersistedRuntimeState = {
+      projects: db.projects,
+      billingByAccountId: db.billingByAccountId,
+      tickets: db.tickets,
+      notifications: db.notifications,
+    };
+    window.localStorage.setItem(RUNTIME_STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+    // ignore storage errors
+  }
 };
 
 export const createId = (prefix: string) =>
@@ -19,6 +144,7 @@ const createEmptyBillingState = () => ({
 export const getBillingByAccountId = (accountId: string) => {
   if (!db.billingByAccountId[accountId]) {
     db.billingByAccountId[accountId] = createEmptyBillingState();
+    persistRuntimeState();
   }
   return db.billingByAccountId[accountId];
 };
@@ -28,6 +154,7 @@ export const getActiveBilling = () => {
   const activeAccountId = db.activeAccountId ?? fallbackAccountId;
   if (!db.activeAccountId) {
     db.activeAccountId = activeAccountId;
+    persistAccountsState();
   }
   return getBillingByAccountId(activeAccountId);
 };

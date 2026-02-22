@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from "msw";
 import type { HttpHandler } from "msw";
-import { createId, getActiveBilling } from "../data/db";
+import { createId, getActiveBilling, persistRuntimeState } from "../data/db";
 
 const TIMEOUT_DELAY_MS = 13_000;
 
@@ -79,6 +79,7 @@ export const billingHandlers: HttpHandler[] = [
       createdAt: new Date().toISOString(),
       status: "success",
     });
+    persistRuntimeState();
 
     return HttpResponse.json({ success: true, credit: billing.credit }, { status: 201 });
   }),

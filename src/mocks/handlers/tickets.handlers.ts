@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 import type { HttpHandler } from "msw";
-import { createId, db } from "../data/db";
+import { createId, db, persistRuntimeState } from "../data/db";
 
 export const ticketHandlers: HttpHandler[] = [
   http.get("/tickets", () => {
@@ -29,6 +29,7 @@ export const ticketHandlers: HttpHandler[] = [
     };
 
     db.tickets.unshift(ticket);
+    persistRuntimeState();
     return HttpResponse.json(ticket, { status: 201 });
   }),
 
@@ -70,6 +71,7 @@ export const ticketHandlers: HttpHandler[] = [
     };
 
     ticket.replies.push(supportReply);
+    persistRuntimeState();
     return HttpResponse.json(reply, { status: 201 });
   }),
 ];

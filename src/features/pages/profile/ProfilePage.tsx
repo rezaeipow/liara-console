@@ -41,7 +41,7 @@ import {
 import { selectActiveAccount } from "../../../app/store/slices/accountSlice";
 import { showToast } from "../../../app/store/slices/uiSlice";
 
-const PHONE_STORAGE_KEY = "console-profile-phone";
+const PHONE_STORAGE_KEY_PREFIX = "console-profile-phone";
 const LAST_LOGIN_STORAGE_KEY = "console-profile-last-login";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
@@ -60,6 +60,10 @@ function writeStorage(key: string, value: string) {
   } catch {
     // ignore storage failures
   }
+}
+
+function getPhoneStorageKey(userId: string): string {
+  return `${PHONE_STORAGE_KEY_PREFIX}:${userId}`;
 }
 
 function formatDateTime(value: string): string {
@@ -95,9 +99,6 @@ export default function ProfilePage() {
   }, [user]);
 
   useEffect(() => {
-    const storedPhone = readStorage(PHONE_STORAGE_KEY);
-    setPhone(storedPhone);
-
     const storedLogin = readStorage(LAST_LOGIN_STORAGE_KEY);
     if (storedLogin) {
       setLastLoginAt(storedLogin);
@@ -107,6 +108,11 @@ export default function ProfilePage() {
     setLastLoginAt(now);
     writeStorage(LAST_LOGIN_STORAGE_KEY, now);
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    setPhone(readStorage(getPhoneStorageKey(user.id)));
+  }, [user?.id]);
 
   const trimmedName = name.trim();
   const trimmedEmail = email.trim();
@@ -136,7 +142,7 @@ export default function ProfilePage() {
       (trimmedName !== (user.name ?? "") ||
         trimmedEmail !== (user.email ?? "") ||
         trimmedAvatarDraft !== (user.avatar ?? "") ||
-        trimmedPhone !== readStorage(PHONE_STORAGE_KEY)),
+        trimmedPhone !== readStorage(getPhoneStorageKey(user.id))),
   );
 
   const securityTone = user?.twoFAEnabled ? "success" : "warning";
@@ -163,7 +169,7 @@ export default function ProfilePage() {
         avatar: trimmedAvatarDraft || undefined,
       }),
     );
-    writeStorage(PHONE_STORAGE_KEY, trimmedPhone);
+    writeStorage(getPhoneStorageKey(user.id), trimmedPhone);
     dispatch(showToast({ message: "Profile updated successfully.", severity: "success" }));
   };
 

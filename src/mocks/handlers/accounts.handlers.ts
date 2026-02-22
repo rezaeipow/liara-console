@@ -1,6 +1,12 @@
 import { http, HttpResponse } from "msw";
 import type { HttpHandler } from "msw";
-import { createId, db, getBillingByAccountId } from "../data/db";
+import {
+  createId,
+  db,
+  getBillingByAccountId,
+  persistAccountsState,
+  persistRuntimeState,
+} from "../data/db";
 
 export const accountHandlers: HttpHandler[] = [
   http.get("/accounts", () => {
@@ -19,6 +25,8 @@ export const accountHandlers: HttpHandler[] = [
     const account = { id: createId("acc"), name: body.name };
     db.accounts.unshift(account);
     getBillingByAccountId(account.id);
+    persistAccountsState();
+    persistRuntimeState();
 
     return HttpResponse.json(account, { status: 201 });
   }),
@@ -30,6 +38,7 @@ export const accountHandlers: HttpHandler[] = [
     }
 
     db.activeAccountId = body.accountId;
+    persistAccountsState();
     return HttpResponse.json({ activeAccountId: db.activeAccountId });
   }),
 
@@ -54,6 +63,7 @@ export const accountHandlers: HttpHandler[] = [
     }
 
     account.name = body.name.trim();
+    persistAccountsState();
     return HttpResponse.json(account);
   }),
 
@@ -71,6 +81,8 @@ export const accountHandlers: HttpHandler[] = [
     if (db.activeAccountId === accountId) {
       db.activeAccountId = db.accounts[0]?.id ?? null;
     }
+    persistAccountsState();
+    persistRuntimeState();
 
     return HttpResponse.json({ id: accountId, activeAccountId: db.activeAccountId });
   }),

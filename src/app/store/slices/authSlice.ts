@@ -10,6 +10,8 @@ interface PersistedAuth {
   user: User | null;
 }
 
+type PersistedProfileCache = Record<string, Partial<User>>;
+
 export interface AuthState {
   user: User | null;
   token: string | null;
@@ -19,6 +21,56 @@ export interface AuthState {
 }
 
 const STORAGE_KEY = "console-auth-session";
+const PROFILE_CACHE_KEY = "console-auth-profile-cache";
+
+function cacheKeyForUser(user: Pick<User, "id" | "email">): string {
+  return user.id || user.email.toLowerCase();
+}
+
+function readProfileCache(): PersistedProfileCache {
+  try {
+    const raw = localStorage.getItem(PROFILE_CACHE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as PersistedProfileCache;
+    if (!parsed || typeof parsed !== "object") return {};
+    return parsed;
+  } catch {
+    return {};
+  }
+}
+
+function writeProfileCache(cache: PersistedProfileCache) {
+  try {
+    localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(cache));
+  } catch {
+    // ignore persistence errors
+  }
+}
+
+function mergeUserWithProfileCache(user: User | null): User | null {
+  if (!user) return null;
+  const cache = readProfileCache();
+  const cached = cache[cacheKeyForUser(user)];
+  if (!cached) return user;
+  return {
+    ...user,
+    ...cached,
+  };
+}
+
+function upsertProfileCache(user: User | null) {
+  if (!user) return;
+  const cache = readProfileCache();
+  const key = cacheKeyForUser(user);
+  cache[key] = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    avatar: user.avatar,
+    twoFAEnabled: user.twoFAEnabled,
+  };
+  writeProfileCache(cache);
+}
 
 function readPersistedAuth(): PersistedAuth {
   try {
@@ -30,7 +82,7 @@ function readPersistedAuth(): PersistedAuth {
     const parsed = JSON.parse(raw) as PersistedAuth;
     return {
       token: parsed.token ?? null,
-      user: parsed.user ?? null,
+      user: mergeUserWithProfileCache(parsed.user ?? null),
     };
   } catch {
     return { token: null, user: null };
@@ -40,6 +92,7 @@ function readPersistedAuth(): PersistedAuth {
 function persistAuth(payload: PersistedAuth) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    upsertProfileCache(payload.user);
   } catch {
     // ignore persistence errors
   }
@@ -143,16 +196,19 @@ const authSlice = createSlice({
       if (!state.user) return;
       state.user = { ...state.user, ...action.payload };
       persistAuth({ token: state.token, user: state.user });
+      upsertProfileCache(state.user);
     },
     enable2FA(state) {
       if (!state.user) return;
       state.user.twoFAEnabled = true;
       persistAuth({ token: state.token, user: state.user });
+      upsertProfileCache(state.user);
     },
     disable2FA(state) {
       if (!state.user) return;
       state.user.twoFAEnabled = false;
       persistAuth({ token: state.token, user: state.user });
+      upsertProfileCache(state.user);
     },
   },
   extraReducers: (builder) => {
@@ -164,7 +220,7 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.status = "authenticated";
         state.error = null;
-        state.user = action.payload.user;
+        state.user = mergeUserWithProfileCache(action.payload.user);
         state.token = action.payload.token;
         state.initialized = true;
         persistAuth({ token: state.token, user: state.user });
@@ -180,7 +236,7 @@ const authSlice = createSlice({
       .addCase(signup.fulfilled, (state, action) => {
         state.status = "authenticated";
         state.error = null;
-        state.user = action.payload.user;
+        state.user = mergeUserWithProfileCache(action.payload.user);
         state.token = action.payload.token;
         state.initialized = true;
         persistAuth({ token: state.token, user: state.user });
@@ -196,7 +252,7 @@ const authSlice = createSlice({
       .addCase(fetchMe.fulfilled, (state, action) => {
         state.status = "authenticated";
         state.error = null;
-        state.user = action.payload;
+        state.user = mergeUserWithProfileCache(action.payload);
         state.initialized = true;
         persistAuth({ token: state.token, user: state.user });
       })

@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 import type { HttpHandler } from "msw";
-import { db } from "../data/db";
+import { db, persistRuntimeState } from "../data/db";
 
 export const notificationHandlers: HttpHandler[] = [
   http.get("/notifications", () => {
@@ -14,6 +14,7 @@ export const notificationHandlers: HttpHandler[] = [
     }
 
     notification.read = true;
+    persistRuntimeState();
     return HttpResponse.json({ success: true });
   }),
 
@@ -21,6 +22,7 @@ export const notificationHandlers: HttpHandler[] = [
     db.notifications.forEach((n) => {
       n.read = true;
     });
+    persistRuntimeState();
 
     return HttpResponse.json({ success: true });
   }),

@@ -239,7 +239,7 @@ export default function AccountsPage() {
               <Stack direction="row" spacing={1} alignItems="center">
                 <ViewListOutlinedIcon />
                 <Typography variant="h6" fontWeight={800}>
-                  Accounts
+                  Accounts List
                 </Typography>
               </Stack>
 
