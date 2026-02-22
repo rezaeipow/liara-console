@@ -10,6 +10,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { alpha, useTheme } from "@mui/material/styles";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PublicIcon from "@mui/icons-material/Public";
@@ -24,6 +25,7 @@ import {
 import type { ProjectCreateActionData, ProjectCreateLoaderData } from "./projectsData";
 
 export default function NewProjectPage() {
+  const theme = useTheme();
   const actionData = useActionData() as ProjectCreateActionData | undefined;
   const loaderData = useLoaderData() as ProjectCreateLoaderData;
   const navigation = useNavigation();
@@ -46,9 +48,8 @@ export default function NewProjectPage() {
         sx={{
           p: { xs: 2, sm: 2.5 },
           borderRadius: { xs: 1.5, sm: 2 },
-          background:
-            "linear-gradient(120deg, rgba(31,111,235,0.14), rgba(14,165,164,0.10))",
-          border: "1px solid rgba(31,111,235,0.22)",
+          background: `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.14)}, ${alpha(theme.palette.secondary.main, 0.1)})`,
+          border: `1px solid ${alpha(theme.palette.primary.main, 0.22)}`,
         }}
       >
         <Stack spacing={0.75}>

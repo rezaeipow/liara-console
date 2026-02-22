@@ -23,7 +23,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { useMemo, useState } from "react";
 import { Link, useFetcher, useLoaderData } from "react-router-dom";
 import type {
@@ -32,6 +32,7 @@ import type {
 } from "./projectsData";
 
 export default function ProjectOverviewPage() {
+  const theme = useTheme();
   const { project } = useLoaderData() as ProjectOverviewLoaderData;
   const actionFetcher = useFetcher<ProjectOverviewActionData>();
 
@@ -118,9 +119,8 @@ export default function ProjectOverviewPage() {
           sx={{
             p: { xs: 2, sm: 2.5 },
             borderRadius: { xs: 1.5, sm: 2 },
-            border: "1px solid rgba(31,111,235,0.22)",
-            background:
-              "linear-gradient(120deg, rgba(31,111,235,0.14), rgba(14,165,164,0.10))",
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.22)}`,
+            background: `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.14)}, ${alpha(theme.palette.secondary.main, 0.1)})`,
           }}
         >
           <Stack spacing={1.2}>
@@ -175,7 +175,7 @@ export default function ProjectOverviewPage() {
             gap: 1.5,
           }}
         >
-          <Paper variant="outlined" sx={{ p: 1.75, borderColor: alpha("#1f6feb", 0.2) }}>
+          <Paper variant="outlined" sx={{ p: 1.75, borderColor: alpha(theme.palette.primary.main, 0.2) }}>
             <Stack spacing={1.1}>
               <Stack direction="row" spacing={1} alignItems="center">
                 <AppsIcon fontSize="small" />
@@ -197,7 +197,7 @@ export default function ProjectOverviewPage() {
             </Stack>
           </Paper>
 
-          <Paper variant="outlined" sx={{ p: 1.75, borderColor: alpha("#1f6feb", 0.2) }}>
+          <Paper variant="outlined" sx={{ p: 1.75, borderColor: alpha(theme.palette.primary.main, 0.2) }}>
             <Stack spacing={1.1}>
               <Stack direction="row" spacing={1} alignItems="center">
                 <StorageIcon fontSize="small" />
@@ -219,7 +219,7 @@ export default function ProjectOverviewPage() {
             </Stack>
           </Paper>
 
-          <Paper variant="outlined" sx={{ p: 1.75, borderColor: alpha("#1f6feb", 0.2) }}>
+          <Paper variant="outlined" sx={{ p: 1.75, borderColor: alpha(theme.palette.primary.main, 0.2) }}>
             <Stack spacing={1.1}>
               <Stack direction="row" spacing={1} alignItems="center">
                 <ReceiptLongIcon fontSize="small" />
@@ -241,7 +241,7 @@ export default function ProjectOverviewPage() {
             </Stack>
           </Paper>
 
-          <Paper variant="outlined" sx={{ p: 1.75, borderColor: alpha("#1f6feb", 0.2) }}>
+          <Paper variant="outlined" sx={{ p: 1.75, borderColor: alpha(theme.palette.primary.main, 0.2) }}>
             <Stack spacing={1.1}>
               <Stack direction="row" spacing={1} alignItems="center">
                 <TimelineIcon fontSize="small" />
@@ -275,8 +275,8 @@ export default function ProjectOverviewPage() {
                 sx={{
                   p: 1.1,
                   borderRadius: 1.25,
-                    border: `1px solid ${alpha("#0f172a", 0.08)}`,
-                  backgroundColor: alpha("#ffffff", 0.5),
+                    border: `1px solid ${alpha(theme.palette.text.primary, 0.08)}`,
+                  backgroundColor: alpha(theme.palette.common.white, 0.5),
                 }}
               >
                 <Typography variant="body2" fontWeight={600}>

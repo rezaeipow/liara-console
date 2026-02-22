@@ -1,4 +1,4 @@
-﻿import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import BoltOutlinedIcon from "@mui/icons-material/BoltOutlined";
 import CreditCardOutlinedIcon from "@mui/icons-material/CreditCardOutlined";
@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import { useAppSelector } from "../../../app/store/hooks";
 import { selectActiveAccount } from "../../../app/store/slices/accountSlice";
 import { selectTableDensity, selectUnreadNotificationsCount } from "../../../app/store/slices/uiSlice";
+import { glassBackdrop } from "../../../shared/ui/glassTokens";
 
 type QuickAction = {
   id: string;
@@ -75,10 +76,10 @@ export default function ConsoleHomePage() {
         sx={{
           p: isCompact ? { xs: 1.2, sm: 1.4 } : { xs: 2.1, sm: 2.6 },
           borderRadius: isCompact ? { xs: 0.9, sm: 1.1 } : { xs: 1.5, sm: 2 },
-          border: "1px solid rgba(31,111,235,0.34)",
-          background:
-            "linear-gradient(120deg, rgba(31,111,235,0.24), rgba(14,165,164,0.16))",
-          backdropFilter: "blur(14px)",
+          border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.34)}`,
+          background: (theme) =>
+            `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.24)}, ${alpha(theme.palette.secondary.main, 0.16)})`,
+          backdropFilter: glassBackdrop.hero,
         }}
       >
         <Stack
@@ -190,10 +191,10 @@ export default function ConsoleHomePage() {
           sx={{
             p: isCompact ? { xs: 1.1, sm: 1.3 } : { xs: 1.8, sm: 2.2 },
             borderRadius: isCompact ? { xs: 0.9, sm: 1.1 } : { xs: 1.5, sm: 2 },
-            border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
-            backdropFilter: "blur(10px)",
+            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+            background: (theme) =>
+              `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.88)}, ${alpha(theme.palette.common.white, 0.76)})`,
+            backdropFilter: glassBackdrop.card,
           }}
         >
           <Stack spacing={isCompact ? 0.65 : 1.1}>
@@ -214,8 +215,8 @@ export default function ConsoleHomePage() {
                   sx={{
                     p: isCompact ? 0.75 : 1.1,
                     borderRadius: isCompact ? 0.8 : 1.3,
-                    border: `1px solid ${alpha("#0f172a", 0.1)}`,
-                    backgroundColor: alpha("#ffffff", 0.56),
+                    border: (theme) => `1px solid ${alpha(theme.palette.text.primary, 0.1)}`,
+                    backgroundColor: (theme) => alpha(theme.palette.common.white, 0.56),
                   }}
                 >
                   <Stack spacing={0.2}>
@@ -249,10 +250,10 @@ export default function ConsoleHomePage() {
           sx={{
             p: isCompact ? { xs: 1.1, sm: 1.3 } : { xs: 1.8, sm: 2.2 },
             borderRadius: isCompact ? { xs: 0.9, sm: 1.1 } : { xs: 1.5, sm: 2 },
-            border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.74))",
-            backdropFilter: "blur(10px)",
+            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+            background: (theme) =>
+              `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.86)}, ${alpha(theme.palette.common.white, 0.74)})`,
+            backdropFilter: glassBackdrop.card,
           }}
         >
           <Stack spacing={isCompact ? 0.65 : 1.1}>
@@ -268,8 +269,8 @@ export default function ConsoleHomePage() {
                   sx={{
                     p: isCompact ? 0.7 : 1,
                     borderRadius: isCompact ? 0.75 : 1.2,
-                    border: `1px solid ${alpha("#0f172a", 0.08)}`,
-                    backgroundColor: alpha("#ffffff", 0.48),
+                    border: (theme) => `1px solid ${alpha(theme.palette.text.primary, 0.08)}`,
+                    backgroundColor: (theme) => alpha(theme.palette.common.white, 0.48),
                   }}
                 >
                   <ReceiptLongOutlinedIcon fontSize="small" />
@@ -317,10 +318,10 @@ function StatCard({ title, value, hint, icon, to }: StatCardProps) {
       sx={{
         p: 1.6,
         borderRadius: 1.5,
-        borderColor: alpha("#1f6feb", 0.24),
-        background:
-          "linear-gradient(165deg, rgba(255,255,255,0.9), rgba(255,255,255,0.78))",
-        backdropFilter: "blur(10px)",
+        borderColor: (theme) => alpha(theme.palette.primary.main, 0.24),
+        background: (theme) =>
+          `linear-gradient(165deg, ${alpha(theme.palette.common.white, 0.9)}, ${alpha(theme.palette.common.white, 0.78)})`,
+        backdropFilter: glassBackdrop.card,
       }}
     >
       <Stack spacing={0.8}>
@@ -351,3 +352,4 @@ function StatCard({ title, value, hint, icon, to }: StatCardProps) {
     </Paper>
   );
 }
+

@@ -15,7 +15,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppsAPI } from "../../../api/appsApi";
@@ -33,6 +33,7 @@ const MAX_LOG_ITEMS = 120;
 const STREAM_INTERVAL_MS = 3500;
 
 export default function AppLogsPage() {
+  const theme = useTheme();
   const { appId } = useParams();
   const [logs, setLogs] = useState<LogItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -225,18 +226,18 @@ export default function AppLogsPage() {
         sx={{
           p: { xs: 1.5, sm: 1.75 },
           borderRadius: 1.5,
-          border: `1px solid ${alpha("#1f6feb", 0.15)}`,
-          background: "linear-gradient(180deg, rgba(2,6,23,0.84), rgba(15,23,42,0.82))",
+          border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}`,
+          background: `linear-gradient(180deg, ${alpha(theme.palette.text.primary, 0.9)}, ${alpha(theme.palette.text.primary, 0.82)})`,
         }}
       >
         {isLoading ? (
           <Stack spacing={1}>
             {Array.from({ length: 4 }).map((_, idx) => (
-              <Paper
-                key={`logs-skeleton-${idx}`}
-                variant="outlined"
-                sx={{ p: 1, borderColor: alpha("#ffffff", 0.12) }}
-              >
+                <Paper
+                  key={`logs-skeleton-${idx}`}
+                  variant="outlined"
+                  sx={{ p: 1, borderColor: alpha(theme.palette.common.white, 0.12) }}
+                >
                 <Stack spacing={0.75}>
                   <Skeleton variant="text" width="80%" />
                   <Skeleton variant="text" width="35%" />
@@ -257,8 +258,8 @@ export default function AppLogsPage() {
                   px: 1,
                   py: 0.9,
                   borderRadius: 1.1,
-                  border: `1px solid ${alpha("#94a3b8", 0.22)}`,
-                  backgroundColor: alpha("#0f172a", 0.45),
+                  border: `1px solid ${alpha(theme.palette.text.secondary, 0.22)}`,
+                  backgroundColor: alpha(theme.palette.text.primary, 0.45),
                 }}
               >
                 <Stack direction="row" spacing={0.8} alignItems="center" sx={{ mb: 0.55 }}>
@@ -268,14 +269,14 @@ export default function AppLogsPage() {
                     color={getChipColor(item.level)}
                     sx={{ textTransform: "uppercase", fontWeight: 700, height: 22 }}
                   />
-                  <Typography variant="caption" sx={{ color: alpha("#cbd5e1", 0.88) }}>
+                  <Typography variant="caption" sx={{ color: alpha(theme.palette.common.white, 0.82) }}>
                     {dateTimeFormatter.format(new Date(item.fetchedAt))}
                   </Typography>
                 </Stack>
                 <Typography
                   variant="body2"
                   sx={{
-                    color: alpha("#e2e8f0", 0.96),
+                    color: alpha(theme.palette.common.white, 0.95),
                     fontFamily: '"Cascadia Code", "Consolas", monospace',
                     wordBreak: "break-word",
                   }}

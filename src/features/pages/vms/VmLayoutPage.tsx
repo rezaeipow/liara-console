@@ -1,12 +1,13 @@
 import DnsOutlinedIcon from "@mui/icons-material/DnsOutlined";
 import { Box, Button, Chip, Divider, Paper, Skeleton, Stack, Typography } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useParams } from "react-router-dom";
 import { VmsAPI } from "../../../api/vmsApi";
 import type { Vm } from "../../../api/types";
 
 export default function VmLayoutPage() {
+  const theme = useTheme();
   const { vmId } = useParams();
   const [vm, setVm] = useState<Vm | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,16 +48,16 @@ export default function VmLayoutPage() {
   const statusChipSx =
     vm?.status === "running"
       ? {
-          backgroundColor: "#1d4ed8",
-          color: "#ffffff",
-          borderColor: "#1e40af",
-          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+          borderColor: theme.palette.primary.dark,
+          "& .MuiChip-label": { color: theme.palette.primary.contrastText, fontWeight: 700 },
         }
       : {
-          backgroundColor: "#6b7280",
-          color: "#ffffff",
-          borderColor: "#4b5563",
-          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+          backgroundColor: alpha(theme.palette.text.secondary, 0.9),
+          color: theme.palette.common.white,
+          borderColor: alpha(theme.palette.text.secondary, 0.98),
+          "& .MuiChip-label": { color: theme.palette.common.white, fontWeight: 700 },
         };
 
   return (
@@ -74,8 +75,8 @@ export default function VmLayoutPage() {
         sx={{
           p: { xs: 2, sm: 2.5 },
           borderRadius: { xs: 1.5, sm: 2 },
-          border: "1px solid rgba(31,111,235,0.22)",
-          background: "linear-gradient(120deg, rgba(31,111,235,0.14), rgba(14,165,164,0.10))",
+          border: `1px solid ${alpha(theme.palette.primary.main, 0.22)}`,
+          background: `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.14)}, ${alpha(theme.palette.secondary.main, 0.1)})`,
         }}
       >
         {isLoading ? (
@@ -138,8 +139,8 @@ export default function VmLayoutPage() {
                     minWidth: { xs: 0, sm: 88 },
                     whiteSpace: "nowrap",
                     "&.active": {
-                      borderColor: alpha("#1f6feb", 0.42),
-                      backgroundColor: alpha("#1f6feb", 0.12),
+                      borderColor: alpha(theme.palette.primary.main, 0.42),
+                      backgroundColor: alpha(theme.palette.primary.main, 0.12),
                     },
                   }}
                 >

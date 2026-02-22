@@ -14,7 +14,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { useMemo, useState } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
 import type { Vm } from "../../../api/types";
@@ -42,6 +42,7 @@ function normalize(series: number[], max: number) {
 }
 
 export default function VmMetricsPage() {
+  const theme = useTheme();
   const { vmId } = useParams();
   const { vm, isLoading, error } = useOutletContext<VmLayoutContext>();
   const [range, setRange] = useState<RangeKey>("24h");
@@ -91,8 +92,8 @@ export default function VmMetricsPage() {
         sx={{
           p: { xs: 1.5, sm: 1.8 },
           borderRadius: 1.75,
-          border: `1px solid ${alpha("#1f6feb", 0.18)}`,
-          background: "linear-gradient(160deg, rgba(31,111,235,0.12), rgba(14,116,144,0.08))",
+          border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
+          background: `linear-gradient(160deg, ${alpha(theme.palette.primary.main, 0.12)}, ${alpha(theme.palette.secondary.main, 0.08)})`,
         }}
       >
         <Stack spacing={1.1}>

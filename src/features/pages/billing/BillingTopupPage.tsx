@@ -1,4 +1,4 @@
-﻿import AddCardOutlinedIcon from "@mui/icons-material/AddCardOutlined";
+import AddCardOutlinedIcon from "@mui/icons-material/AddCardOutlined";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { useMemo, useState, type ChangeEvent } from "react";
+import { glassBackdrop } from "../../../shared/ui/glassTokens";
 import {
   Form,
   Link,
@@ -90,10 +91,10 @@ export default function BillingTopupPage() {
           sx={{
           p: { xs: 2, sm: 2.5 },
           borderRadius: { xs: 1.5, sm: 2 },
-          border: "1px solid rgba(31,111,235,0.32)",
-          background:
-            "linear-gradient(130deg, rgba(31,111,235,0.20), rgba(14,165,164,0.14))",
-          backdropFilter: "blur(14px)",
+          border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.32)}`,
+          background: (theme) =>
+            `linear-gradient(130deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.14)})`,
+          backdropFilter: glassBackdrop.hero,
         }}
         >
           <Stack
@@ -145,10 +146,10 @@ export default function BillingTopupPage() {
             sx={{
               p: { xs: 2, sm: 2.5 },
               borderRadius: { xs: 1.5, sm: 2 },
-              border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
-              backdropFilter: "blur(10px)",
+              border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+              background: (theme) =>
+                `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.88)}, ${alpha(theme.palette.common.white, 0.76)})`,
+              backdropFilter: glassBackdrop.card,
             }}
           >
             {isRouteLoading ? <LinearProgress sx={{ mb: 1.2 }} /> : null}
@@ -255,10 +256,10 @@ export default function BillingTopupPage() {
             sx={{
               p: { xs: 2, sm: 2.5 },
               borderRadius: { xs: 1.5, sm: 2 },
-              border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.74))",
-              backdropFilter: "blur(10px)",
+              border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+              background: (theme) =>
+                `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.86)}, ${alpha(theme.palette.common.white, 0.74)})`,
+              backdropFilter: glassBackdrop.card,
             }}
           >
             <Stack spacing={1.2}>
@@ -286,8 +287,8 @@ export default function BillingTopupPage() {
                       sx={{
                         p: 1,
                         borderRadius: 1.2,
-                        border: `1px solid ${alpha("#0f172a", 0.1)}`,
-                        backgroundColor: alpha("#ffffff", 0.56),
+                        border: (theme) => `1px solid ${alpha(theme.palette.text.primary, 0.1)}`,
+                        backgroundColor: (theme) => alpha(theme.palette.common.white, 0.56),
                       }}
                     >
                       <Stack spacing={0.15}>
@@ -330,3 +331,4 @@ export default function BillingTopupPage() {
     </>
   );
 }
+

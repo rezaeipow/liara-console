@@ -11,7 +11,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { NavLink, useOutletContext, useParams } from "react-router-dom";
 import { AppsAPI } from "../../../api/appsApi";
@@ -24,6 +24,7 @@ type AppLayoutContext = {
 };
 
 export default function AppOverviewPage() {
+  const theme = useTheme();
   const { appId } = useParams();
   const { app, isLoading, error } = useOutletContext<AppLayoutContext>();
 
@@ -91,7 +92,7 @@ export default function AppOverviewPage() {
           gap: 1.25,
         }}
       >
-        <Paper variant="outlined" sx={{ p: 1.5, borderColor: alpha("#1f6feb", 0.2) }}>
+        <Paper variant="outlined" sx={{ p: 1.5, borderColor: alpha(theme.palette.primary.main, 0.2) }}>
           <Stack spacing={0.75}>
             <Stack direction="row" spacing={0.8} alignItems="center">
               <ReceiptLongIcon fontSize="small" />
@@ -106,7 +107,7 @@ export default function AppOverviewPage() {
           </Stack>
         </Paper>
 
-        <Paper variant="outlined" sx={{ p: 1.5, borderColor: alpha("#1f6feb", 0.2) }}>
+        <Paper variant="outlined" sx={{ p: 1.5, borderColor: alpha(theme.palette.primary.main, 0.2) }}>
           <Stack spacing={0.75}>
             <Stack direction="row" spacing={0.8} alignItems="center">
               <KeyIcon fontSize="small" />
@@ -121,7 +122,7 @@ export default function AppOverviewPage() {
           </Stack>
         </Paper>
 
-        <Paper variant="outlined" sx={{ p: 1.5, borderColor: alpha("#1f6feb", 0.2) }}>
+        <Paper variant="outlined" sx={{ p: 1.5, borderColor: alpha(theme.palette.primary.main, 0.2) }}>
           <Stack spacing={0.75}>
             <Stack direction="row" spacing={0.8} alignItems="center">
               <DnsIcon fontSize="small" />
@@ -141,8 +142,8 @@ export default function AppOverviewPage() {
         variant="outlined"
         sx={{
           p: 1.5,
-          borderColor: alpha("#0f172a", 0.12),
-          backgroundColor: alpha("#ffffff", 0.5),
+          borderColor: alpha(theme.palette.text.primary, 0.12),
+          backgroundColor: alpha(theme.palette.common.white, 0.5),
         }}
       >
         <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mb: 0.6 }}>

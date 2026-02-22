@@ -28,6 +28,7 @@ import {
 } from "react-router-dom";
 import { useAppSelector } from "../../../app/store/hooks";
 import { selectTableDensity } from "../../../app/store/slices/uiSlice";
+import { glassBackdrop } from "../../../shared/ui/glassTokens";
 import type { NewTicketLoaderData, TicketActionData } from "./supportData";
 
 const DRAFT_KEY = "support-ticket-draft";
@@ -118,10 +119,10 @@ export default function NewTicketPage() {
           sx={{
             p: isCompact ? { xs: 1.2, sm: 1.4 } : { xs: 2, sm: 2.5 },
             borderRadius: isCompact ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
-            border: "1px solid rgba(31,111,235,0.32)",
-            background:
-              "linear-gradient(120deg, rgba(31,111,235,0.20), rgba(14,165,164,0.14))",
-            backdropFilter: "blur(14px)",
+            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.32)}`,
+            background: (theme) =>
+              `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.14)})`,
+            backdropFilter: glassBackdrop.hero,
           }}
         >
           <Stack
@@ -171,10 +172,10 @@ export default function NewTicketPage() {
           sx={{
             p: isCompact ? { xs: 1.2, sm: 1.4 } : { xs: 2, sm: 2.5 },
             borderRadius: isCompact ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
-            border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
-            backdropFilter: "blur(10px)",
+            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+            background: (theme) =>
+              `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.88)}, ${alpha(theme.palette.common.white, 0.76)})`,
+            backdropFilter: glassBackdrop.card,
           }}
         >
           {isRouteLoading ? <LinearProgress sx={{ mb: 1.2 }} /> : null}
@@ -297,3 +298,4 @@ export default function NewTicketPage() {
     </>
   );
 }
+

@@ -18,7 +18,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLoaderData, useNavigation, useSearchParams } from "react-router-dom";
 import type { ProjectsLoaderData } from "./projectsData";
@@ -38,6 +38,7 @@ const sortOptions: SortMode[] = ["created-desc", "created-asc", "name-asc", "nam
 const healthOptions: HealthFilter[] = ["all", "healthy", "provisioning"];
 
 export default function ProjectsPage() {
+  const theme = useTheme();
   const data = useLoaderData() as ProjectsLoaderData;
   const navigation = useNavigation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -152,9 +153,8 @@ export default function ProjectsPage() {
         sx={{
           p: { xs: 2, sm: 2.5 },
           borderRadius: { xs: 1.5, sm: 2 },
-          background:
-            "linear-gradient(120deg, rgba(31,111,235,0.14), rgba(14,165,164,0.10))",
-          border: "1px solid rgba(31,111,235,0.22)",
+          background: `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.14)}, ${alpha(theme.palette.secondary.main, 0.1)})`,
+          border: `1px solid ${alpha(theme.palette.primary.main, 0.22)}`,
         }}
       >
         <Stack
@@ -202,9 +202,8 @@ export default function ProjectsPage() {
         sx={{
           p: { xs: 2, sm: 2.5 },
           borderRadius: { xs: 1.5, sm: 2 },
-          border: "1px solid rgba(148,163,184,0.24)",
-          background:
-            "linear-gradient(180deg, rgba(148,163,184,0.06), rgba(255,255,255,0.52))",
+          border: `1px solid ${alpha(theme.palette.text.secondary, 0.24)}`,
+          background: `linear-gradient(180deg, ${alpha(theme.palette.text.secondary, 0.06)}, ${alpha(theme.palette.common.white, 0.52)})`,
         }}
       >
         <Stack spacing={1.5}>
@@ -256,10 +255,10 @@ export default function ProjectsPage() {
                 sx={
                   healthFilter === "healthy"
                     ? {
-                        backgroundColor: "#1d4ed8",
-                        color: "#ffffff",
-                        borderColor: "#1e40af",
-                        "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+                        backgroundColor: theme.palette.primary.main,
+                        color: theme.palette.primary.contrastText,
+                        borderColor: theme.palette.primary.dark,
+                        "& .MuiChip-label": { color: theme.palette.primary.contrastText, fontWeight: 700 },
                       }
                     : undefined
                 }
@@ -273,10 +272,10 @@ export default function ProjectsPage() {
                 sx={
                   healthFilter === "provisioning"
                     ? {
-                        backgroundColor: "#92400e",
-                        color: "#ffffff",
-                        borderColor: "#78350f",
-                        "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+                        backgroundColor: theme.palette.warning.dark,
+                        color: theme.palette.warning.contrastText,
+                        borderColor: alpha(theme.palette.warning.dark, 0.95),
+                        "& .MuiChip-label": { color: theme.palette.warning.contrastText, fontWeight: 700 },
                       }
                     : undefined
                 }
@@ -379,14 +378,13 @@ export default function ProjectsPage() {
                     minHeight: 196,
                     display: "flex",
                     flexDirection: "column",
-                    borderColor: alpha("#1f6feb", 0.12),
-                    background:
-                      "linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.52))",
+                    borderColor: alpha(theme.palette.primary.main, 0.12),
+                    background: `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.72)}, ${alpha(theme.palette.common.white, 0.52)})`,
                     transition: "transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease",
                     "&:hover": {
                       transform: "translateY(-2px)",
-                      borderColor: alpha("#1f6feb", 0.32),
-                      boxShadow: "0 16px 30px rgba(15, 23, 42, 0.14)",
+                      borderColor: alpha(theme.palette.primary.main, 0.32),
+                      boxShadow: `0 16px 30px ${alpha(theme.palette.text.primary, 0.14)}`,
                     },
                   }}
                 >
@@ -425,9 +423,9 @@ export default function ProjectsPage() {
                         sx={{
                           textTransform: "capitalize",
                           alignSelf: "flex-start",
-                          backgroundColor: alpha("#0f172a", 0.9),
-                          color: "#ffffff",
-                          border: `1px solid ${alpha("#0f172a", 0.95)}`,
+                          backgroundColor: alpha(theme.palette.text.primary, 0.9),
+                          color: theme.palette.common.white,
+                          border: `1px solid ${alpha(theme.palette.text.primary, 0.95)}`,
                           height: 26,
                           display: "inline-flex",
                           alignItems: "center",
@@ -450,8 +448,8 @@ export default function ProjectsPage() {
                         px: 1.2,
                         py: 1,
                         borderRadius: 1.4,
-                        border: `1px solid ${alpha("#0f172a", 0.08)}`,
-                        backgroundColor: alpha("#ffffff", 0.52),
+                        border: `1px solid ${alpha(theme.palette.text.primary, 0.08)}`,
+                        backgroundColor: alpha(theme.palette.common.white, 0.52),
                       }}
                     >
                       <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
@@ -469,8 +467,8 @@ export default function ProjectsPage() {
                           px: 1,
                           py: 0.75,
                           borderRadius: 1.2,
-                          border: `1px solid ${alpha("#0f172a", 0.08)}`,
-                          backgroundColor: alpha("#ffffff", 0.48),
+                          border: `1px solid ${alpha(theme.palette.text.primary, 0.08)}`,
+                          backgroundColor: alpha(theme.palette.common.white, 0.48),
                         }}
                       >
                         <Stack direction="row" alignItems="center" spacing={0.5}>
@@ -489,8 +487,8 @@ export default function ProjectsPage() {
                           px: 1,
                           py: 0.75,
                           borderRadius: 1.2,
-                          border: `1px solid ${alpha("#0f172a", 0.08)}`,
-                          backgroundColor: alpha("#ffffff", 0.48),
+                          border: `1px solid ${alpha(theme.palette.text.primary, 0.08)}`,
+                          backgroundColor: alpha(theme.palette.common.white, 0.48),
                         }}
                       >
                         <Stack direction="row" alignItems="center" spacing={0.5}>

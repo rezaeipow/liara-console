@@ -1,6 +1,6 @@
 import AppsIcon from "@mui/icons-material/Apps";
 import { Alert, Box, Button, Chip, Divider, Paper, Skeleton, Stack, Typography } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useParams } from "react-router-dom";
 import { AppsAPI } from "../../../api/appsApi";
@@ -15,6 +15,7 @@ const appTabs = [
 ];
 
 export default function AppLayoutPage() {
+  const theme = useTheme();
   const { appId } = useParams();
   const [app, setApp] = useState<AppService | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,23 +58,23 @@ export default function AppLayoutPage() {
   const statusChipSx =
     app?.status === "running"
       ? {
-          backgroundColor: "#1d4ed8",
-          color: "#ffffff",
-          borderColor: "#1e40af",
-          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+          borderColor: theme.palette.primary.dark,
+          "& .MuiChip-label": { color: theme.palette.primary.contrastText, fontWeight: 700 },
         }
       : app?.status === "deploying"
         ? {
-            backgroundColor: "#92400e",
-            color: "#ffffff",
-            borderColor: "#78350f",
-            "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+            backgroundColor: theme.palette.warning.dark,
+            color: theme.palette.warning.contrastText,
+            borderColor: alpha(theme.palette.warning.dark, 0.95),
+            "& .MuiChip-label": { color: theme.palette.warning.contrastText, fontWeight: 700 },
           }
         : {
-            backgroundColor: "#b91c1c",
-            color: "#ffffff",
-            borderColor: "#991b1b",
-            "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+            backgroundColor: theme.palette.error.main,
+            color: theme.palette.error.contrastText,
+            borderColor: alpha(theme.palette.error.dark, 0.95),
+            "& .MuiChip-label": { color: theme.palette.error.contrastText, fontWeight: 700 },
           };
 
   return (
@@ -91,9 +92,8 @@ export default function AppLayoutPage() {
         sx={{
           p: { xs: 2, sm: 2.5 },
           borderRadius: { xs: 1.5, sm: 2 },
-          border: "1px solid rgba(31,111,235,0.22)",
-          background:
-            "linear-gradient(120deg, rgba(31,111,235,0.14), rgba(14,165,164,0.10))",
+          border: `1px solid ${alpha(theme.palette.primary.main, 0.22)}`,
+          background: `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.14)}, ${alpha(theme.palette.secondary.main, 0.1)})`,
         }}
       >
         {isLoading ? (
@@ -150,8 +150,8 @@ export default function AppLayoutPage() {
                     minWidth: { xs: 0, sm: 88 },
                     whiteSpace: "nowrap",
                     "&.active": {
-                      borderColor: alpha("#1f6feb", 0.42),
-                      backgroundColor: alpha("#1f6feb", 0.12),
+                      borderColor: alpha(theme.palette.primary.main, 0.42),
+                      backgroundColor: alpha(theme.palette.primary.main, 0.12),
                     },
                   }}
                 >

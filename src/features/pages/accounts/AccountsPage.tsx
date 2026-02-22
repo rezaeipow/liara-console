@@ -23,6 +23,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -190,15 +191,14 @@ export default function AccountsPage() {
         px: { xs: 1.25, sm: 1.5, md: 2, lg: 2 },
       }}
     >
-      <Paper
-        sx={{
-          p: { xs: 2, sm: 2.5 },
-          background:
-            "linear-gradient(120deg, rgba(31,111,235,0.14), rgba(14,165,164,0.10))",
-          border: "1px solid rgba(31,111,235,0.22)",
-          borderRadius: { xs: 1.5, sm: 2 },
-        }}
-      >
+        <Paper
+          sx={{
+            p: { xs: 2, sm: 2.5 },
+            background: `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.14)}, ${alpha(theme.palette.secondary.main, 0.1)})`,
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.22)}`,
+            borderRadius: { xs: 1.5, sm: 2 },
+          }}
+        >
         <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={2}
@@ -223,11 +223,10 @@ export default function AccountsPage() {
         <Paper
           sx={{
             p: { xs: 2, sm: 3 },
-            border: "1px solid rgba(148,163,184,0.24)",
-            background:
-              "linear-gradient(180deg, rgba(148,163,184,0.06), rgba(255,255,255,0.52))",
+            border: `1px solid ${alpha(theme.palette.text.secondary, 0.24)}`,
+            background: `linear-gradient(180deg, ${alpha(theme.palette.text.secondary, 0.06)}, ${alpha(theme.palette.common.white, 0.52)})`,
             borderRadius: { xs: 1.5, sm: 2 },
-            boxShadow: "0 10px 24px rgba(15, 23, 42, 0.06)",
+            boxShadow: `0 10px 24px ${alpha(theme.palette.text.primary, 0.06)}`,
           }}
         >
           <Stack spacing={1.5}>
@@ -384,17 +383,19 @@ export default function AccountsPage() {
                       p: 1.6,
                       borderRadius: { xs: 1.5, sm: 2 },
                       border: "1px solid",
-                      borderColor: isActive ? "rgba(31,111,235,0.45)" : "divider",
+                      borderColor: isActive ? alpha(theme.palette.primary.main, 0.45) : "divider",
                       backgroundColor: isActive
-                        ? "rgba(31,111,235,0.10)"
-                        : "rgba(255,255,255,0.35)",
+                        ? alpha(theme.palette.primary.main, 0.1)
+                        : alpha(theme.palette.common.white, 0.35),
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
                       gap: 1.25,
                       transition: "border-color 140ms ease, background-color 140ms ease",
                       "&:hover": {
-                        borderColor: isActive ? "rgba(31,111,235,0.52)" : "rgba(100,116,139,0.45)",
+                        borderColor: isActive
+                          ? alpha(theme.palette.primary.main, 0.52)
+                          : alpha(theme.palette.text.secondary, 0.45),
                       },
                     }}
                   >
@@ -435,11 +436,11 @@ export default function AccountsPage() {
                           }
                           size="small"
                           sx={{
-                            bgcolor: "#1e3a8a",
-                            color: "#ffffff",
+                            bgcolor: "primary.dark",
+                            color: "primary.contrastText",
                             fontWeight: 700,
                             height: 24,
-                            border: "1px solid rgba(255,255,255,0.25)",
+                            border: `1px solid ${alpha(theme.palette.common.white, 0.25)}`,
                             display: "inline-flex",
                             alignItems: "center",
                             "& .MuiChip-label": {

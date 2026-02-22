@@ -21,7 +21,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { AppsAPI } from "../../../api/appsApi";
@@ -36,6 +36,7 @@ const sortOptions: SortOrder[] = ["newest", "oldest"];
 const viewOptions: ViewMode[] = ["cards", "table"];
 
 export default function AppDeploymentsPage() {
+  const theme = useTheme();
   const { appId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const [items, setItems] = useState<Deployment[]>([]);
@@ -116,49 +117,49 @@ export default function AppDeploymentsPage() {
     if (tone === "solid") {
       if (status === "success") {
         return {
-          backgroundColor: "#1d4ed8",
-          color: "#ffffff",
-          borderColor: "#1e40af",
-          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+          borderColor: theme.palette.primary.dark,
+          "& .MuiChip-label": { color: theme.palette.primary.contrastText, fontWeight: 700 },
         };
       }
       if (status === "running") {
         return {
-          backgroundColor: "#92400e",
-          color: "#ffffff",
-          borderColor: "#78350f",
-          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+          backgroundColor: theme.palette.warning.dark,
+          color: theme.palette.warning.contrastText,
+          borderColor: alpha(theme.palette.warning.dark, 0.95),
+          "& .MuiChip-label": { color: theme.palette.warning.contrastText, fontWeight: 700 },
         };
       }
       return {
-        backgroundColor: "#b91c1c",
-        color: "#ffffff",
-        borderColor: "#991b1b",
-        "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+        backgroundColor: theme.palette.error.main,
+        color: theme.palette.error.contrastText,
+        borderColor: alpha(theme.palette.error.dark, 0.95),
+        "& .MuiChip-label": { color: theme.palette.error.contrastText, fontWeight: 700 },
       };
     }
 
     if (status === "success") {
       return {
-        backgroundColor: alpha("#1f6feb", 0.18),
-        color: "#1e3a8a",
-        borderColor: alpha("#1d4ed8", 0.4),
-        "& .MuiChip-label": { color: "#1e3a8a", fontWeight: 700 },
+        backgroundColor: alpha(theme.palette.primary.main, 0.18),
+        color: theme.palette.primary.dark,
+        borderColor: alpha(theme.palette.primary.main, 0.4),
+        "& .MuiChip-label": { color: theme.palette.primary.dark, fontWeight: 700 },
       };
     }
     if (status === "running") {
       return {
-        backgroundColor: alpha("#f59e0b", 0.22),
-        color: "#78350f",
-        borderColor: alpha("#92400e", 0.35),
-        "& .MuiChip-label": { color: "#78350f", fontWeight: 700 },
+        backgroundColor: alpha(theme.palette.warning.main, 0.22),
+        color: theme.palette.warning.dark,
+        borderColor: alpha(theme.palette.warning.dark, 0.35),
+        "& .MuiChip-label": { color: theme.palette.warning.dark, fontWeight: 700 },
       };
     }
     return {
-      backgroundColor: alpha("#ef4444", 0.18),
-      color: "#7f1d1d",
-      borderColor: alpha("#b91c1c", 0.35),
-      "& .MuiChip-label": { color: "#7f1d1d", fontWeight: 700 },
+      backgroundColor: alpha(theme.palette.error.main, 0.18),
+      color: theme.palette.error.dark,
+      borderColor: alpha(theme.palette.error.main, 0.35),
+      "& .MuiChip-label": { color: theme.palette.error.dark, fontWeight: 700 },
     };
   };
 
@@ -282,9 +283,8 @@ export default function AppDeploymentsPage() {
           sx={{
             p: 1.25,
             borderRadius: 1.5,
-            border: `1px solid ${alpha("#1f6feb", 0.2)}`,
-            background:
-              "linear-gradient(115deg, rgba(31,111,235,0.12), rgba(14,165,164,0.08))",
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+            background: `linear-gradient(115deg, ${alpha(theme.palette.primary.main, 0.12)}, ${alpha(theme.palette.secondary.main, 0.08)})`,
           }}
         >
           <Stack
@@ -327,9 +327,9 @@ export default function AppDeploymentsPage() {
             sx={
               statusFilter === "all"
                 ? {
-                    backgroundColor: "#1d4ed8",
-                    color: "#ffffff",
-                    borderColor: "#1e40af",
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.primary.contrastText,
+                    borderColor: theme.palette.primary.dark,
                     "& .MuiChip-label": { fontWeight: 700 },
                   }
                 : undefined
@@ -344,12 +344,12 @@ export default function AppDeploymentsPage() {
             sx={{
               ...(statusFilter === "success"
                 ? {
-                    backgroundColor: "#1d4ed8 !important",
-                    color: "#ffffff !important",
-                    borderColor: "#1e40af !important",
+                    backgroundColor: `${theme.palette.primary.main} !important`,
+                    color: `${theme.palette.primary.contrastText} !important`,
+                    borderColor: `${theme.palette.primary.dark} !important`,
                     "& .MuiChip-label": {
                       fontWeight: 700,
-                      color: "#ffffff",
+                      color: theme.palette.primary.contrastText,
                     },
                   }
                 : undefined),
@@ -364,12 +364,12 @@ export default function AppDeploymentsPage() {
             sx={{
               ...(statusFilter === "running"
                 ? {
-                    backgroundColor: "#92400e !important",
-                    color: "#ffffff !important",
-                    borderColor: "#78350f !important",
+                    backgroundColor: `${theme.palette.warning.dark} !important`,
+                    color: `${theme.palette.warning.contrastText} !important`,
+                    borderColor: `${alpha(theme.palette.warning.dark, 0.95)} !important`,
                     "& .MuiChip-label": {
                       fontWeight: 700,
-                      color: "#ffffff",
+                      color: theme.palette.warning.contrastText,
                     },
                   }
                 : undefined),
@@ -465,10 +465,10 @@ export default function AppDeploymentsPage() {
                     sx={{
                       p: 1.4,
                       borderRadius: 1.5,
-                      borderColor: alpha("#1f6feb", 0.14),
+                      borderColor: alpha(theme.palette.primary.main, 0.14),
                       transition: "border-color 140ms ease, transform 140ms ease",
                       "&:hover": {
-                        borderColor: alpha("#1f6feb", 0.3),
+                        borderColor: alpha(theme.palette.primary.main, 0.3),
                         transform: "translateY(-1px)",
                       },
                     }}

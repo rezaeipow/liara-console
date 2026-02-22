@@ -35,7 +35,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { useCallback, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import {
@@ -62,6 +62,7 @@ function formatMemory(mb: number) {
 }
 
 export default function ProjectVmsPage() {
+  const theme = useTheme();
   const { projectId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -143,16 +144,16 @@ export default function ProjectVmsPage() {
   const getVmStatusSx = (status: Vm["status"]) =>
     status === "running"
       ? {
-          backgroundColor: "#1d4ed8",
-          color: "#ffffff",
-          borderColor: "#1e40af",
-          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+          borderColor: theme.palette.primary.dark,
+          "& .MuiChip-label": { color: theme.palette.primary.contrastText, fontWeight: 700 },
         }
       : {
-          backgroundColor: "#6b7280",
-          color: "#ffffff",
-          borderColor: "#4b5563",
-          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+          backgroundColor: alpha(theme.palette.text.secondary, 0.9),
+          color: theme.palette.common.white,
+          borderColor: alpha(theme.palette.text.secondary, 0.98),
+          "& .MuiChip-label": { color: theme.palette.common.white, fontWeight: 700 },
         };
 
   const canCreateVm =
@@ -269,8 +270,8 @@ export default function ProjectVmsPage() {
           sx={{
             p: { xs: 2, sm: 2.5 },
             borderRadius: { xs: 1.5, sm: 2 },
-            background: "linear-gradient(120deg, rgba(14,116,144,0.2), rgba(31,111,235,0.14))",
-            border: "1px solid rgba(14,116,144,0.28)",
+            background: `linear-gradient(120deg, ${alpha(theme.palette.secondary.main, 0.2)}, ${alpha(theme.palette.primary.main, 0.14)})`,
+            border: `1px solid ${alpha(theme.palette.secondary.main, 0.28)}`,
           }}
         >
           <Stack spacing={1.25}>
@@ -324,8 +325,8 @@ export default function ProjectVmsPage() {
           sx={{
             p: { xs: 1.5, sm: 2 },
             borderRadius: { xs: 1.5, sm: 2 },
-            border: "1px solid rgba(148,163,184,0.24)",
-            background: "linear-gradient(180deg, rgba(148,163,184,0.08), rgba(255,255,255,0.64))",
+            border: `1px solid ${alpha(theme.palette.text.secondary, 0.24)}`,
+            background: `linear-gradient(180deg, ${alpha(theme.palette.text.secondary, 0.08)}, ${alpha(theme.palette.common.white, 0.64)})`,
           }}
         >
           <Stack direction={{ xs: "column", lg: "row" }} spacing={1} justifyContent="space-between">
@@ -354,10 +355,10 @@ export default function ProjectVmsPage() {
                   sx={
                     statusFilter === "running"
                       ? {
-                          backgroundColor: "#1d4ed8",
-                          color: "#ffffff",
-                          borderColor: "#1e40af",
-                          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+                          backgroundColor: theme.palette.primary.main,
+                          color: theme.palette.primary.contrastText,
+                          borderColor: theme.palette.primary.dark,
+                          "& .MuiChip-label": { color: theme.palette.primary.contrastText, fontWeight: 700 },
                         }
                       : undefined
                   }
@@ -371,10 +372,10 @@ export default function ProjectVmsPage() {
                   sx={
                     statusFilter === "stopped"
                       ? {
-                          backgroundColor: "#6b7280",
-                          color: "#ffffff",
-                          borderColor: "#4b5563",
-                          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+                          backgroundColor: alpha(theme.palette.text.secondary, 0.9),
+                          color: theme.palette.common.white,
+                          borderColor: alpha(theme.palette.text.secondary, 0.98),
+                          "& .MuiChip-label": { color: theme.palette.common.white, fontWeight: 700 },
                         }
                       : undefined
                   }
@@ -428,8 +429,8 @@ export default function ProjectVmsPage() {
           sx={{
             p: { xs: 1.5, sm: 1.75 },
             borderRadius: { xs: 1.5, sm: 2 },
-            border: "1px solid rgba(148,163,184,0.24)",
-            background: "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(248,250,252,0.92))",
+            border: `1px solid ${alpha(theme.palette.text.secondary, 0.24)}`,
+            background: `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.74)}, ${alpha(theme.palette.background.default, 0.92)})`,
           }}
         >
           {isLoading ? (
@@ -490,11 +491,11 @@ export default function ProjectVmsPage() {
                   sx={{
                     p: 1.35,
                     borderRadius: 1.5,
-                    borderColor: alpha("#1f6feb", 0.16),
+                    borderColor: alpha(theme.palette.primary.main, 0.16),
                     transition: "transform 160ms ease, border-color 160ms ease",
                     "&:hover": {
                       transform: "translateY(-2px)",
-                      borderColor: alpha("#1f6feb", 0.34),
+                      borderColor: alpha(theme.palette.primary.main, 0.34),
                     },
                   }}
                 >

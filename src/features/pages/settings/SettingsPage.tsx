@@ -30,6 +30,7 @@ import { alpha } from "@mui/material/styles";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { useAppDispatch, useAppSelector } from "../../../app/store/hooks";
+import { glassBackdrop } from "../../../shared/ui/glassTokens";
 import {
   selectUIPreferences,
   setSidebarMode,
@@ -287,10 +288,10 @@ export default function SettingsPage() {
           sx={{
             p: { xs: 2, sm: 2.5 },
             borderRadius: { xs: 1.5, sm: 2 },
-            border: "1px solid rgba(31,111,235,0.32)",
-            background:
-              "linear-gradient(120deg, rgba(31,111,235,0.20), rgba(14,165,164,0.14))",
-            backdropFilter: "blur(14px)",
+            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.32)}`,
+            background: (theme) =>
+              `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.14)})`,
+            backdropFilter: glassBackdrop.hero,
           }}
         >
           <Stack
@@ -327,10 +328,10 @@ export default function SettingsPage() {
             sx={{
               p: { xs: 2, sm: 2.5 },
               borderRadius: { xs: 1.5, sm: 2 },
-              border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
-              backdropFilter: "blur(10px)",
+              border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+              background: (theme) =>
+                `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.88)}, ${alpha(theme.palette.common.white, 0.76)})`,
+              backdropFilter: glassBackdrop.card,
               transition: "transform .2s ease",
               "&:hover": { transform: "translateY(-1px)" },
             }}
@@ -400,8 +401,8 @@ export default function SettingsPage() {
                   sx={{
                     p: 1.1,
                     borderRadius: 1.2,
-                    borderColor: alpha("#16a34a", 0.3),
-                    backgroundColor: alpha("#ecfdf5", 0.7),
+                    borderColor: (theme) => alpha(theme.palette.success.main, 0.3),
+                    backgroundColor: (theme) => alpha(theme.palette.success.light, 0.35),
                   }}
                 >
                   <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.6 }}>
@@ -420,10 +421,10 @@ export default function SettingsPage() {
             sx={{
               p: { xs: 2, sm: 2.5 },
               borderRadius: { xs: 1.5, sm: 2 },
-              border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
-              backdropFilter: "blur(10px)",
+              border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+              background: (theme) =>
+                `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.88)}, ${alpha(theme.palette.common.white, 0.76)})`,
+              backdropFilter: glassBackdrop.card,
               transition: "transform .2s ease",
               "&:hover": { transform: "translateY(-1px)" },
             }}
@@ -508,8 +509,8 @@ export default function SettingsPage() {
                     sx={{
                       p: 1,
                       borderRadius: 1.2,
-                      borderColor: alpha("#0f172a", 0.12),
-                      backgroundColor: alpha("#ffffff", 0.55),
+                      borderColor: (theme) => alpha(theme.palette.text.primary, 0.12),
+                      backgroundColor: (theme) => alpha(theme.palette.common.white, 0.55),
                     }}
                   >
                     <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.8 }}>
@@ -532,8 +533,8 @@ export default function SettingsPage() {
                             minHeight: `${densityPreviewRowMinHeight}px`,
                             px: 1.2,
                             borderRadius: 1,
-                            borderColor: alpha("#0f172a", 0.1),
-                            backgroundColor: alpha("#ffffff", 0.72),
+                            borderColor: (theme) => alpha(theme.palette.text.primary, 0.1),
+                            backgroundColor: (theme) => alpha(theme.palette.common.white, 0.72),
                             display: "flex",
                             alignItems: "center",
                           }}
@@ -558,10 +559,10 @@ export default function SettingsPage() {
           sx={{
             p: { xs: 1.2, sm: 1.4 },
             borderRadius: { xs: 1.5, sm: 2 },
-            border: `1px solid ${alpha("#1f6feb", 0.2)}`,
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8))",
-            backdropFilter: "blur(8px)",
+            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+            background: (theme) =>
+              `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.9)}, ${alpha(theme.palette.common.white, 0.8)})`,
+            backdropFilter: glassBackdrop.subtle,
             position: "sticky",
             bottom: 10,
             zIndex: 12,
@@ -724,8 +725,8 @@ function SettingRow({ icon, title, description, control }: SettingRowProps) {
       sx={{
         p: 1.2,
         borderRadius: 1.4,
-        borderColor: alpha("#0f172a", 0.12),
-        backgroundColor: alpha("#ffffff", 0.7),
+        borderColor: (theme) => alpha(theme.palette.text.primary, 0.12),
+        backgroundColor: (theme) => alpha(theme.palette.common.white, 0.7),
       }}
     >
       <Stack direction="row" spacing={1} alignItems="flex-start" justifyContent="space-between">
@@ -760,8 +761,8 @@ function PreferenceField({ icon, title, description, children }: PreferenceField
       sx={{
         p: 1.2,
         borderRadius: 1.4,
-        borderColor: alpha("#0f172a", 0.12),
-        backgroundColor: alpha("#ffffff", 0.7),
+        borderColor: (theme) => alpha(theme.palette.text.primary, 0.12),
+        backgroundColor: (theme) => alpha(theme.palette.common.white, 0.7),
       }}
     >
       <Stack direction={{ xs: "column", sm: "row" }} spacing={1} justifyContent="space-between">
@@ -781,3 +782,4 @@ function PreferenceField({ icon, title, description, children }: PreferenceField
     </Paper>
   );
 }
+

@@ -25,6 +25,7 @@ import {
 } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../app/store/hooks";
 import { selectTableDensity, setUnreadNotificationsCount } from "../../../app/store/slices/uiSlice";
+import { glassBackdrop } from "../../../shared/ui/glassTokens";
 import { formatDateTime } from "../billing/billingFormat";
 import type { NotificationsActionData, NotificationsLoaderData } from "./notificationsData";
 
@@ -109,10 +110,10 @@ export default function NotificationsPage() {
           sx={{
             p: { xs: 2, sm: 2.5 },
             borderRadius: tableDensity === "compact" ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
-            border: "1px solid rgba(31,111,235,0.32)",
-            background:
-              "linear-gradient(120deg, rgba(31,111,235,0.20), rgba(14,165,164,0.14))",
-            backdropFilter: "blur(14px)",
+            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.32)}`,
+            background: (theme) =>
+              `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.14)})`,
+            backdropFilter: glassBackdrop.hero,
           }}
         >
           {isRouteLoading ? <LinearProgress sx={{ mb: 1.1 }} /> : null}
@@ -161,21 +162,21 @@ export default function NotificationsPage() {
             label="Total"
             value={String(items.length)}
             icon={<NotificationsActiveOutlinedIcon fontSize="small" />}
-            color="#2563eb"
+            tone="primary"
             density={tableDensity}
           />
           <SummaryCard
             label="Unread"
             value={String(unreadCount)}
             icon={<NotificationsNoneOutlinedIcon fontSize="small" />}
-            color="#f59e0b"
+            tone="warning"
             density={tableDensity}
           />
           <SummaryCard
             label="Read"
             value={String(readCount)}
             icon={<DoneAllOutlinedIcon fontSize="small" />}
-            color="#16a34a"
+            tone="success"
             density={tableDensity}
           />
         </Box>
@@ -184,10 +185,10 @@ export default function NotificationsPage() {
           sx={{
             p: { xs: 2, sm: 2.5 },
             borderRadius: tableDensity === "compact" ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
-            border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
-            backdropFilter: "blur(10px)",
+            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+            background: (theme) =>
+              `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.88)}, ${alpha(theme.palette.common.white, 0.76)})`,
+            backdropFilter: glassBackdrop.card,
           }}
         >
           <Stack spacing={1.4}>
@@ -205,14 +206,16 @@ export default function NotificationsPage() {
                   variant={filter === "all" ? "filled" : "outlined"}
                   onClick={() => updateParam("filter", "all", "all")}
                   aria-label="Show all notifications"
-                  sx={{
-                    color: filter === "all" ? "primary.dark" : "text.primary",
-                    backgroundColor:
-                      filter === "all" ? alpha("#1f6feb", 0.18) : "transparent",
-                    borderColor: alpha("#1f6feb", 0.28),
-                    fontWeight: 700,
-                  }}
-                />
+                    sx={{
+                      color: filter === "all" ? "primary.dark" : "text.primary",
+                      backgroundColor:
+                        filter === "all"
+                          ? (theme) => alpha(theme.palette.primary.main, 0.18)
+                          : "transparent",
+                      borderColor: (theme) => alpha(theme.palette.primary.main, 0.28),
+                      fontWeight: 700,
+                    }}
+                  />
                 <Chip
                   label="Unread"
                   clickable
@@ -220,14 +223,16 @@ export default function NotificationsPage() {
                   variant={filter === "unread" ? "filled" : "outlined"}
                   onClick={() => updateParam("filter", "unread", "all")}
                   aria-label="Filter unread notifications"
-                  sx={{
-                    color: filter === "unread" ? "warning.dark" : "text.primary",
-                    backgroundColor:
-                      filter === "unread" ? alpha("#f59e0b", 0.18) : "transparent",
-                    borderColor: alpha("#f59e0b", 0.3),
-                    fontWeight: 700,
-                  }}
-                />
+                    sx={{
+                      color: filter === "unread" ? "warning.dark" : "text.primary",
+                      backgroundColor:
+                        filter === "unread"
+                          ? (theme) => alpha(theme.palette.warning.main, 0.18)
+                          : "transparent",
+                      borderColor: (theme) => alpha(theme.palette.warning.main, 0.3),
+                      fontWeight: 700,
+                    }}
+                  />
                 <Chip
                   label="Read"
                   clickable
@@ -235,14 +240,16 @@ export default function NotificationsPage() {
                   variant={filter === "read" ? "filled" : "outlined"}
                   onClick={() => updateParam("filter", "read", "all")}
                   aria-label="Filter read notifications"
-                  sx={{
-                    color: filter === "read" ? "success.dark" : "text.primary",
-                    backgroundColor:
-                      filter === "read" ? alpha("#16a34a", 0.16) : "transparent",
-                    borderColor: alpha("#16a34a", 0.3),
-                    fontWeight: 700,
-                  }}
-                />
+                    sx={{
+                      color: filter === "read" ? "success.dark" : "text.primary",
+                      backgroundColor:
+                        filter === "read"
+                          ? (theme) => alpha(theme.palette.success.main, 0.16)
+                          : "transparent",
+                      borderColor: (theme) => alpha(theme.palette.success.main, 0.3),
+                      fontWeight: 700,
+                    }}
+                  />
               </Stack>
               <TextField
                 size="small"
@@ -260,8 +267,8 @@ export default function NotificationsPage() {
                 sx={{
                   p: 2,
                   borderRadius: tableDensity === "compact" ? 0.7 : 1.4,
-                  borderColor: alpha("#0f172a", 0.12),
-                  backgroundColor: alpha("#ffffff", 0.62),
+                  borderColor: (theme) => alpha(theme.palette.text.primary, 0.12),
+                  backgroundColor: (theme) => alpha(theme.palette.common.white, 0.62),
                 }}
               >
                 <Typography fontWeight={800}>No notifications found</Typography>
@@ -280,8 +287,12 @@ export default function NotificationsPage() {
                       px: itemPaddingX,
                       py: itemPaddingY,
                       borderRadius: tableDensity === "compact" ? 0.7 : 1.4,
-                      borderColor: alpha("#0f172a", item.read ? 0.12 : 0.2),
-                      backgroundColor: item.read ? alpha("#ffffff", 0.6) : alpha("#eff6ff", 0.78),
+                      borderColor: (theme) =>
+                        alpha(theme.palette.text.primary, item.read ? 0.12 : 0.2),
+                      backgroundColor: (theme) =>
+                        item.read
+                          ? alpha(theme.palette.common.white, 0.6)
+                          : alpha(theme.palette.primary.light, 0.24),
                     }}
                   >
                     <Stack spacing={itemInnerSpacing}>
@@ -367,11 +378,11 @@ type SummaryCardProps = {
   label: string;
   value: string;
   icon: ReactNode;
-  color: string;
+  tone: "primary" | "warning" | "success";
   density: "compact" | "standard" | "comfortable";
 };
 
-function SummaryCard({ label, value, icon, color, density }: SummaryCardProps) {
+function SummaryCard({ label, value, icon, tone, density }: SummaryCardProps) {
   const paddingX = density === "comfortable" ? 2.1 : density === "compact" ? 0.35 : 1.3;
   const paddingY = density === "comfortable" ? 2.1 : density === "compact" ? 0.35 : 1.3;
   const spacing = density === "comfortable" ? 1.2 : density === "compact" ? 0.12 : 0.6;
@@ -383,8 +394,16 @@ function SummaryCard({ label, value, icon, color, density }: SummaryCardProps) {
         px: paddingX,
         py: paddingY,
         borderRadius: density === "compact" ? 0.7 : 1.4,
-        borderColor: alpha(color, 0.25),
-        backgroundColor: alpha("#ffffff", 0.82),
+        borderColor: (theme) => {
+          const base =
+            tone === "warning"
+              ? theme.palette.warning.main
+              : tone === "success"
+                ? theme.palette.success.main
+                : theme.palette.primary.main;
+          return alpha(base, 0.25);
+        },
+        backgroundColor: (theme) => alpha(theme.palette.common.white, 0.82),
       }}
     >
       <Stack spacing={spacing}>
@@ -401,3 +420,4 @@ function SummaryCard({ label, value, icon, color, density }: SummaryCardProps) {
     </Paper>
   );
 }
+

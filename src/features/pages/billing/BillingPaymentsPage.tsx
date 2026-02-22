@@ -1,4 +1,4 @@
-﻿import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
@@ -25,6 +25,7 @@ import { useMemo } from "react";
 import { useLoaderData, useNavigation, useSearchParams } from "react-router-dom";
 import { useAppSelector } from "../../../app/store/hooks";
 import { selectTableDensity } from "../../../app/store/slices/uiSlice";
+import { glassBackdrop } from "../../../shared/ui/glassTokens";
 import type { BillingPaymentsLoaderData } from "./billingData";
 import { formatDateTime, formatIrr } from "./billingFormat";
 
@@ -85,10 +86,10 @@ export default function BillingPaymentsPage() {
         sx={{
           p: { xs: 2, sm: 2.5 },
           borderRadius: { xs: 1.5, sm: 2 },
-          border: "1px solid rgba(31,111,235,0.32)",
-          background:
-            "linear-gradient(120deg, rgba(31,111,235,0.20), rgba(14,165,164,0.14))",
-          backdropFilter: "blur(14px)",
+          border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.32)}`,
+          background: (theme) =>
+            `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.14)})`,
+          backdropFilter: glassBackdrop.hero,
         }}
       >
         <Stack spacing={1.1}>
@@ -134,10 +135,10 @@ export default function BillingPaymentsPage() {
         sx={{
           p: { xs: 2, sm: 2.5 },
           borderRadius: { xs: 1.5, sm: 2 },
-          border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
-          backdropFilter: "blur(10px)",
+          border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+          background: (theme) =>
+            `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.88)}, ${alpha(theme.palette.common.white, 0.76)})`,
+          backdropFilter: glassBackdrop.card,
         }}
       >
         {isRouteLoading ? <LinearProgress sx={{ mb: 1.2 }} /> : null}
@@ -226,8 +227,8 @@ export default function BillingPaymentsPage() {
                         px: itemPaddingX,
                         py: itemPaddingY,
                         borderRadius: 1.4,
-                        borderColor: alpha("#0f172a", 0.12),
-                        backgroundColor: alpha("#ffffff", 0.6),
+                        borderColor: (theme) => alpha(theme.palette.text.primary, 0.12),
+                        backgroundColor: (theme) => alpha(theme.palette.common.white, 0.6),
                       }}
                     >
                       <Stack spacing={itemInnerSpacing}>
@@ -265,8 +266,8 @@ export default function BillingPaymentsPage() {
                 sx={{
                   display: { xs: "none", lg: "block" },
                   borderRadius: 1.6,
-                  borderColor: alpha("#0f172a", 0.12),
-                  backgroundColor: alpha("#ffffff", 0.66),
+                  borderColor: (theme) => alpha(theme.palette.text.primary, 0.12),
+                  backgroundColor: (theme) => alpha(theme.palette.common.white, 0.66),
                 }}
               >
                 <Table size="medium" aria-label="Payments table">
@@ -329,8 +330,6 @@ type SummaryCardProps = {
 };
 
 function SummaryCard({ label, value, tone = "default", density }: SummaryCardProps) {
-  const color =
-    tone === "success" ? "#16a34a" : tone === "primary" ? "#2563eb" : "#475569";
   const paddingX = density === "comfortable" ? 1.6 : density === "compact" ? 0.8 : 1.2;
   const paddingY = density === "comfortable" ? 1.6 : density === "compact" ? 0.8 : 1;
 
@@ -344,8 +343,16 @@ function SummaryCard({ label, value, tone = "default", density }: SummaryCardPro
         px: paddingX,
         py: paddingY,
         borderRadius: 1.3,
-        borderColor: alpha(color, 0.25),
-        backgroundColor: alpha("#ffffff", 0.82),
+        borderColor: (theme) => {
+          const base =
+            tone === "success"
+              ? theme.palette.success.main
+              : tone === "primary"
+                ? theme.palette.primary.main
+                : theme.palette.text.secondary;
+          return alpha(base, 0.25);
+        },
+        backgroundColor: (theme) => alpha(theme.palette.common.white, 0.82),
       }}
     >
       <Typography variant="caption" color="text.secondary">
@@ -357,3 +364,4 @@ function SummaryCard({ label, value, tone = "default", density }: SummaryCardPro
     </Paper>
   );
 }
+

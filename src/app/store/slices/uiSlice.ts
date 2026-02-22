@@ -22,6 +22,7 @@ interface UIState {
   isMobileSidebarOpen: boolean; // for xs drawer only
   toast: ToastState;
   unreadNotificationsCount: number;
+  billingCredit: number | null;
 }
 
 const STORAGE_KEY = "console-ui-preferences";
@@ -69,6 +70,7 @@ const initialState: UIState = {
     severity: "success",
   },
   unreadNotificationsCount: 0,
+  billingCredit: null,
 };
 
 /* -----------------------------
@@ -127,6 +129,10 @@ export const uiSlice = createSlice({
     setUnreadNotificationsCount(state, action: PayloadAction<number>) {
       state.unreadNotificationsCount = action.payload >= 0 ? action.payload : 0;
     },
+
+    setBillingCredit(state, action: PayloadAction<number | null>) {
+      state.billingCredit = action.payload;
+    },
   },
 });
 
@@ -143,6 +149,7 @@ export const {
   showToast,
   hideToast,
   setUnreadNotificationsCount,
+  setBillingCredit,
 } = uiSlice.actions;
 
 /* -----------------------------
@@ -164,5 +171,6 @@ export const selectMobileSidebarOpen = (state: { ui: UIState }) =>
 export const selectToast = (state: { ui: UIState }) => state.ui.toast;
 export const selectUnreadNotificationsCount = (state: { ui: UIState }) =>
   state.ui.unreadNotificationsCount;
+export const selectBillingCredit = (state: { ui: UIState }) => state.ui.billingCredit;
 
 export default uiSlice.reducer;

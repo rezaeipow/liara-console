@@ -24,6 +24,7 @@ import {
 } from "react-router-dom";
 import { useAppSelector } from "../../../app/store/hooks";
 import { selectTableDensity } from "../../../app/store/slices/uiSlice";
+import { glassBackdrop } from "../../../shared/ui/glassTokens";
 import { formatDateTime } from "../billing/billingFormat";
 import type { TicketActionData, TicketDetailLoaderData } from "./supportData";
 
@@ -124,10 +125,10 @@ export default function TicketDetailPage() {
           sx={{
             p: isCompact ? { xs: 1.2, sm: 1.4 } : { xs: 2, sm: 2.5 },
             borderRadius: isCompact ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
-            border: "1px solid rgba(31,111,235,0.32)",
-            background:
-              "linear-gradient(120deg, rgba(31,111,235,0.20), rgba(14,165,164,0.14))",
-            backdropFilter: "blur(14px)",
+            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.32)}`,
+            background: (theme) =>
+              `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.14)})`,
+            backdropFilter: glassBackdrop.hero,
           }}
         >
           <Stack spacing={isCompact ? 0.55 : 1.1}>
@@ -171,10 +172,10 @@ export default function TicketDetailPage() {
           sx={{
             p: isCompact ? { xs: 0.85, sm: 1 } : { xs: 2, sm: 2.5 },
             borderRadius: isCompact ? { xs: 0.55, sm: 0.7 } : { xs: 1.5, sm: 2 },
-            border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
-            backdropFilter: "blur(10px)",
+            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+            background: (theme) =>
+              `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.88)}, ${alpha(theme.palette.common.white, 0.76)})`,
+            backdropFilter: glassBackdrop.card,
           }}
         >
           {isRouteLoading ? <LinearProgress sx={{ mb: 1.2 }} /> : null}
@@ -209,7 +210,7 @@ export default function TicketDetailPage() {
                           variant="outlined"
                           sx={{
                             alignSelf: "center",
-                            backgroundColor: alpha("#ffffff", 0.8),
+                            backgroundColor: (theme) => alpha(theme.palette.common.white, 0.8),
                             ...(isCompact
                               ? { borderRadius: 0.45, height: 16, fontSize: "0.58rem", px: 0.25 }
                               : undefined),
@@ -246,10 +247,10 @@ export default function TicketDetailPage() {
           sx={{
             p: isCompact ? { xs: 1.2, sm: 1.4 } : { xs: 2, sm: 2.5 },
             borderRadius: isCompact ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
-            border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.74))",
-            backdropFilter: "blur(10px)",
+            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+            background: (theme) =>
+              `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.86)}, ${alpha(theme.palette.common.white, 0.74)})`,
+            backdropFilter: glassBackdrop.card,
           }}
         >
           <Stack spacing={isCompact ? 0.7 : 1.2}>
@@ -355,8 +356,14 @@ function MessageBubble({ label, body, timestamp, tone, density, pending = false 
           px: isCompact ? 0.45 : 1.2,
           py: isCompact ? 0.35 : 0.9,
           borderRadius: isCompact ? 0.45 : 1.4,
-          borderColor: leftAligned ? alpha("#0ea5e9", 0.24) : alpha("#1f6feb", 0.24),
-          backgroundColor: leftAligned ? alpha("#f0f9ff", 0.86) : alpha("#eff6ff", 0.86),
+          borderColor: (theme) =>
+            leftAligned
+              ? alpha(theme.palette.info.main, 0.24)
+              : alpha(theme.palette.primary.main, 0.24),
+          backgroundColor: (theme) =>
+            leftAligned
+              ? alpha(theme.palette.info.light, 0.28)
+              : alpha(theme.palette.primary.light, 0.28),
         }}
       >
         <Typography
@@ -376,3 +383,4 @@ function MessageBubble({ label, body, timestamp, tone, density, pending = false 
     </Stack>
   );
 }
+

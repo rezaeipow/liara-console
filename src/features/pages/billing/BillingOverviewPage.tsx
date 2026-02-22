@@ -1,4 +1,4 @@
-﻿import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
+import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import CreditCardOutlinedIcon from "@mui/icons-material/CreditCardOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
@@ -16,6 +16,7 @@ import {
 import { alpha } from "@mui/material/styles";
 import type { ReactNode } from "react";
 import { Link, useLoaderData, useNavigation } from "react-router-dom";
+import { glassBackdrop } from "../../../shared/ui/glassTokens";
 import type { BillingOverviewLoaderData } from "./billingData";
 import { formatDateTime, formatIrr } from "./billingFormat";
 
@@ -47,10 +48,10 @@ export default function BillingOverviewPage() {
         sx={{
           p: { xs: 2, sm: 2.5 },
           borderRadius: { xs: 1.5, sm: 2 },
-          border: "1px solid rgba(31,111,235,0.32)",
-          background:
-            "linear-gradient(120deg, rgba(31,111,235,0.20), rgba(14,165,164,0.14))",
-          backdropFilter: "blur(14px)",
+          border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.32)}`,
+          background: (theme) =>
+            `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.14)})`,
+          backdropFilter: glassBackdrop.hero,
         }}
       >
         {isRouteLoading ? <LinearProgress sx={{ mb: 1.2 }} /> : null}
@@ -135,10 +136,10 @@ export default function BillingOverviewPage() {
         sx={{
           p: { xs: 2, sm: 2.5 },
           borderRadius: { xs: 1.5, sm: 2 },
-          border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.74))",
-          backdropFilter: "blur(10px)",
+          border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+          background: (theme) =>
+            `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.86)}, ${alpha(theme.palette.common.white, 0.74)})`,
+          backdropFilter: glassBackdrop.card,
         }}
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.2 }}>
@@ -178,8 +179,8 @@ export default function BillingOverviewPage() {
                 sx={{
                   p: 1.1,
                   borderRadius: 1.2,
-                  border: `1px solid ${alpha("#0f172a", 0.1)}`,
-                  backgroundColor: alpha("#ffffff", 0.52),
+                  border: (theme) => `1px solid ${alpha(theme.palette.text.primary, 0.1)}`,
+                  backgroundColor: (theme) => alpha(theme.palette.common.white, 0.52),
                 }}
               >
                 <Stack spacing={0.2}>
@@ -221,10 +222,10 @@ function GlassStatCard({ title, value, hint, icon }: GlassStatCardProps) {
       sx={{
         p: 1.65,
         borderRadius: 1.5,
-        borderColor: alpha("#1f6feb", 0.24),
-        background:
-          "linear-gradient(165deg, rgba(255,255,255,0.9), rgba(255,255,255,0.78))",
-        backdropFilter: "blur(10px)",
+        borderColor: (theme) => alpha(theme.palette.primary.main, 0.24),
+        background: (theme) =>
+          `linear-gradient(165deg, ${alpha(theme.palette.common.white, 0.9)}, ${alpha(theme.palette.common.white, 0.78)})`,
+        backdropFilter: glassBackdrop.card,
       }}
     >
       <Stack spacing={0.8}>
@@ -244,3 +245,4 @@ function GlassStatCard({ title, value, hint, icon }: GlassStatCardProps) {
     </Paper>
   );
 }
+

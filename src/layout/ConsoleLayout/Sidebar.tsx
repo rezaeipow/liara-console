@@ -13,6 +13,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import {
   ChevronLeft as ChevronLeftIcon,
   CreditCard as CreditCardIcon,
@@ -113,8 +114,8 @@ export default function Sidebar() {
                 justifyContent: isCollapsed ? "center" : "flex-start",
                 px: isCollapsed ? 1 : 1.25,
                 "&.active": {
-                  backgroundColor: "rgba(31, 111, 235, 0.14)",
-                  border: "1px solid rgba(31, 111, 235, 0.20)",
+                  backgroundColor: alpha(theme.palette.primary.main, 0.14),
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
                 },
               }}
             >

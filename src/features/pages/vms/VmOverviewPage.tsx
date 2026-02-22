@@ -16,7 +16,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { VmsAPI } from "../../../api/vmsApi";
@@ -35,6 +35,7 @@ function deriveMockUsage(vmId: string, maxCpu: number, maxRam: number, maxDisk: 
 }
 
 export default function VmOverviewPage() {
+  const theme = useTheme();
   const { vmId } = useParams();
 
   const [vm, setVm] = useState<Vm | null>(null);
@@ -83,16 +84,16 @@ export default function VmOverviewPage() {
   const statusChipSx =
     vm?.status === "running"
       ? {
-          backgroundColor: "#1d4ed8",
-          color: "#ffffff",
-          borderColor: "#1e40af",
-          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+          borderColor: theme.palette.primary.dark,
+          "& .MuiChip-label": { color: theme.palette.primary.contrastText, fontWeight: 700 },
         }
       : {
-          backgroundColor: "#6b7280",
-          color: "#ffffff",
-          borderColor: "#4b5563",
-          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+          backgroundColor: alpha(theme.palette.text.secondary, 0.9),
+          color: theme.palette.common.white,
+          borderColor: alpha(theme.palette.text.secondary, 0.98),
+          "& .MuiChip-label": { color: theme.palette.common.white, fontWeight: 700 },
         };
 
   const runAction = async (type: "start" | "stop" | "reboot") => {
@@ -168,8 +169,8 @@ export default function VmOverviewPage() {
           sx={{
             p: { xs: 1.5, sm: 1.8 },
             borderRadius: 1.75,
-            border: `1px solid ${alpha("#1f6feb", 0.18)}`,
-            background: "linear-gradient(160deg, rgba(31,111,235,0.14), rgba(14,116,144,0.1))",
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
+            background: `linear-gradient(160deg, ${alpha(theme.palette.primary.main, 0.14)}, ${alpha(theme.palette.secondary.main, 0.1)})`,
           }}
         >
           <Stack spacing={1.1}>

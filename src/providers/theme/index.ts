@@ -1,11 +1,12 @@
 import { alpha, createTheme } from "@mui/material/styles";
 import type { TableDensity } from "../../app/store/slices/uiSlice";
+import { glassBackdrop } from "../../shared/ui/glassTokens";
 
 const glass = {
-  base: "rgba(255, 255, 255, 0.72)",
-  soft: "rgba(255, 255, 255, 0.58)",
-  strong: "rgba(255, 255, 255, 0.84)",
-  border: "rgba(255, 255, 255, 0.48)",
+  base: "rgba(255, 255, 255, 0.78)",
+  soft: "rgba(255, 255, 255, 0.66)",
+  strong: "rgba(255, 255, 255, 0.88)",
+  border: "rgba(255, 255, 255, 0.56)",
   highlight: "rgba(255, 255, 255, 0.92)",
 };
 
@@ -106,7 +107,7 @@ export function buildTheme(tableDensity: TableDensity = "standard") {
       },
       text: {
         primary: "#0f172a",
-        secondary: "#334155",
+        secondary: "#1f2937",
       },
       divider: alpha("#ffffff", 0.45),
     },
@@ -183,8 +184,8 @@ export function buildTheme(tableDensity: TableDensity = "standard") {
           backgroundImage: "none",
           backgroundColor: glass.base,
           border: `1px solid ${glass.border}`,
-          backdropFilter: "blur(18px) saturate(160%)",
-          WebkitBackdropFilter: "blur(18px) saturate(160%)",
+          backdropFilter: `${glassBackdrop.hero} saturate(160%)`,
+          WebkitBackdropFilter: `${glassBackdrop.hero} saturate(160%)`,
           boxShadow: "0 10px 28px rgba(15, 23, 42, 0.12)",
           position: "relative",
           overflow: "hidden",
@@ -197,7 +198,7 @@ export function buildTheme(tableDensity: TableDensity = "standard") {
         root: {
           backgroundColor: glass.soft,
           border: `1px solid ${glass.border}`,
-          backdropFilter: "blur(16px) saturate(150%)",
+          backdropFilter: `${glassBackdrop.hero} saturate(150%)`,
           boxShadow: "0 12px 30px rgba(15, 23, 42, 0.10)",
           borderRadius: uiDensityTokens.radius,
         },
@@ -209,7 +210,7 @@ export function buildTheme(tableDensity: TableDensity = "standard") {
           color: "#0f172a",
           backgroundColor: glass.strong,
           borderBottom: `1px solid ${glass.border}`,
-          backdropFilter: "blur(14px) saturate(145%)",
+          backdropFilter: `${glassBackdrop.hero} saturate(145%)`,
           boxShadow: "0 8px 24px rgba(15, 23, 42, 0.10)",
           overflow: "visible",
         },
@@ -220,7 +221,7 @@ export function buildTheme(tableDensity: TableDensity = "standard") {
         paper: {
           backgroundColor: glass.strong,
           borderRight: `1px solid ${glass.border}`,
-          backdropFilter: "blur(16px) saturate(150%)",
+          backdropFilter: `${glassBackdrop.hero} saturate(150%)`,
         },
       },
     },
@@ -229,7 +230,7 @@ export function buildTheme(tableDensity: TableDensity = "standard") {
         paper: {
           backgroundColor: glass.strong,
           border: `1px solid ${glass.border}`,
-          backdropFilter: "blur(20px) saturate(155%)",
+          backdropFilter: `${glassBackdrop.hero} saturate(155%)`,
           boxShadow: "0 20px 44px rgba(15, 23, 42, 0.18)",
         },
       },
@@ -299,7 +300,7 @@ export function buildTheme(tableDensity: TableDensity = "standard") {
         root: {
           backgroundColor: glass.soft,
           border: `1px solid ${glass.border}`,
-          backdropFilter: "blur(14px) saturate(140%)",
+          backdropFilter: `${glassBackdrop.card} saturate(140%)`,
           boxShadow: "0 10px 24px rgba(15, 23, 42, 0.08)",
         },
       },
@@ -351,7 +352,7 @@ export function buildTheme(tableDensity: TableDensity = "standard") {
           height: `${uiDensityTokens.chipHeight}px`,
           backgroundColor: alpha("#ffffff", 0.62),
           border: `1px solid ${alpha("#ffffff", 0.74)}`,
-          backdropFilter: "blur(10px) saturate(130%)",
+          backdropFilter: `${glassBackdrop.card} saturate(130%)`,
           borderRadius: uiDensityTokens.radius * (isCompact ? 0.5 : 0.66),
           "& .MuiChip-label": {
             paddingInline: isCompact ? 6 : 10,
@@ -422,7 +423,7 @@ export function buildTheme(tableDensity: TableDensity = "standard") {
         tooltip: {
           backgroundColor: alpha("#0f172a", 0.92),
           border: `1px solid ${alpha("#ffffff", 0.2)}`,
-          backdropFilter: "blur(10px)",
+          backdropFilter: glassBackdrop.card,
         },
       },
     },

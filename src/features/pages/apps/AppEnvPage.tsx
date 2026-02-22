@@ -20,7 +20,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppsAPI } from "../../../api/appsApi";
@@ -42,6 +42,7 @@ const KEY_PATTERN = /^[A-Z_][A-Z0-9_]*$/;
 const createLocalId = () => `env-${Math.random().toString(36).slice(2, 9)}`;
 
 export default function AppEnvPage() {
+  const theme = useTheme();
   const { appId } = useParams();
   const [rows, setRows] = useState<EnvRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -233,7 +234,7 @@ export default function AppEnvPage() {
         sx={{
           p: { xs: 1.5, sm: 1.75 },
           borderRadius: 1.5,
-          border: `1px solid ${alpha("#1f6feb", 0.14)}`,
+          border: `1px solid ${alpha(theme.palette.primary.main, 0.14)}`,
         }}
       >
         {isLoading ? (
@@ -263,8 +264,8 @@ export default function AppEnvPage() {
                   sx={{
                     p: 1.2,
                     borderRadius: 1.25,
-                    borderColor: alpha("#0f172a", 0.12),
-                    backgroundColor: alpha("#ffffff", 0.46),
+                    borderColor: alpha(theme.palette.text.primary, 0.12),
+                    backgroundColor: alpha(theme.palette.common.white, 0.46),
                   }}
                 >
                   <Stack spacing={0.8}>

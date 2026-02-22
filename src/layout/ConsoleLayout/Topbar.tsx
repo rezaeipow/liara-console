@@ -17,6 +17,7 @@ import {
   useTheme,
   type SelectChangeEvent,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import {
   AccountCircle as AccountCircleIcon,
   CreditCard as CreditCardIcon,
@@ -24,6 +25,7 @@ import {
   Notifications as NotificationsIcon,
 } from "@mui/icons-material";
 import { Link, useFetcher, useLocation, useNavigate } from "react-router-dom";
+import { BillingAPI } from "../../api/billingApi";
 import { NotificationsAPI } from "../../api/notificationsApi";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import { selectUser } from "../../app/store/slices/authSlice";
@@ -31,8 +33,10 @@ import { selectAccounts, selectActiveAccountId } from "../../app/store/slices/ac
 import {
   hideToast,
   openMobileSidebar,
+  selectBillingCredit,
   selectUnreadNotificationsCount,
   setUnreadNotificationsCount,
+  setBillingCredit,
   selectSidebarMode,
   selectToast,
   toggleSidebarMode,
@@ -56,6 +60,7 @@ export default function Topbar() {
   const activeAccountId = useAppSelector(selectActiveAccountId);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const creditAmount = useAppSelector(selectBillingCredit);
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -105,9 +110,28 @@ export default function Topbar() {
     }
   }, [dispatch]);
 
+  const refreshCredit = useCallback(async () => {
+    try {
+      const response = await BillingAPI.getCredit();
+      dispatch(setBillingCredit(response.credit));
+    } catch {
+      // Keep last successful amount on transient billing failures.
+    }
+  }, [dispatch]);
+
   useEffect(() => {
     void refreshUnreadCount();
   }, [refreshUnreadCount, location.pathname]);
+
+  useEffect(() => {
+    void refreshCredit();
+  }, [refreshCredit, selectedAccountId]);
+
+  useEffect(() => {
+    if (location.pathname.startsWith("/console/billing")) {
+      void refreshCredit();
+    }
+  }, [location.pathname, refreshCredit]);
 
   return (
     <>
@@ -189,12 +213,14 @@ export default function Topbar() {
                 py: 0.75,
                 borderRadius: 2,
                 border: `1px solid ${theme.palette.divider}`,
-                backgroundColor: "rgba(255,255,255,0.52)",
+                backgroundColor: alpha(theme.palette.common.white, 0.52),
               }}
             >
               <CreditCardIcon fontSize="small" />
               <Typography variant="body2" fontWeight={600}>
-                750,000 IRR
+                {creditAmount == null
+                  ? "..."
+                  : `${new Intl.NumberFormat().format(creditAmount)} IRR`}
               </Typography>
             </Box>
           )}

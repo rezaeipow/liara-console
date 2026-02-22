@@ -28,6 +28,7 @@ import { alpha } from "@mui/material/styles";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../app/store/hooks";
+import { glassBackdrop } from "../../../shared/ui/glassTokens";
 import {
   disable2FA,
   enable2FA,
@@ -273,10 +274,10 @@ export default function ProfilePage() {
         sx={{
           p: { xs: 2, sm: 2.4 },
           borderRadius: { xs: 1.5, sm: 2 },
-          border: "1px solid rgba(31,111,235,0.32)",
-          background:
-            "linear-gradient(120deg, rgba(31,111,235,0.2), rgba(14,165,164,0.14))",
-          backdropFilter: "blur(14px)",
+          border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.32)}`,
+          background: (theme) =>
+            `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.14)})`,
+          backdropFilter: glassBackdrop.hero,
         }}
       >
         <Stack spacing={1}>
@@ -309,10 +310,10 @@ export default function ProfilePage() {
             flex: 1.3,
             p: { xs: 1.8, sm: 2.2 },
             borderRadius: { xs: 1.5, sm: 2 },
-            border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
-            backdropFilter: "blur(10px)",
+            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+            background: (theme) =>
+              `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.88)}, ${alpha(theme.palette.common.white, 0.76)})`,
+            backdropFilter: glassBackdrop.card,
           }}
         >
           <Stack spacing={1}>
@@ -328,13 +329,17 @@ export default function ProfilePage() {
               sx={{
                 p: 1,
                 borderRadius: 1.2,
-                border: `1px solid ${alpha("#0f172a", 0.12)}`,
-                backgroundColor: alpha("#ffffff", 0.5),
+                border: (theme) => `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
+                backgroundColor: (theme) => alpha(theme.palette.common.white, 0.5),
               }}
             >
               <Avatar
                 src={trimmedAvatarDraft || undefined}
-                sx={{ width: 52, height: 52, border: `1px solid ${alpha("#0f172a", 0.14)}` }}
+                sx={{
+                  width: 52,
+                  height: 52,
+                  border: (theme) => `1px solid ${alpha(theme.palette.text.primary, 0.14)}`,
+                }}
               >
                 {(trimmedName[0] ?? "U").toUpperCase()}
               </Avatar>
@@ -448,10 +453,10 @@ export default function ProfilePage() {
             sx={{
               p: { xs: 1.6, sm: 2 },
               borderRadius: { xs: 1.4, sm: 1.8 },
-              border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.74))",
-              backdropFilter: "blur(10px)",
+              border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+              background: (theme) =>
+                `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.86)}, ${alpha(theme.palette.common.white, 0.74)})`,
+              backdropFilter: glassBackdrop.card,
             }}
           >
             <Stack spacing={0.9}>
@@ -490,10 +495,10 @@ export default function ProfilePage() {
             sx={{
               p: { xs: 1.6, sm: 2 },
               borderRadius: { xs: 1.4, sm: 1.8 },
-              border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.74))",
-              backdropFilter: "blur(10px)",
+              border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+              background: (theme) =>
+                `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.86)}, ${alpha(theme.palette.common.white, 0.74)})`,
+              backdropFilter: glassBackdrop.card,
             }}
           >
             <Stack spacing={0.9}>
@@ -567,3 +572,4 @@ export default function ProfilePage() {
     </Stack>
   );
 }
+

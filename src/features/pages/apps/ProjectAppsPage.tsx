@@ -33,7 +33,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import type { AppService, Deployment } from "../../../api/types";
@@ -79,6 +79,7 @@ function statusRank(status: AppService["status"]) {
 }
 
 export default function ProjectAppsPage() {
+  const theme = useTheme();
   const { projectId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -138,28 +139,28 @@ export default function ProjectAppsPage() {
     () => (status: AppService["status"] | Deployment["status"]) => {
       if (status === "running" || status === "success") {
         return {
-          backgroundColor: "#1d4ed8",
-          color: "#ffffff",
-          borderColor: "#1e40af",
-          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+          borderColor: theme.palette.primary.dark,
+          "& .MuiChip-label": { color: theme.palette.primary.contrastText, fontWeight: 700 },
         };
       }
       if (status === "deploying") {
         return {
-          backgroundColor: "#92400e",
-          color: "#ffffff",
-          borderColor: "#78350f",
-          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+          backgroundColor: theme.palette.warning.dark,
+          color: theme.palette.warning.contrastText,
+          borderColor: alpha(theme.palette.warning.dark, 0.95),
+          "& .MuiChip-label": { color: theme.palette.warning.contrastText, fontWeight: 700 },
         };
       }
       return {
-        backgroundColor: "#b91c1c",
-        color: "#ffffff",
-        borderColor: "#991b1b",
-        "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+        backgroundColor: theme.palette.error.main,
+        color: theme.palette.error.contrastText,
+        borderColor: alpha(theme.palette.error.dark, 0.95),
+        "& .MuiChip-label": { color: theme.palette.error.contrastText, fontWeight: 700 },
       };
     },
-    [],
+    [theme.palette.error.contrastText, theme.palette.error.dark, theme.palette.error.main, theme.palette.primary.contrastText, theme.palette.primary.dark, theme.palette.primary.main, theme.palette.warning.contrastText, theme.palette.warning.dark],
   );
 
   const apps = useMemo(() => appsResponse?.items ?? [], [appsResponse]);
@@ -305,8 +306,8 @@ export default function ProjectAppsPage() {
           sx={{
             p: { xs: 2, sm: 2.5 },
             borderRadius: { xs: 1.5, sm: 2 },
-            background: "linear-gradient(120deg, rgba(31,111,235,0.2), rgba(14,165,164,0.14))",
-            border: "1px solid rgba(31,111,235,0.28)",
+            background: `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.14)})`,
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.28)}`,
           }}
         >
           <Stack spacing={1.25}>
@@ -366,8 +367,8 @@ export default function ProjectAppsPage() {
           sx={{
             p: { xs: 1.5, sm: 2 },
             borderRadius: { xs: 1.5, sm: 2 },
-            border: "1px solid rgba(148,163,184,0.24)",
-            background: "linear-gradient(180deg, rgba(148,163,184,0.08), rgba(255,255,255,0.64))",
+            border: `1px solid ${alpha(theme.palette.text.secondary, 0.24)}`,
+            background: `linear-gradient(180deg, ${alpha(theme.palette.text.secondary, 0.08)}, ${alpha(theme.palette.common.white, 0.64)})`,
           }}
         >
           <Stack direction={{ xs: "column", lg: "row" }} spacing={1} justifyContent="space-between">
@@ -396,10 +397,10 @@ export default function ProjectAppsPage() {
                   sx={
                     statusFilter === "running"
                       ? {
-                          backgroundColor: "#1d4ed8",
-                          color: "#ffffff",
-                          borderColor: "#1e40af",
-                          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+                          backgroundColor: theme.palette.primary.main,
+                          color: theme.palette.primary.contrastText,
+                          borderColor: theme.palette.primary.dark,
+                          "& .MuiChip-label": { color: theme.palette.primary.contrastText, fontWeight: 700 },
                         }
                       : undefined
                   }
@@ -413,10 +414,10 @@ export default function ProjectAppsPage() {
                   sx={
                     statusFilter === "deploying"
                       ? {
-                          backgroundColor: "#92400e",
-                          color: "#ffffff",
-                          borderColor: "#78350f",
-                          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+                          backgroundColor: theme.palette.warning.dark,
+                          color: theme.palette.warning.contrastText,
+                          borderColor: alpha(theme.palette.warning.dark, 0.95),
+                          "& .MuiChip-label": { color: theme.palette.warning.contrastText, fontWeight: 700 },
                         }
                       : undefined
                   }
@@ -430,10 +431,10 @@ export default function ProjectAppsPage() {
                   sx={
                     statusFilter === "failed"
                       ? {
-                          backgroundColor: "#b91c1c",
-                          color: "#ffffff",
-                          borderColor: "#991b1b",
-                          "& .MuiChip-label": { color: "#ffffff", fontWeight: 700 },
+                          backgroundColor: theme.palette.error.main,
+                          color: theme.palette.error.contrastText,
+                          borderColor: alpha(theme.palette.error.dark, 0.95),
+                          "& .MuiChip-label": { color: theme.palette.error.contrastText, fontWeight: 700 },
                         }
                       : undefined
                   }
@@ -500,8 +501,8 @@ export default function ProjectAppsPage() {
             sx={{
               p: { xs: 1.5, sm: 1.75 },
               borderRadius: { xs: 1.5, sm: 2 },
-              border: "1px solid rgba(148,163,184,0.24)",
-              background: "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(248,250,252,0.92))",
+              border: `1px solid ${alpha(theme.palette.text.secondary, 0.24)}`,
+              background: `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.74)}, ${alpha(theme.palette.background.default, 0.92)})`,
             }}
           >
             <Stack spacing={1.25}>
@@ -566,16 +567,16 @@ export default function ProjectAppsPage() {
                       key={app.id}
                       variant="outlined"
                       sx={{
-                        p: 1.35,
-                        borderRadius: 1.5,
-                        borderColor: alpha("#1f6feb", 0.16),
-                        transition: "transform 160ms ease, border-color 160ms ease",
-                        "&:hover": {
-                          transform: "translateY(-2px)",
-                          borderColor: alpha("#1f6feb", 0.34),
-                        },
-                      }}
-                    >
+                    p: 1.35,
+                    borderRadius: 1.5,
+                    borderColor: alpha(theme.palette.primary.main, 0.16),
+                    transition: "transform 160ms ease, border-color 160ms ease",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      borderColor: alpha(theme.palette.primary.main, 0.34),
+                    },
+                  }}
+                >
                       <Stack spacing={1}>
                         <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1}>
                           <Box sx={{ minWidth: 0 }}>
@@ -740,8 +741,8 @@ export default function ProjectAppsPage() {
               sx={{
                 p: 1.4,
                 borderRadius: 2,
-                border: "1px solid rgba(148,163,184,0.24)",
-                background: "linear-gradient(180deg, rgba(255,255,255,0.78), rgba(248,250,252,0.9))",
+                border: `1px solid ${alpha(theme.palette.text.secondary, 0.24)}`,
+                background: `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.78)}, ${alpha(theme.palette.background.default, 0.9)})`,
               }}
             >
               <Stack spacing={1}>
@@ -756,7 +757,7 @@ export default function ProjectAppsPage() {
                     <Paper
                       key={`${item.appId}-${item.createdAt ?? "na"}`}
                       variant="outlined"
-                      sx={{ p: 1, borderRadius: 1.3, borderColor: alpha("#1f6feb", 0.16) }}
+                      sx={{ p: 1, borderRadius: 1.3, borderColor: alpha(theme.palette.primary.main, 0.16) }}
                     >
                       <Stack spacing={0.4}>
                         <Stack direction="row" justifyContent="space-between" spacing={1}>

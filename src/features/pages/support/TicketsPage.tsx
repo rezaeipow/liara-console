@@ -19,6 +19,7 @@ import { useMemo } from "react";
 import { Link, useLoaderData, useNavigation, useSearchParams } from "react-router-dom";
 import { useAppSelector } from "../../../app/store/hooks";
 import { selectTableDensity } from "../../../app/store/slices/uiSlice";
+import { glassBackdrop } from "../../../shared/ui/glassTokens";
 import type { Ticket } from "../../../api/types";
 import type { TicketsLoaderData } from "./supportData";
 import { formatDateTime } from "../billing/billingFormat";
@@ -83,10 +84,10 @@ export default function TicketsPage() {
         sx={{
           p: { xs: 2, sm: 2.5 },
           borderRadius: tableDensity === "compact" ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
-          border: "1px solid rgba(31,111,235,0.32)",
-          background:
-            "linear-gradient(120deg, rgba(31,111,235,0.20), rgba(14,165,164,0.14))",
-          backdropFilter: "blur(14px)",
+          border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.32)}`,
+          background: (theme) =>
+            `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.14)})`,
+          backdropFilter: glassBackdrop.hero,
         }}
       >
         <Stack
@@ -127,19 +128,19 @@ export default function TicketsPage() {
         }}
       >
         <SummaryCard label="Total" value={String(items.length)} density={tableDensity} />
-        <SummaryCard label="Open" value={String(summary.open)} color="#f59e0b" density={tableDensity} />
-        <SummaryCard label="Pending" value={String(summary.pending)} color="#0ea5e9" density={tableDensity} />
-        <SummaryCard label="Closed" value={String(summary.closed)} color="#16a34a" density={tableDensity} />
+        <SummaryCard label="Open" value={String(summary.open)} tone="warning" density={tableDensity} />
+        <SummaryCard label="Pending" value={String(summary.pending)} tone="info" density={tableDensity} />
+        <SummaryCard label="Closed" value={String(summary.closed)} tone="success" density={tableDensity} />
       </Box>
 
       <Paper
         sx={{
           p: { xs: 2, sm: 2.5 },
           borderRadius: tableDensity === "compact" ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
-          border: `1px solid ${alpha("#1f6feb", 0.24)}`,
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76))",
-          backdropFilter: "blur(10px)",
+          border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+          background: (theme) =>
+            `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.88)}, ${alpha(theme.palette.common.white, 0.76)})`,
+          backdropFilter: glassBackdrop.card,
         }}
       >
         {isRouteLoading ? <LinearProgress sx={{ mb: 1.2 }} /> : null}
@@ -233,8 +234,8 @@ export default function TicketsPage() {
                 sx={{
                   p: 2,
                   borderRadius: tableDensity === "compact" ? 0.8 : 1.6,
-                  borderColor: alpha("#0f172a", 0.12),
-                  backgroundColor: alpha("#ffffff", 0.65),
+                  borderColor: (theme) => alpha(theme.palette.text.primary, 0.12),
+                  backgroundColor: (theme) => alpha(theme.palette.common.white, 0.65),
                 }}
             >
               <Stack spacing={1.2} alignItems="flex-start">
@@ -273,8 +274,8 @@ export default function TicketsPage() {
                     px: itemPaddingX,
                     py: itemPaddingY,
                     borderRadius: tableDensity === "compact" ? 0.7 : 1.4,
-                    borderColor: alpha("#0f172a", 0.12),
-                    backgroundColor: alpha("#ffffff", 0.62),
+                    borderColor: (theme) => alpha(theme.palette.text.primary, 0.12),
+                    backgroundColor: (theme) => alpha(theme.palette.common.white, 0.62),
                   }}
                 >
                   <Stack spacing={itemInnerSpacing}>
@@ -337,11 +338,11 @@ export default function TicketsPage() {
 type SummaryCardProps = {
   label: string;
   value: string;
-  color?: string;
+  tone?: "default" | "warning" | "info" | "success";
   density: "compact" | "standard" | "comfortable";
 };
 
-function SummaryCard({ label, value, color = "#475569", density }: SummaryCardProps) {
+function SummaryCard({ label, value, tone = "default", density }: SummaryCardProps) {
   const paddingX = density === "comfortable" ? 1.4 : density === "compact" ? 0.3 : 1.2;
   const paddingY = density === "comfortable" ? 1.9 : density === "compact" ? 0.3 : 1;
 
@@ -355,8 +356,18 @@ function SummaryCard({ label, value, color = "#475569", density }: SummaryCardPr
         px: paddingX,
         py: paddingY,
         borderRadius: density === "compact" ? 0.65 : 1.3,
-        borderColor: alpha(color, 0.25),
-        backgroundColor: alpha("#ffffff", 0.82),
+        borderColor: (theme) => {
+          const baseColor =
+            tone === "warning"
+              ? theme.palette.warning.main
+              : tone === "info"
+                ? theme.palette.info.main
+                : tone === "success"
+                  ? theme.palette.success.main
+                  : theme.palette.text.secondary;
+          return alpha(baseColor, 0.25);
+        },
+        backgroundColor: (theme) => alpha(theme.palette.common.white, 0.82),
       }}
     >
       <Typography variant="caption" color="text.secondary">
@@ -368,3 +379,4 @@ function SummaryCard({ label, value, color = "#475569", density }: SummaryCardPr
     </Paper>
   );
 }
+

@@ -16,7 +16,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { useEffect, useMemo, useState } from "react";
 import { useFetcher, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { VmsAPI } from "../../../api/vmsApi";
@@ -32,6 +32,7 @@ type VmLayoutContext = {
 };
 
 export default function VmSettingsPage() {
+  const theme = useTheme();
   const { vm, isLoading, error, setVm } = useOutletContext<VmLayoutContext>();
   const { vmId } = useParams();
   const navigate = useNavigate();
@@ -153,8 +154,8 @@ export default function VmSettingsPage() {
           sx={{
             p: { xs: 1.5, sm: 1.8 },
             borderRadius: 1.75,
-            border: `1px solid ${alpha("#1f6feb", 0.16)}`,
-            background: "linear-gradient(170deg, rgba(255,255,255,0.72), rgba(248,250,252,0.9))",
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.16)}`,
+            background: `linear-gradient(170deg, ${alpha(theme.palette.common.white, 0.72)}, ${alpha(theme.palette.background.default, 0.9)})`,
           }}
         >
           <Stack spacing={1.2}>
@@ -202,8 +203,8 @@ export default function VmSettingsPage() {
           sx={{
             p: { xs: 1.5, sm: 1.8 },
             borderRadius: 1.75,
-            border: `1px solid ${alpha("#0ea5a4", 0.2)}`,
-            background: "linear-gradient(170deg, rgba(240,253,250,0.56), rgba(236,253,245,0.75))",
+            border: `1px solid ${alpha(theme.palette.secondary.main, 0.2)}`,
+            background: `linear-gradient(170deg, ${alpha(theme.palette.secondary.light, 0.26)}, ${alpha(theme.palette.secondary.main, 0.2)})`,
           }}
         >
           <Stack spacing={1.2}>
@@ -229,8 +230,8 @@ export default function VmSettingsPage() {
           sx={{
             p: { xs: 1.5, sm: 1.8 },
             borderRadius: 1.75,
-            border: `1px solid ${alpha("#dc2626", 0.24)}`,
-            background: "linear-gradient(170deg, rgba(254,242,242,0.74), rgba(254,226,226,0.86))",
+            border: `1px solid ${alpha(theme.palette.error.main, 0.24)}`,
+            background: `linear-gradient(170deg, ${alpha(theme.palette.error.light, 0.3)}, ${alpha(theme.palette.error.main, 0.2)})`,
           }}
         >
           <Stack spacing={1.2}>
