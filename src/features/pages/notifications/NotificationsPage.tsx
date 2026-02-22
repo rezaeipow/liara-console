@@ -1,12 +1,15 @@
 import DoneAllOutlinedIcon from "@mui/icons-material/DoneAllOutlined";
 import NotificationsActiveOutlinedIcon from "@mui/icons-material/NotificationsActiveOutlined";
-import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import {
   Alert,
   Box,
   Button,
   Chip,
   LinearProgress,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
   Paper,
   Snackbar,
   Stack,
@@ -15,7 +18,6 @@ import {
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
 import {
   Form,
   useActionData,
@@ -77,6 +79,8 @@ export default function NotificationsPage() {
       );
     });
   }, [filter, items, search]);
+  const unreadFiltered = filteredItems.filter((item) => !item.read);
+  const readFiltered = filteredItems.filter((item) => item.read);
 
   const updateParam = (key: string, value: string, defaultValue = "") => {
     const next = new URLSearchParams(searchParams);
@@ -153,203 +157,119 @@ export default function NotificationsPage() {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: {
-              xs: "1fr",
-              sm: "repeat(2, minmax(0, 1fr))",
-              lg: "repeat(3, minmax(0, 1fr))",
-            },
-            gap: 1,
+            gridTemplateColumns: { xs: "1fr", lg: "280px minmax(0, 1fr)" },
+            gap: 1.25,
           }}
         >
-          <SummaryCard
-            label="Total"
-            value={String(items.length)}
-            icon={<NotificationsActiveOutlinedIcon fontSize="small" />}
-            tone="primary"
-            density={tableDensity}
-          />
-          <SummaryCard
-            label="Unread"
-            value={String(unreadCount)}
-            icon={<NotificationsNoneOutlinedIcon fontSize="small" />}
-            tone="warning"
-            density={tableDensity}
-          />
-          <SummaryCard
-            label="Read"
-            value={String(readCount)}
-            icon={<DoneAllOutlinedIcon fontSize="small" />}
-            tone="success"
-            density={tableDensity}
-          />
-        </Box>
-
-        <Paper
-          sx={{
-            p: { xs: 2, sm: 2.5 },
-            borderRadius: tableDensity === "compact" ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
-            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
-            background: (theme) =>
-              `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.88)}, ${alpha(theme.palette.common.white, 0.76)})`,
-            backdropFilter: glassBackdrop.card,
-          }}
-        >
-          <Stack spacing={1.4}>
-            <Stack
-              direction={{ xs: "column", md: "row" }}
-              spacing={1}
-              justifyContent="space-between"
-              alignItems={{ xs: "stretch", md: "center" }}
-            >
-              <Stack direction="row" spacing={0.8} flexWrap="wrap" useFlexGap>
-                <Chip
-                  label="All"
-                  clickable
-                  color={filter === "all" ? "primary" : "default"}
-                  variant={filter === "all" ? "filled" : "outlined"}
-                  onClick={() => updateParam("filter", "all", "all")}
-                  aria-label="Show all notifications"
-                    sx={{
-                      color: filter === "all" ? "primary.dark" : "text.primary",
-                      backgroundColor:
-                        filter === "all"
-                          ? (theme) => alpha(theme.palette.primary.main, 0.18)
-                          : "transparent",
-                      borderColor: (theme) => alpha(theme.palette.primary.main, 0.28),
-                      fontWeight: 700,
-                    }}
-                  />
-                <Chip
-                  label="Unread"
-                  clickable
-                  color={filter === "unread" ? "warning" : "default"}
-                  variant={filter === "unread" ? "filled" : "outlined"}
-                  onClick={() => updateParam("filter", "unread", "all")}
-                  aria-label="Filter unread notifications"
-                    sx={{
-                      color: filter === "unread" ? "warning.dark" : "text.primary",
-                      backgroundColor:
-                        filter === "unread"
-                          ? (theme) => alpha(theme.palette.warning.main, 0.18)
-                          : "transparent",
-                      borderColor: (theme) => alpha(theme.palette.warning.main, 0.3),
-                      fontWeight: 700,
-                    }}
-                  />
-                <Chip
-                  label="Read"
-                  clickable
-                  color={filter === "read" ? "success" : "default"}
-                  variant={filter === "read" ? "filled" : "outlined"}
-                  onClick={() => updateParam("filter", "read", "all")}
-                  aria-label="Filter read notifications"
-                    sx={{
-                      color: filter === "read" ? "success.dark" : "text.primary",
-                      backgroundColor:
-                        filter === "read"
-                          ? (theme) => alpha(theme.palette.success.main, 0.16)
-                          : "transparent",
-                      borderColor: (theme) => alpha(theme.palette.success.main, 0.3),
-                      fontWeight: 700,
-                    }}
-                  />
-              </Stack>
+          <Paper
+            sx={{
+              p: { xs: 1.3, sm: 1.6 },
+              borderRadius: tableDensity === "compact" ? { xs: 0.7, sm: 1 } : { xs: 1.4, sm: 1.8 },
+              border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.22)}`,
+              background: (theme) =>
+                `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.88)}, ${alpha(theme.palette.common.white, 0.76)})`,
+              backdropFilter: glassBackdrop.card,
+              alignSelf: "start",
+            }}
+          >
+            <Stack spacing={1.2}>
+              <Typography fontWeight={800}>Inbox Filters</Typography>
               <TextField
                 size="small"
                 value={search}
                 onChange={(event) => updateParam("q", event.target.value)}
                 placeholder="Search notifications"
-                sx={{ minWidth: { xs: "100%", md: 260 } }}
                 slotProps={{ htmlInput: { "aria-label": "Search notifications" } }}
               />
-            </Stack>
-
-            {filteredItems.length === 0 ? (
-              <Paper
-                variant="outlined"
-                sx={{
-                  p: 2,
-                  borderRadius: tableDensity === "compact" ? 0.7 : 1.4,
-                  borderColor: (theme) => alpha(theme.palette.text.primary, 0.12),
-                  backgroundColor: (theme) => alpha(theme.palette.common.white, 0.62),
-                }}
-              >
-                <Typography fontWeight={800}>No notifications found</Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                  Try changing the search text or the selected filter.
-                </Typography>
-              </Paper>
-            ) : (
-              <Stack spacing={listSpacing} role="list" aria-label="Notifications list">
-                {filteredItems.map((item) => (
-                  <Paper
-                    key={item.id}
-                    role="listitem"
-                    variant="outlined"
-                    sx={{
-                      px: itemPaddingX,
-                      py: itemPaddingY,
-                      borderRadius: tableDensity === "compact" ? 0.7 : 1.4,
-                      borderColor: (theme) =>
-                        alpha(theme.palette.text.primary, item.read ? 0.12 : 0.2),
-                      backgroundColor: (theme) =>
-                        item.read
-                          ? alpha(theme.palette.common.white, 0.6)
-                          : alpha(theme.palette.primary.light, 0.24),
-                    }}
-                  >
-                    <Stack spacing={itemInnerSpacing}>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
-                        <Typography
-                          fontWeight={800}
-                          sx={tableDensity === "compact" ? { fontSize: "0.82rem", lineHeight: 1.2 } : undefined}
-                        >
-                          {item.title}
-                        </Typography>
-                        <Chip
-                          size="small"
-                          color={item.read ? "success" : "warning"}
-                          variant="outlined"
-                          label={item.read ? "Read" : "Unread"}
-                        />
-                      </Stack>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={tableDensity === "compact" ? { fontSize: "0.73rem", lineHeight: 1.25 } : undefined}
-                      >
-                        {item.body}
-                      </Typography>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={tableDensity === "compact" ? { fontSize: "0.64rem", lineHeight: 1.15 } : undefined}
-                        >
-                          {formatDateTime(item.createdAt)}
-                        </Typography>
-
-                        <Form method="post" replace>
-                          <input type="hidden" name="intent" value="mark-read" />
-                          <input type="hidden" name="notificationId" value={item.id} />
-                          <Button
-                            type="submit"
-                            size="small"
-                            variant="text"
-                            disabled={item.read || isSubmitting}
-                            aria-label={`Mark notification ${item.id} as read`}
-                          >
-                            Mark as read
-                          </Button>
-                        </Form>
-                      </Stack>
-                    </Stack>
-                  </Paper>
+              <List disablePadding>
+                {[
+                  { key: "all", label: "All", count: items.length },
+                  { key: "unread", label: "Unread", count: unreadCount },
+                  { key: "read", label: "Read", count: readCount },
+                ].map((entry) => (
+                  <ListItem key={entry.key} disablePadding sx={{ mb: 0.35 }}>
+                    <ListItemButton
+                      selected={filter === entry.key}
+                      onClick={() => updateParam("filter", entry.key, "all")}
+                      sx={{
+                        borderRadius: 1,
+                        border: (theme) => `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
+                        "&.Mui-selected": {
+                          borderColor: (theme) => alpha(theme.palette.primary.main, 0.36),
+                          backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.12),
+                        },
+                      }}
+                    >
+                      <ListItemText primary={entry.label} />
+                      <Chip size="small" label={entry.count} />
+                    </ListItemButton>
+                  </ListItem>
                 ))}
+              </List>
+              <Stack direction="row" spacing={0.6} flexWrap="wrap" useFlexGap>
+                <Chip label={`Total: ${items.length}`} size="small" variant="outlined" />
+                <Chip label={`Unread: ${unreadCount}`} size="small" color="warning" variant="outlined" />
               </Stack>
-            )}
-          </Stack>
-        </Paper>
+            </Stack>
+          </Paper>
+
+          <Paper
+            sx={{
+              p: { xs: 1.4, sm: 1.8 },
+              borderRadius: tableDensity === "compact" ? { xs: 0.7, sm: 1 } : { xs: 1.4, sm: 1.8 },
+              border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
+              background: (theme) =>
+                `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.88)}, ${alpha(theme.palette.common.white, 0.76)})`,
+              backdropFilter: glassBackdrop.card,
+            }}
+          >
+            <Stack spacing={1.1}>
+              {filteredItems.length === 0 ? (
+                <Paper
+                  variant="outlined"
+                  sx={{
+                    p: 2,
+                    borderRadius: tableDensity === "compact" ? 0.7 : 1.4,
+                    borderColor: (theme) => alpha(theme.palette.text.primary, 0.12),
+                    backgroundColor: (theme) => alpha(theme.palette.common.white, 0.62),
+                  }}
+                >
+                  <Typography fontWeight={800}>No notifications found</Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                    Try changing search text or filter.
+                  </Typography>
+                </Paper>
+              ) : (
+                <>
+                  {filter !== "read" && unreadFiltered.length > 0 ? (
+                    <NotificationSection
+                      title="Unread"
+                      items={unreadFiltered}
+                      listSpacing={listSpacing}
+                      itemPaddingX={itemPaddingX}
+                      itemPaddingY={itemPaddingY}
+                      itemInnerSpacing={itemInnerSpacing}
+                      tableDensity={tableDensity}
+                      isSubmitting={isSubmitting}
+                    />
+                  ) : null}
+                  {filter !== "unread" && readFiltered.length > 0 ? (
+                    <NotificationSection
+                      title="Read"
+                      items={readFiltered}
+                      listSpacing={listSpacing}
+                      itemPaddingX={itemPaddingX}
+                      itemPaddingY={itemPaddingY}
+                      itemInnerSpacing={itemInnerSpacing}
+                      tableDensity={tableDensity}
+                      isSubmitting={isSubmitting}
+                    />
+                  ) : null}
+                </>
+              )}
+            </Stack>
+          </Paper>
+        </Box>
       </Stack>
 
       <Snackbar
@@ -377,50 +297,99 @@ export default function NotificationsPage() {
   );
 }
 
-type SummaryCardProps = {
-  label: string;
-  value: string;
-  icon: ReactNode;
-  tone: "primary" | "warning" | "success";
-  density: "compact" | "standard" | "comfortable";
+type NotificationSectionProps = {
+  title: string;
+  items: NotificationsLoaderData["items"];
+  listSpacing: number;
+  itemPaddingX: number;
+  itemPaddingY: number;
+  itemInnerSpacing: number;
+  tableDensity: "compact" | "standard" | "comfortable";
+  isSubmitting: boolean;
 };
 
-function SummaryCard({ label, value, icon, tone, density }: SummaryCardProps) {
-  const paddingX = density === "comfortable" ? 2.1 : density === "compact" ? 0.35 : 1.3;
-  const paddingY = density === "comfortable" ? 2.1 : density === "compact" ? 0.35 : 1.3;
-  const spacing = density === "comfortable" ? 1.2 : density === "compact" ? 0.12 : 0.6;
-
+function NotificationSection({
+  title,
+  items,
+  listSpacing,
+  itemPaddingX,
+  itemPaddingY,
+  itemInnerSpacing,
+  tableDensity,
+  isSubmitting,
+}: NotificationSectionProps) {
   return (
-    <Paper
-      variant="outlined"
-      sx={{
-        px: paddingX,
-        py: paddingY,
-        borderRadius: density === "compact" ? 0.7 : 1.4,
-        borderColor: (theme) => {
-          const base =
-            tone === "warning"
-              ? theme.palette.warning.main
-              : tone === "success"
-                ? theme.palette.success.main
-                : theme.palette.primary.main;
-          return alpha(base, 0.25);
-        },
-        backgroundColor: (theme) => alpha(theme.palette.common.white, 0.82),
-      }}
-    >
-      <Stack spacing={spacing}>
-        <Stack direction="row" alignItems="center" spacing={0.7}>
-          {icon}
-          <Typography variant="body2" color="text.secondary">
-            {label}
-          </Typography>
-        </Stack>
-        <Typography variant="h6" fontWeight={800}>
-          {value}
-        </Typography>
+    <Stack spacing={0.9}>
+      <Stack direction="row" alignItems="center" spacing={0.8}>
+        <Typography fontWeight={800}>{title}</Typography>
+        <Chip size="small" label={items.length} />
       </Stack>
-    </Paper>
+      <Stack spacing={listSpacing} role="list" aria-label={`${title} notifications`}>
+        {items.map((item) => (
+          <Paper
+            key={item.id}
+            role="listitem"
+            variant="outlined"
+            sx={{
+              px: itemPaddingX,
+              py: itemPaddingY,
+              borderRadius: tableDensity === "compact" ? 0.7 : 1.4,
+              borderColor: (theme) =>
+                alpha(theme.palette.text.primary, item.read ? 0.12 : 0.2),
+              backgroundColor: (theme) =>
+                item.read ? alpha(theme.palette.common.white, 0.6) : alpha(theme.palette.primary.light, 0.24),
+            }}
+          >
+            <Stack spacing={itemInnerSpacing}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
+                <Typography
+                  fontWeight={800}
+                  sx={tableDensity === "compact" ? { fontSize: "0.82rem", lineHeight: 1.2 } : undefined}
+                >
+                  {item.title}
+                </Typography>
+                <Chip
+                  size="small"
+                  color={item.read ? "success" : "warning"}
+                  variant="outlined"
+                  label={item.read ? "Read" : "Unread"}
+                />
+              </Stack>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={tableDensity === "compact" ? { fontSize: "0.73rem", lineHeight: 1.25 } : undefined}
+              >
+                {item.body}
+              </Typography>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={tableDensity === "compact" ? { fontSize: "0.64rem", lineHeight: 1.15 } : undefined}
+                >
+                  {formatDateTime(item.createdAt)}
+                </Typography>
+
+                <Form method="post" replace>
+                  <input type="hidden" name="intent" value="mark-read" />
+                  <input type="hidden" name="notificationId" value={item.id} />
+                  <Button
+                    type="submit"
+                    size="small"
+                    variant="text"
+                    disabled={item.read || isSubmitting}
+                    aria-label={`Mark notification ${item.id} as read`}
+                  >
+                    Mark as read
+                  </Button>
+                </Form>
+              </Stack>
+            </Stack>
+          </Paper>
+        ))}
+      </Stack>
+    </Stack>
   );
 }
 

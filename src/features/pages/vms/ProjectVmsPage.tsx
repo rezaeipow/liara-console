@@ -1,5 +1,6 @@
 import DnsOutlinedIcon from "@mui/icons-material/DnsOutlined";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import PowerOffOutlinedIcon from "@mui/icons-material/PowerOffOutlined";
 import PowerSettingsNewOutlinedIcon from "@mui/icons-material/PowerSettingsNewOutlined";
@@ -219,11 +220,11 @@ export default function ProjectVmsPage() {
         setSnackbarMessage("VM rebooted.");
       } else {
         await deleteVm({ vmId, projectId: projectId ?? "" }).unwrap();
-        setConfirmOpen(false);
-        setPendingAction(null);
         setSnackbarSeverity("success");
         setSnackbarMessage("VM deleted.");
       }
+      setConfirmOpen(false);
+      setPendingAction(null);
       void refetch();
     } catch (requestError: unknown) {
       setSnackbarSeverity("error");
@@ -292,7 +293,17 @@ export default function ProjectVmsPage() {
                   </Typography>
                 </Box>
               </Stack>
-              <Stack direction="row" spacing={1}>
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ width: { xs: "100%", sm: "auto" } }}>
+                {projectId ? (
+                  <Button
+                    component={Link}
+                    to={`/console/projects/${projectId}`}
+                    variant="outlined"
+                    startIcon={<ArrowBackIcon />}
+                  >
+                    Back to Project
+                  </Button>
+                ) : null}
                 <Button
                   variant="outlined"
                   startIcon={<RefreshIcon />}
@@ -345,6 +356,19 @@ export default function ProjectVmsPage() {
                   variant={statusFilter === "all" ? "filled" : "outlined"}
                   color={statusFilter === "all" ? "primary" : "default"}
                   onClick={() => updateSearchParam("status", "all", "all")}
+                  sx={
+                    statusFilter === "all"
+                      ? {
+                          backgroundColor: theme.palette.primary.main,
+                          color: theme.palette.primary.contrastText,
+                          borderColor: theme.palette.primary.dark,
+                          "& .MuiChip-label": {
+                            color: theme.palette.primary.contrastText,
+                            fontWeight: 700,
+                          },
+                        }
+                      : undefined
+                  }
                 />
                 <Chip
                   label="Running"
@@ -598,7 +622,12 @@ export default function ProjectVmsPage() {
               ))}
             </Box>
           ) : (
-            <TableContainer>
+            <TableContainer
+              sx={{
+                borderRadius: { xs: 1.5, sm: 2 },
+                overflow: "hidden",
+              }}
+            >
               <Table size="small" aria-label="vms table">
                 <TableHead>
                   <TableRow>

@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { useMemo, useState } from "react";
-import { useLoaderData, useNavigation, useSearchParams } from "react-router-dom";
+import { Link, useLoaderData, useNavigation, useSearchParams } from "react-router-dom";
 import { BillingAPI } from "../../../api/billingApi";
 import { ApiError } from "../../../api/httpClient";
 import { useAppSelector } from "../../../app/store/hooks";
@@ -135,19 +135,42 @@ export default function BillingInvoicesPage() {
         }}
         >
           <Stack spacing={1}>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <ReceiptLongOutlinedIcon fontSize="small" />
-              <Typography variant="h5" fontWeight={800}>Invoices</Typography>
+            <Stack
+              direction={{ xs: "column", md: "row" }}
+              alignItems={{ xs: "flex-start", md: "center" }}
+              justifyContent="space-between"
+              spacing={1.5}
+            >
+              <Stack spacing={0.5}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <ReceiptLongOutlinedIcon fontSize="small" />
+                  <Typography variant="h5" fontWeight={800}>Invoices</Typography>
+                </Stack>
+                <Typography variant="body2" color="text.secondary">
+                  Review billing documents and download mock PDFs.
+                </Typography>
+                <Chip
+                  variant="outlined"
+                  color={unpaidCount > 0 ? "warning" : "success"}
+                  label={unpaidCount > 0 ? `${unpaidCount} unpaid invoices` : "All invoices are paid"}
+                  sx={{ alignSelf: "flex-start" }}
+                />
+              </Stack>
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ width: { xs: "100%", md: "auto" } }}>
+                <Button component={Link} to="/console/billing" variant="outlined">
+                  Overview
+                </Button>
+                <Button component={Link} to="/console/billing/topup" variant="outlined">
+                  Top up
+                </Button>
+                <Button component={Link} to="/console/billing/payments" variant="outlined">
+                  Payments
+                </Button>
+                <Button component={Link} to="/console/billing/invoices" variant="contained">
+                  Invoices
+                </Button>
+              </Stack>
             </Stack>
-            <Typography variant="body2" color="text.secondary">
-              Review billing documents and download mock PDFs.
-            </Typography>
-            <Chip
-              variant="outlined"
-              color={unpaidCount > 0 ? "warning" : "success"}
-              label={unpaidCount > 0 ? `${unpaidCount} unpaid invoices` : "All invoices are paid"}
-              sx={{ alignSelf: "flex-start" }}
-            />
           </Stack>
         </Paper>
 

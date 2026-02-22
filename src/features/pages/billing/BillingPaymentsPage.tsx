@@ -5,6 +5,7 @@ import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import {
   Alert,
   Box,
+  Button,
   Chip,
   LinearProgress,
   MenuItem,
@@ -22,7 +23,7 @@ import {
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { useMemo } from "react";
-import { useLoaderData, useNavigation, useSearchParams } from "react-router-dom";
+import { Link, useLoaderData, useNavigation, useSearchParams } from "react-router-dom";
 import { useAppSelector } from "../../../app/store/hooks";
 import { selectTableDensity } from "../../../app/store/slices/uiSlice";
 import { glassBackdrop } from "../../../shared/ui/glassTokens";
@@ -93,15 +94,38 @@ export default function BillingPaymentsPage() {
         }}
       >
         <Stack spacing={1.1}>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <PaymentsOutlinedIcon fontSize="small" />
-            <Typography variant="h5" fontWeight={800}>
-              Payment History
-            </Typography>
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            alignItems={{ xs: "flex-start", md: "center" }}
+            justifyContent="space-between"
+            spacing={1.5}
+          >
+            <Stack spacing={0.5}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <PaymentsOutlinedIcon fontSize="small" />
+                <Typography variant="h5" fontWeight={800}>
+                  Payment History
+                </Typography>
+              </Stack>
+              <Typography variant="body2" color="text.secondary">
+                Monitor every top-up transaction with status, amount, and timeline.
+              </Typography>
+            </Stack>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ width: { xs: "100%", md: "auto" } }}>
+              <Button component={Link} to="/console/billing" variant="outlined">
+                Overview
+              </Button>
+              <Button component={Link} to="/console/billing/topup" variant="outlined">
+                Top up
+              </Button>
+              <Button component={Link} to="/console/billing/payments" variant="contained">
+                Payments
+              </Button>
+              <Button component={Link} to="/console/billing/invoices" variant="outlined">
+                Invoices
+              </Button>
+            </Stack>
           </Stack>
-          <Typography variant="body2" color="text.secondary">
-            Monitor every top-up transaction with status, amount, and timeline.
-          </Typography>
 
           <Box
             sx={{

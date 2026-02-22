@@ -10,6 +10,15 @@ import {
 
 export const accountHandlers: HttpHandler[] = [
   http.get("/accounts", () => {
+    if (db.accounts.length === 0) {
+      const fallbackAccount = { id: createId("acc"), name: "Main Account" };
+      db.accounts.push(fallbackAccount);
+      db.activeAccountId = fallbackAccount.id;
+      getBillingByAccountId(fallbackAccount.id);
+      persistAccountsState();
+      persistRuntimeState();
+    }
+
     return HttpResponse.json({
       items: db.accounts,
       activeAccountId: db.activeAccountId,
@@ -73,6 +82,13 @@ export const accountHandlers: HttpHandler[] = [
 
     if (targetIndex === -1) {
       return HttpResponse.json({ message: "account not found" }, { status: 404 });
+    }
+
+    if (db.accounts.length <= 1) {
+      return HttpResponse.json(
+        { message: "At least one account must remain active." },
+        { status: 409 },
+      );
     }
 
     db.accounts.splice(targetIndex, 1);

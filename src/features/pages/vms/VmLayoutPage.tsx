@@ -1,4 +1,5 @@
 import DnsOutlinedIcon from "@mui/icons-material/DnsOutlined";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Box, Button, Chip, Divider, Paper, Skeleton, Stack, Typography } from "@mui/material";
 import { alpha, useTheme } from "@mui/material/styles";
 import { useEffect, useState } from "react";
@@ -112,6 +113,17 @@ export default function VmLayoutPage() {
                   </Stack>
                 </Box>
               </Stack>
+              {vm?.projectId ? (
+                <Button
+                  component={NavLink}
+                  to={`/console/projects/${vm.projectId}/vms`}
+                  variant="outlined"
+                  size="small"
+                  startIcon={<ArrowBackIcon />}
+                >
+                  Back to VMs List
+                </Button>
+              ) : null}
             </Stack>
 
             <Box

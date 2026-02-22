@@ -73,8 +73,11 @@ export default function BillingOverviewPage() {
             </Typography>
           </Stack>
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ width: { xs: "100%", md: "auto" } }}>
-            <Button component={Link} to="/console/billing/topup" variant="contained" startIcon={<CreditCardOutlinedIcon />}>
-              Top up credit
+            <Button component={Link} to="/console/billing" variant="contained">
+              Overview
+            </Button>
+            <Button component={Link} to="/console/billing/topup" variant="outlined" startIcon={<CreditCardOutlinedIcon />}>
+              Top up
             </Button>
             <Button
               component={Link}
@@ -83,7 +86,7 @@ export default function BillingOverviewPage() {
               endIcon={<ArrowOutwardIcon />}
               aria-label="View full payment history"
             >
-              View payments
+              Payments
             </Button>
             <Button
               component={Link}
@@ -92,7 +95,7 @@ export default function BillingOverviewPage() {
               endIcon={<ArrowOutwardIcon />}
               aria-label="View full invoices list"
             >
-              View invoices
+              Invoices
             </Button>
           </Stack>
         </Stack>

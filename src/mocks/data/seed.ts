@@ -158,52 +158,11 @@ export const createSeedData = (): MockDb => {
         invoices: [{ id: "inv-2", amount: 90000, createdAt: now, status: "unpaid" }],
       },
     },
-    projects: [
-      {
-        id: "prj-1",
-        accountId: "acc-1",
-        name: "liara-console",
-        region: "de-fra",
-        plan: "starter",
-        createdAt: now,
-      },
-    ],
-    apps: [
-      {
-        id: "app-1",
-        projectId: "prj-1",
-        name: "frontend",
-        region: "de-fra",
-        plan: "starter",
-        status: "running",
-      },
-    ],
-    deployments: [
-      {
-        id: "dep-1",
-        appId: "app-1",
-        version: "v1",
-        status: "success",
-        createdAt: now,
-      },
-    ],
-    envByAppId: {
-      "app-1": [
-        { key: "NODE_ENV", value: "production" },
-        { key: "API_KEY", value: "secret-value", secret: true },
-      ],
-    },
-    vms: [
-      {
-        id: "vm-1",
-        projectId: "prj-1",
-        name: "api-vm",
-        status: "running",
-        cpu: 2,
-        ram: 4096,
-        disk: 40,
-      },
-    ],
+    projects: [],
+    apps: [],
+    deployments: [],
+    envByAppId: {},
+    vms: [],
     tickets: [
       {
         id: "t-1",

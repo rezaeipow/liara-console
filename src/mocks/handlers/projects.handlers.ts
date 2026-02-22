@@ -1,6 +1,33 @@
 import { http, HttpResponse } from "msw";
 import type { HttpHandler } from "msw";
-import { createId, db, getActiveBilling, paginate, persistRuntimeState } from "../data/db";
+import {
+  createId,
+  db,
+  getBillingByAccountId,
+  getActiveBilling,
+  paginate,
+  persistAccountsState,
+  persistRuntimeState,
+} from "../data/db";
+
+function resolveActiveAccountId() {
+  if (db.accounts.length === 0) {
+    const fallbackAccount = { id: createId("acc"), name: "Main Account" };
+    db.accounts.push(fallbackAccount);
+    db.activeAccountId = fallbackAccount.id;
+    getBillingByAccountId(fallbackAccount.id);
+    persistAccountsState();
+    persistRuntimeState();
+  }
+
+  const fallbackAccountId = db.accounts[0]?.id ?? null;
+  const resolvedAccountId = db.activeAccountId ?? fallbackAccountId;
+  if (resolvedAccountId && db.activeAccountId !== resolvedAccountId) {
+    db.activeAccountId = resolvedAccountId;
+    persistAccountsState();
+  }
+  return resolvedAccountId;
+}
 
 export const projectHandlers: HttpHandler[] = [
   http.get("/projects/meta", () => {
@@ -30,8 +57,10 @@ export const projectHandlers: HttpHandler[] = [
     const pageSize = Number(url.searchParams.get("pageSize") ?? "10");
     const query = (url.searchParams.get("q") ?? "").trim().toLowerCase();
 
+    const activeAccountId = resolveActiveAccountId();
     const projects = db.projects.filter((p) => {
-      if (p.accountId !== db.activeAccountId) return false;
+      if (!activeAccountId) return false;
+      if (p.accountId !== activeAccountId) return false;
       if (!query) return true;
       return p.name.toLowerCase().includes(query);
     });
@@ -48,7 +77,7 @@ export const projectHandlers: HttpHandler[] = [
     if (!body.name || !body.region || !body.plan) {
       return HttpResponse.json({ message: "Invalid payload" }, { status: 400 });
     }
-    const activeAccountId = db.activeAccountId ?? db.accounts[0]?.id;
+    const activeAccountId = resolveActiveAccountId();
     if (!activeAccountId) {
       return HttpResponse.json({ message: "No account available" }, { status: 400 });
     }

@@ -1,6 +1,7 @@
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import AppsIcon from "@mui/icons-material/Apps";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -328,7 +329,17 @@ export default function ProjectAppsPage() {
                   </Typography>
                 </Box>
               </Stack>
-              <Stack direction="row" spacing={1}>
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ width: { xs: "100%", sm: "auto" } }}>
+                {projectId ? (
+                  <Button
+                    component={Link}
+                    to={`/console/projects/${projectId}`}
+                    variant="outlined"
+                    startIcon={<ArrowBackIcon />}
+                  >
+                    Back to Project
+                  </Button>
+                ) : null}
                 <Button
                   variant="outlined"
                   startIcon={<RefreshIcon />}
@@ -358,6 +369,20 @@ export default function ProjectAppsPage() {
                 size="small"
                 label={`Needs attention: ${summary.attention}`}
                 color={summary.attention > 0 ? "warning" : "default"}
+                variant="outlined"
+                sx={
+                  summary.attention > 0
+                    ? {
+                        backgroundColor: alpha(theme.palette.warning.main, 0.18),
+                        borderColor: alpha(theme.palette.warning.main, 0.5),
+                        color: theme.palette.warning.dark,
+                        "& .MuiChip-label": {
+                          color: theme.palette.warning.dark,
+                          fontWeight: 700,
+                        },
+                      }
+                    : undefined
+                }
               />
             </Stack>
           </Stack>
@@ -385,8 +410,29 @@ export default function ProjectAppsPage() {
                   label="All"
                   clickable
                   variant={statusFilter === "all" ? "filled" : "outlined"}
-                  color={statusFilter === "all" ? "primary" : "default"}
+                  color="primary"
                   onClick={() => updateSearchParam("status", "all", "all")}
+                  sx={
+                    statusFilter === "all"
+                      ? {
+                          backgroundColor: theme.palette.primary.main,
+                          borderColor: theme.palette.primary.dark,
+                          color: theme.palette.primary.contrastText,
+                          "& .MuiChip-label": {
+                            color: theme.palette.primary.contrastText,
+                            fontWeight: 700,
+                          },
+                        }
+                      : {
+                          color: theme.palette.primary.main,
+                          borderColor: alpha(theme.palette.primary.main, 0.48),
+                          backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                          "& .MuiChip-label": {
+                            color: theme.palette.primary.main,
+                            fontWeight: 600,
+                          },
+                        }
+                  }
                 />
                 <Chip
                   label="Running"
@@ -672,7 +718,13 @@ export default function ProjectAppsPage() {
                   ))}
                 </Box>
               ) : (
-                <TableContainer>
+                <TableContainer
+                  sx={{
+                    borderRadius: 1.75,
+                    overflow: "hidden",
+                    border: `1px solid ${alpha(theme.palette.text.secondary, 0.22)}`,
+                  }}
+                >
                   <Table size="small" aria-label="apps table">
                     <TableHead>
                       <TableRow>

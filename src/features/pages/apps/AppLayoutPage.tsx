@@ -1,4 +1,5 @@
 import AppsIcon from "@mui/icons-material/Apps";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Alert, Box, Button, Chip, Divider, Paper, Skeleton, Stack, Typography } from "@mui/material";
 import { alpha, useTheme } from "@mui/material/styles";
 import { useEffect, useState } from "react";
@@ -16,10 +17,12 @@ const appTabs = [
 
 export default function AppLayoutPage() {
   const theme = useTheme();
-  const { appId } = useParams();
+  const { appId, projectId } = useParams();
   const [app, setApp] = useState<AppService | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const projectAppsHref =
+    projectId ?? app?.projectId ? `/console/projects/${projectId ?? app?.projectId}/apps` : null;
 
   useEffect(() => {
     let active = true;
@@ -127,6 +130,17 @@ export default function AppLayoutPage() {
                   </Stack>
                 </Box>
               </Stack>
+              {projectAppsHref ? (
+                <Button
+                  component={NavLink}
+                  to={projectAppsHref}
+                  variant="outlined"
+                  size="small"
+                  startIcon={<ArrowBackIcon />}
+                >
+                  Back to Apps List
+                </Button>
+              ) : null}
             </Stack>
 
             <Box

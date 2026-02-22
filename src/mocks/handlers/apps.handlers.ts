@@ -1,6 +1,17 @@
 import { http, HttpResponse } from "msw";
 import type { HttpHandler } from "msw";
-import { createId, db } from "../data/db";
+import { createId, db, persistRuntimeState } from "../data/db";
+
+function nextDeploymentVersion(appId: string) {
+  const versions = db.deployments
+    .filter((item) => item.appId === appId)
+    .map((item) => {
+      const match = /^v(\d+)$/i.exec(item.version.trim());
+      return match ? Number(match[1]) : 0;
+    });
+  const maxVersion = versions.length > 0 ? Math.max(...versions) : 0;
+  return `v${maxVersion + 1}`;
+}
 
 export const appHandlers: HttpHandler[] = [
   http.get("/projects/:projectId/apps", ({ params }) => {
@@ -25,6 +36,14 @@ export const appHandlers: HttpHandler[] = [
 
     db.apps.unshift(app);
     db.envByAppId[app.id] = [];
+    db.deployments.unshift({
+      id: createId("dep"),
+      appId: app.id,
+      version: nextDeploymentVersion(app.id),
+      status: "success",
+      createdAt: new Date().toISOString(),
+    });
+    persistRuntimeState();
     return HttpResponse.json(app, { status: 201 });
   }),
 
@@ -80,6 +99,14 @@ export const appHandlers: HttpHandler[] = [
     }
 
     app.status = "deploying";
+    db.deployments.unshift({
+      id: createId("dep"),
+      appId: app.id,
+      version: nextDeploymentVersion(app.id),
+      status: "running",
+      createdAt: new Date().toISOString(),
+    });
+    persistRuntimeState();
     return HttpResponse.json({ success: true });
   }),
 
@@ -100,6 +127,7 @@ export const appHandlers: HttpHandler[] = [
     }
 
     app.name = name;
+    persistRuntimeState();
     return HttpResponse.json(app);
   }),
 
@@ -110,6 +138,9 @@ export const appHandlers: HttpHandler[] = [
     }
 
     db.apps = next;
+    db.deployments = db.deployments.filter((item) => item.appId !== params.appId);
+    delete db.envByAppId[String(params.appId)];
+    persistRuntimeState();
     return new HttpResponse(null, { status: 204 });
   }),
 ];

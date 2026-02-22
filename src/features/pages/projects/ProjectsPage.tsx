@@ -245,6 +245,19 @@ export default function ProjectsPage() {
                 variant={healthFilter === "all" ? "filled" : "outlined"}
                 color={healthFilter === "all" ? "primary" : "default"}
                 onClick={() => updateSearchParam("health", "all", "all")}
+                sx={
+                  healthFilter === "all"
+                    ? {
+                        backgroundColor: theme.palette.primary.main,
+                        color: theme.palette.primary.contrastText,
+                        borderColor: theme.palette.primary.dark,
+                        "& .MuiChip-label": {
+                          color: theme.palette.primary.contrastText,
+                          fontWeight: 700,
+                        },
+                      }
+                    : undefined
+                }
               />
               <Chip
                 label="Healthy"

@@ -115,6 +115,20 @@ export default function BillingTopupPage() {
               </Typography>
             </Stack>
             <Stack spacing={0.8}>
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ width: { xs: "100%", md: "auto" } }}>
+                <Button component={Link} to="/console/billing" variant="outlined">
+                  Overview
+                </Button>
+                <Button component={Link} to="/console/billing/topup" variant="contained" startIcon={<AddCardOutlinedIcon />}>
+                  Top up
+                </Button>
+                <Button component={Link} to="/console/billing/payments" variant="outlined" endIcon={<ArrowOutwardIcon />}>
+                  Payments
+                </Button>
+                <Button component={Link} to="/console/billing/invoices" variant="outlined" endIcon={<ArrowOutwardIcon />}>
+                  Invoices
+                </Button>
+              </Stack>
               <Chip
                 icon={<CheckCircleOutlineIcon fontSize="small" />}
                 label={`Available: ${formatIrr(displayedCredit)}`}

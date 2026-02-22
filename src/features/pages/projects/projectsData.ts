@@ -69,13 +69,18 @@ export async function projectsLoader({
     const query = (url.searchParams.get("q") ?? "").trim().toLowerCase();
 
     const response = await store
-      .dispatch(api.endpoints.getProjects.initiate({ page, pageSize, q: query }))
+      .dispatch(
+        api.endpoints.getProjects.initiate(
+          { page, pageSize, q: query },
+          { forceRefetch: true },
+        ),
+      )
       .unwrap();
     const items: ProjectListItem[] = await Promise.all(
       response.items.map(async (project) => {
         try {
           const overview = await store
-            .dispatch(api.endpoints.getProjectById.initiate(project.id))
+            .dispatch(api.endpoints.getProjectById.initiate(project.id, { forceRefetch: true }))
             .unwrap();
           const totalServices =
             overview.servicesSummary.apps + overview.servicesSummary.vms;
@@ -137,7 +142,10 @@ export async function projectCreateAction({
   }
 
   try {
-    const project = await ProjectsAPI.create({ name, region, plan });
+    const project = await store
+      .dispatch(api.endpoints.createProject.initiate({ name, region, plan }))
+      .unwrap();
+    store.dispatch(api.util.invalidateTags([{ type: "Projects", id: "LIST" }]));
     return redirect(`/console/projects/${project.id}`);
   } catch (error: unknown) {
     return {
@@ -168,7 +176,9 @@ export async function projectOverviewLoader({
       throw new Response("Project id is required", { status: 400 });
     }
 
-    const project = await store.dispatch(api.endpoints.getProjectById.initiate(projectId)).unwrap();
+    const project = await store
+      .dispatch(api.endpoints.getProjectById.initiate(projectId, { forceRefetch: true }))
+      .unwrap();
     return { project };
   } catch (error) {
     if (import.meta.env.DEV) {
@@ -198,7 +208,8 @@ export async function projectOverviewAction({
     }
 
     try {
-      await ProjectsAPI.rename(projectId, { name });
+      await store.dispatch(api.endpoints.renameProject.initiate({ projectId, name })).unwrap();
+      store.dispatch(api.util.invalidateTags([{ type: "Projects", id: "LIST" }]));
       return { successMessage: "Project renamed successfully.", successAt: Date.now() };
     } catch (error: unknown) {
       return {
@@ -209,7 +220,8 @@ export async function projectOverviewAction({
 
   if (intent === "delete") {
     try {
-      await ProjectsAPI.remove(projectId);
+      await store.dispatch(api.endpoints.deleteProject.initiate(projectId)).unwrap();
+      store.dispatch(api.util.invalidateTags([{ type: "Projects", id: "LIST" }]));
       return redirect("/console/projects?deleted=1");
     } catch (error: unknown) {
       return {

@@ -24,7 +24,7 @@ import {
   Settings as SettingsIcon,
   Support as SupportIcon,
 } from "@mui/icons-material";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import {
   closeMobileSidebar,
@@ -39,7 +39,12 @@ const COLLAPSED_WIDTH = 80;
 const navItems = [
   { label: "Dashboard", path: "/console", icon: <DashboardIcon />, end: true },
   { label: "Accounts", path: "/console/accounts", icon: <PeopleAltIcon /> },
-  { label: "Projects", path: "/console/projects", icon: <FolderIcon /> },
+  {
+    label: "Projects",
+    path: "/console/projects",
+    icon: <FolderIcon />,
+    matchPrefixes: ["/console/projects", "/console/apps", "/console/vms"],
+  },
   { label: "Billing", path: "/console/billing", icon: <CreditCardIcon /> },
   { label: "Support", path: "/console/support/tickets", icon: <SupportIcon /> },
   { label: "Notifications", path: "/console/notifications", icon: <NotificationsIcon /> },
@@ -48,6 +53,7 @@ const navItems = [
 
 export default function Sidebar() {
   const dispatch = useAppDispatch();
+  const location = useLocation();
   const sidebarMode = useAppSelector(selectSidebarMode);
   const mobileOpen = useAppSelector(selectMobileSidebarOpen);
 
@@ -93,6 +99,15 @@ export default function Sidebar() {
 
       <List sx={{ px: 1, py: 1.5 }}>
         {navItems.map((item) => (
+          (() => {
+            const isSelected =
+              item.end === true
+                ? location.pathname === item.path
+                : item.matchPrefixes
+                  ? item.matchPrefixes.some((prefix) => location.pathname.startsWith(prefix))
+                  : location.pathname.startsWith(item.path);
+
+            return (
           <Tooltip
             key={item.path}
             title={isCollapsed ? item.label : ""}
@@ -113,10 +128,12 @@ export default function Sidebar() {
                 borderRadius: 2,
                 justifyContent: isCollapsed ? "center" : "flex-start",
                 px: isCollapsed ? 1 : 1.25,
-                "&.active": {
+                ...(isSelected
+                  ? {
                   backgroundColor: alpha(theme.palette.primary.main, 0.14),
                   border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-                },
+                    }
+                  : {}),
               }}
             >
               <ListItemIcon
@@ -138,6 +155,8 @@ export default function Sidebar() {
               )}
             </ListItemButton>
           </Tooltip>
+            );
+          })()
         ))}
       </List>
     </Box>
