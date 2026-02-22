@@ -62,9 +62,12 @@ export default function BillingOverviewPage() {
           spacing={1.5}
         >
           <Stack spacing={0.6}>
-            <Typography variant="h5" fontWeight={800}>
-              Billing Center
-            </Typography>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <AccountBalanceWalletOutlinedIcon fontSize="small" />
+              <Typography variant="h5" fontWeight={800}>
+                Billing Center
+              </Typography>
+            </Stack>
             <Typography variant="body2" color="text.secondary">
               Monitor credit, payments, and invoices in one place.
             </Typography>

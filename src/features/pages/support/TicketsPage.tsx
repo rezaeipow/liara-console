@@ -1,6 +1,7 @@
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import SearchIcon from "@mui/icons-material/Search";
+import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import {
   Box,
   Button,
@@ -97,9 +98,12 @@ export default function TicketsPage() {
           justifyContent="space-between"
         >
           <Stack spacing={0.55}>
-            <Typography variant="h5" fontWeight={800}>
-              Support Tickets
-            </Typography>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <SupportAgentOutlinedIcon fontSize="small" />
+              <Typography variant="h5" fontWeight={800}>
+                Support Tickets
+              </Typography>
+            </Stack>
             <Typography variant="body2" color="text.secondary">
               Track issue reports and follow up with support replies.
             </Typography>

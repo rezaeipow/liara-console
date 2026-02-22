@@ -104,9 +104,12 @@ export default function BillingTopupPage() {
             justifyContent="space-between"
           >
             <Stack spacing={0.5}>
-              <Typography variant="h5" fontWeight={800}>
-                Credit Top-up
-              </Typography>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <PaymentsOutlinedIcon fontSize="small" />
+                <Typography variant="h5" fontWeight={800}>
+                  Credit Top-up
+                </Typography>
+              </Stack>
               <Typography variant="body2" color="text.secondary">
                 Add balance instantly and continue using services without interruption.
               </Typography>

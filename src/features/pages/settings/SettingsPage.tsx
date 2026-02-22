@@ -1,6 +1,7 @@
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import TuneOutlinedIcon from "@mui/icons-material/TuneOutlined";
 import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
 import ViewSidebarOutlinedIcon from "@mui/icons-material/ViewSidebarOutlined";
@@ -228,12 +229,17 @@ export default function SettingsPage() {
   };
 
   const handleResetToDefaults = () => {
+    dispatch(setSidebarMode(DEFAULT_UI_PREFERENCES.sidebarMode));
+    dispatch(setTableDensity(DEFAULT_UI_PREFERENCES.tableDensity));
+    saveSecurityPreferences(DEFAULT_SECURITY_PREFERENCES);
+    setPersistedSecurity(DEFAULT_SECURITY_PREFERENCES);
     setDraftPreferences(DEFAULT_UI_PREFERENCES);
     setDraftSecurity(DEFAULT_SECURITY_PREFERENCES);
     setVerificationCode("");
     setVerificationError(null);
     setRecoveryCodes([]);
     setResetDialogOpen(false);
+    dispatch(showToast({ message: "Defaults restored and applied.", severity: "success" }));
   };
 
   const changedKeys = useMemo(
@@ -301,9 +307,12 @@ export default function SettingsPage() {
             justifyContent="space-between"
           >
             <Stack spacing={0.5}>
-              <Typography variant="h5" fontWeight={800}>
-                Settings
-              </Typography>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <SettingsOutlinedIcon fontSize="small" />
+                <Typography variant="h5" fontWeight={800}>
+                  Settings
+                </Typography>
+              </Stack>
               <Typography variant="body2" color="text.secondary">
                 Manage security and personalize your console experience.
               </Typography>

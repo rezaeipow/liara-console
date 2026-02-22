@@ -1,6 +1,7 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import {
   Alert,
   Button,
@@ -132,9 +133,12 @@ export default function NewTicketPage() {
             alignItems={{ xs: "flex-start", md: "center" }}
           >
             <Stack spacing={isCompact ? 0.3 : 0.5}>
-              <Typography variant={isCompact ? "h6" : "h5"} fontWeight={800}>
-                Create Support Ticket
-              </Typography>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <SupportAgentOutlinedIcon fontSize="small" />
+                <Typography variant={isCompact ? "h6" : "h5"} fontWeight={800}>
+                  Create Support Ticket
+                </Typography>
+              </Stack>
               <Typography
                 variant="body2"
                 color="text.secondary"

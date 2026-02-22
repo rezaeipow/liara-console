@@ -124,9 +124,12 @@ export default function NotificationsPage() {
             justifyContent="space-between"
           >
             <Stack spacing={0.5}>
-              <Typography variant="h5" fontWeight={800}>
-                Notifications
-              </Typography>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <NotificationsActiveOutlinedIcon fontSize="small" />
+                <Typography variant="h5" fontWeight={800}>
+                  Notifications
+                </Typography>
+              </Stack>
               <Typography variant="body2" color="text.secondary">
                 Review account activity, service alerts, and system updates.
               </Typography>
