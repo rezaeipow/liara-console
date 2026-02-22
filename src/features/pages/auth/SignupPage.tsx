@@ -46,6 +46,41 @@ export default function SignupPage() {
       transform: "translate(42px, 12px) scale(1)",
     },
   } as const;
+  const passwordChecks = {
+    length: password.length >= 8,
+    upper: /[A-Z]/.test(password),
+    lower: /[a-z]/.test(password),
+    number: /\d/.test(password),
+    special: /[^A-Za-z\d]/.test(password),
+  };
+  const showPasswordRules = password.length > 0 || Boolean(actionData?.fieldErrors?.password);
+  const passwordHelper = showPasswordRules ? (
+    <Typography component="span" variant="caption">
+      Use at least{" "}
+      <Box component="span" sx={{ color: passwordChecks.length ? "text.primary" : "error.main", fontWeight: 600 }}>
+        8 chars
+      </Box>{" "}
+      with{" "}
+      <Box component="span" sx={{ color: passwordChecks.upper ? "text.primary" : "error.main", fontWeight: 600 }}>
+        uppercase
+      </Box>
+      /
+      <Box component="span" sx={{ color: passwordChecks.lower ? "text.primary" : "error.main", fontWeight: 600 }}>
+        lowercase
+      </Box>
+      ,{" "}
+      <Box component="span" sx={{ color: passwordChecks.number ? "text.primary" : "error.main", fontWeight: 600 }}>
+        number
+      </Box>
+      ,{" "}
+      <Box component="span" sx={{ color: passwordChecks.special ? "text.primary" : "error.main", fontWeight: 600 }}>
+        special
+      </Box>
+      .
+    </Typography>
+  ) : (
+    "Use at least 8 chars with upper/lowercase, number, special."
+  );
 
   return (
     <Box sx={{ minHeight: "100vh", display: "grid", placeItems: "center", px: 2 }}>
@@ -126,10 +161,7 @@ export default function SignupPage() {
             autoComplete="new-password"
             disabled={isSubmitting}
             error={Boolean(actionData?.fieldErrors?.password)}
-            helperText={
-              actionData?.fieldErrors?.password ??
-              "Use at least 8 chars with upper/lowercase, number, special."
-            }
+            helperText={passwordHelper}
             sx={authFieldSx}
             slotProps={{
               inputLabel: { shrink: passwordFocused || password.length > 0, sx: authLabelSx },

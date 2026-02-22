@@ -25,6 +25,7 @@ function validateCredentials(input: {
   confirmPassword?: string;
   requireName?: boolean;
   requirePasswordConfirmation?: boolean;
+  enforceStrongPassword?: boolean;
 }): AuthActionResult | null {
   const fieldErrors: NonNullable<AuthActionResult["fieldErrors"]> = {};
 
@@ -34,7 +35,9 @@ function validateCredentials(input: {
   if (!input.email || !EMAIL_REGEX.test(input.email)) {
     fieldErrors.email = "Please enter a valid email address.";
   }
-  if (!input.password || !STRONG_PASSWORD_REGEX.test(input.password)) {
+  if (!input.password) {
+    fieldErrors.password = "Password is required.";
+  } else if ((input.enforceStrongPassword ?? true) && !STRONG_PASSWORD_REGEX.test(input.password)) {
     fieldErrors.password =
       "Password must include uppercase, lowercase, number, and special character.";
   }
@@ -98,12 +101,14 @@ export async function loginAction({ request }: ActionFunctionArgs) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
 
-  const validation = validateCredentials({ email, password });
+  const validation = validateCredentials({ email, password, enforceStrongPassword: false });
   if (validation) return validation;
 
   const result = await store.dispatch(login({ email, password }));
   if (login.rejected.match(result)) {
-    return { formError: result.payload ?? "Invalid credentials." } satisfies AuthActionResult;
+    return {
+      fieldErrors: { password: "The password you entered is incorrect." },
+    } satisfies AuthActionResult;
   }
 
   const url = new URL(request.url);
