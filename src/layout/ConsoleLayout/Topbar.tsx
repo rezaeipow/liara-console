@@ -73,7 +73,7 @@ export default function Topbar() {
     navigate("/auth/complete?mode=logout&next=%2Flogin&logout=1");
   };
 
-  const accountItems = useMemo(
+const accountItems = useMemo(
     () =>
       accounts.length > 0
         ? accounts
@@ -82,6 +82,9 @@ export default function Topbar() {
   );
 
   const selectedAccountId = activeAccountId ?? accountItems[0].id;
+  const accountMenuVisibleCount = 3;
+  const accountMenuItemHeight = 40;
+  const accountMenuMaxHeight = accountMenuVisibleCount * accountMenuItemHeight;
 
   const handleAccountChange = (event: SelectChangeEvent) => {
     accountSwitchFetcher.submit(
@@ -187,6 +190,19 @@ export default function Topbar() {
               value={selectedAccountId}
               onChange={handleAccountChange}
               disabled={accountSwitchFetcher.state !== "idle"}
+              MenuProps={{
+                MenuListProps: {
+                  sx: {
+                    py: 0,
+                  },
+                },
+                PaperProps: {
+                  sx: {
+                    maxHeight: accountMenuMaxHeight,
+                    overflowY: "auto",
+                  },
+                },
+              }}
               sx={{
                 "& .MuiSelect-select": {
                   pr: { xs: 3.5, sm: 4 },
@@ -196,7 +212,14 @@ export default function Topbar() {
               }}
             >
               {accountItems.map((account) => (
-                <MenuItem key={account.id} value={account.id}>
+                <MenuItem
+                  key={account.id}
+                  value={account.id}
+                  sx={{
+                    minHeight: `${accountMenuItemHeight}px`,
+                    height: `${accountMenuItemHeight}px`,
+                  }}
+                >
                   {account.name}
                 </MenuItem>
               ))}
