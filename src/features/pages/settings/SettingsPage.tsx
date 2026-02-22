@@ -1,6 +1,5 @@
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import PaletteOutlinedIcon from "@mui/icons-material/PaletteOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import TuneOutlinedIcon from "@mui/icons-material/TuneOutlined";
 import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
@@ -35,9 +34,7 @@ import {
   selectUIPreferences,
   setSidebarMode,
   setTableDensity,
-  setThemeMode,
   showToast,
-  type ThemeMode,
   type UIPreferences,
 } from "../../../app/store/slices/uiSlice";
 
@@ -51,7 +48,6 @@ const SECURITY_STORAGE_KEY = "console-security-preferences";
 const UI_STORAGE_KEY = "console-ui-preferences";
 const MOCK_2FA_CODE = "123456";
 const DEFAULT_UI_PREFERENCES: UIPreferences = {
-  themeMode: "system",
   sidebarMode: "expanded",
   tableDensity: "standard",
 };
@@ -90,10 +86,6 @@ function loadUiPreferencesFromStorage(): UIPreferences {
     if (!raw) return DEFAULT_UI_PREFERENCES;
     const parsed = JSON.parse(raw) as Partial<UIPreferences>;
     return {
-      themeMode:
-        parsed.themeMode === "light" || parsed.themeMode === "dark" || parsed.themeMode === "system"
-          ? parsed.themeMode
-          : DEFAULT_UI_PREFERENCES.themeMode,
       sidebarMode: parsed.sidebarMode === "collapsed" ? "collapsed" : "expanded",
       tableDensity:
         parsed.tableDensity === "compact" ||
@@ -115,7 +107,6 @@ function createMockRecoveryCodes(): string[] {
 
 function arePreferenceEqual(left: UIPreferences, right: UIPreferences): boolean {
   return (
-    left.themeMode === right.themeMode &&
     left.sidebarMode === right.sidebarMode &&
     left.tableDensity === right.tableDensity
   );
@@ -159,7 +150,6 @@ export default function SettingsPage() {
     const onStorage = (event: StorageEvent) => {
       if (event.key === UI_STORAGE_KEY) {
         const incoming = loadUiPreferencesFromStorage();
-        dispatch(setThemeMode(incoming.themeMode));
         dispatch(setSidebarMode(incoming.sidebarMode));
         dispatch(setTableDensity(incoming.tableDensity));
       }
@@ -247,7 +237,6 @@ export default function SettingsPage() {
 
   const changedKeys = useMemo(
     () => ({
-      themeMode: draftPreferences.themeMode !== persistedPreferences.themeMode,
       sidebarMode: draftPreferences.sidebarMode !== persistedPreferences.sidebarMode,
       tableDensity: draftPreferences.tableDensity !== persistedPreferences.tableDensity,
       twoFA: draftSecurity.twoFAEnabled !== persistedSecurity.twoFAEnabled,
@@ -267,7 +256,6 @@ export default function SettingsPage() {
   };
 
   const handleSave = () => {
-    dispatch(setThemeMode(draftPreferences.themeMode));
     dispatch(setSidebarMode(draftPreferences.sidebarMode));
     dispatch(setTableDensity(draftPreferences.tableDensity));
     saveSecurityPreferences(draftSecurity);
@@ -446,36 +434,12 @@ export default function SettingsPage() {
                   <TuneOutlinedIcon fontSize="small" />
                   <Typography fontWeight={800}>Preferences</Typography>
                 </Stack>
-                <Tooltip title="Theme, sidebar behavior, and data density settings.">
+                <Tooltip title="Sidebar behavior and data density settings.">
                   <IconButton size="small" aria-label="Preferences help">
                     <InfoOutlinedIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               </Stack>
-
-              <PreferenceField
-                icon={<PaletteOutlinedIcon fontSize="small" />}
-                title="Theme"
-                description="Choose how the console appears across your devices."
-              >
-                <FormControl size="small" sx={{ minWidth: 168 }}>
-                  <Select
-                    value={draftPreferences.themeMode}
-                    onChange={(event) =>
-                      setDraftPreferences((prev) => ({
-                        ...prev,
-                        themeMode: event.target.value as ThemeMode,
-                      }))
-                    }
-                    inputProps={{ "aria-label": "Select theme mode" }}
-                  >
-                    <MenuItem value="system">System default</MenuItem>
-                    <MenuItem value="light">Light</MenuItem>
-                    <MenuItem value="dark">Dark</MenuItem>
-                  </Select>
-                </FormControl>
-              </PreferenceField>
-              {changedKeys.themeMode ? <Chip size="small" variant="outlined" color="info" label="Changed" /> : null}
 
               {!isLgUp ? (
                 <PreferenceField
@@ -732,7 +696,7 @@ export default function SettingsPage() {
         <DialogTitle id="reset-settings-title">Reset to defaults?</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Theme, sidebar mode, density, and security toggles will be reset to default values.
+            Sidebar mode, density, and security toggles will be reset to default values.
           </Typography>
         </DialogContent>
         <DialogActions>

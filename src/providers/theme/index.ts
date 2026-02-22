@@ -1,4 +1,4 @@
-import { alpha, createTheme, type PaletteMode } from "@mui/material/styles";
+import { alpha, createTheme } from "@mui/material/styles";
 import type { TableDensity } from "../../app/store/slices/uiSlice";
 
 const glass = {
@@ -9,8 +9,7 @@ const glass = {
   highlight: "rgba(255, 255, 255, 0.92)",
 };
 
-export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "standard") {
-  const isDark = mode === "dark";
+export function buildTheme(tableDensity: TableDensity = "standard") {
   const isCompact = tableDensity === "compact";
   const densityTokens =
     tableDensity === "comfortable"
@@ -90,7 +89,7 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
 
   return createTheme({
     palette: {
-      mode,
+      mode: "light",
       primary: {
         main: "#1f6feb",
         dark: "#1158c7",
@@ -102,14 +101,14 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
         contrastText: "#ffffff",
       },
       background: {
-        default: isDark ? "#081225" : "#eaf2ff",
-        paper: isDark ? alpha("#0f172a", 0.72) : glass.base,
+        default: "#eaf2ff",
+        paper: glass.base,
       },
       text: {
-        primary: isDark ? "#e5edf8" : "#0f172a",
-        secondary: isDark ? "#b9c5d8" : "#334155",
+        primary: "#0f172a",
+        secondary: "#334155",
       },
-      divider: isDark ? alpha("#dbeafe", 0.18) : alpha("#ffffff", 0.45),
+      divider: alpha("#ffffff", 0.45),
     },
   shape: {
     borderRadius: uiDensityTokens.radius,
@@ -172,9 +171,8 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
       styleOverrides: {
         body: {
           minHeight: "100vh",
-          background: isDark
-            ? "radial-gradient(1200px circle at 5% -10%, rgba(37, 99, 235, 0.30), transparent 52%), radial-gradient(1200px circle at 95% -15%, rgba(20, 184, 166, 0.22), transparent 48%), linear-gradient(180deg, #030712 0%, #081225 46%, #0b1830 100%)"
-            : "radial-gradient(1100px circle at 5% -10%, rgba(96, 165, 250, 0.26), transparent 55%), radial-gradient(1100px circle at 95% -15%, rgba(20, 184, 166, 0.20), transparent 50%), linear-gradient(180deg, #f6f9ff 0%, #eaf2ff 45%, #f5f9ff 100%)",
+          background:
+            "radial-gradient(1100px circle at 5% -10%, rgba(96, 165, 250, 0.26), transparent 55%), radial-gradient(1100px circle at 95% -15%, rgba(20, 184, 166, 0.20), transparent 50%), linear-gradient(180deg, #f6f9ff 0%, #eaf2ff 45%, #f5f9ff 100%)",
           backgroundAttachment: "fixed",
         },
       },
@@ -183,8 +181,8 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
       styleOverrides: {
         root: {
           backgroundImage: "none",
-          backgroundColor: isDark ? alpha("#0f172a", 0.72) : glass.base,
-          border: `1px solid ${isDark ? alpha("#dbeafe", 0.18) : glass.border}`,
+          backgroundColor: glass.base,
+          border: `1px solid ${glass.border}`,
           backdropFilter: "blur(18px) saturate(160%)",
           WebkitBackdropFilter: "blur(18px) saturate(160%)",
           boxShadow: "0 10px 28px rgba(15, 23, 42, 0.12)",
@@ -197,8 +195,8 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
     MuiCard: {
       styleOverrides: {
         root: {
-          backgroundColor: isDark ? alpha("#0f172a", 0.64) : glass.soft,
-          border: `1px solid ${isDark ? alpha("#dbeafe", 0.18) : glass.border}`,
+          backgroundColor: glass.soft,
+          border: `1px solid ${glass.border}`,
           backdropFilter: "blur(16px) saturate(150%)",
           boxShadow: "0 12px 30px rgba(15, 23, 42, 0.10)",
           borderRadius: uiDensityTokens.radius,
@@ -208,9 +206,9 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
     MuiAppBar: {
       styleOverrides: {
         root: {
-          color: isDark ? "#e5edf8" : "#0f172a",
-          backgroundColor: isDark ? alpha("#0f172a", 0.84) : glass.strong,
-          borderBottom: `1px solid ${isDark ? alpha("#dbeafe", 0.18) : glass.border}`,
+          color: "#0f172a",
+          backgroundColor: glass.strong,
+          borderBottom: `1px solid ${glass.border}`,
           backdropFilter: "blur(14px) saturate(145%)",
           boxShadow: "0 8px 24px rgba(15, 23, 42, 0.10)",
           overflow: "visible",
@@ -220,8 +218,8 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: isDark ? alpha("#0f172a", 0.84) : glass.strong,
-          borderRight: `1px solid ${isDark ? alpha("#dbeafe", 0.18) : glass.border}`,
+          backgroundColor: glass.strong,
+          borderRight: `1px solid ${glass.border}`,
           backdropFilter: "blur(16px) saturate(150%)",
         },
       },
@@ -229,8 +227,8 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
     MuiDialog: {
       styleOverrides: {
         paper: {
-          backgroundColor: isDark ? alpha("#0f172a", 0.84) : glass.strong,
-          border: `1px solid ${isDark ? alpha("#dbeafe", 0.18) : glass.border}`,
+          backgroundColor: glass.strong,
+          border: `1px solid ${glass.border}`,
           backdropFilter: "blur(20px) saturate(155%)",
           boxShadow: "0 20px 44px rgba(15, 23, 42, 0.18)",
         },
@@ -261,11 +259,11 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
           },
         },
         outlined: {
-          borderColor: isDark ? alpha("#dbeafe", 0.2) : alpha("#0f172a", 0.16),
-          backgroundColor: isDark ? alpha("#0f172a", 0.5) : alpha("#ffffff", 0.44),
+          borderColor: alpha("#0f172a", 0.16),
+          backgroundColor: alpha("#ffffff", 0.44),
           "&:hover": {
-            borderColor: isDark ? alpha("#dbeafe", 0.34) : alpha("#0f172a", 0.28),
-            backgroundColor: isDark ? alpha("#0f172a", 0.68) : alpha("#ffffff", 0.62),
+            borderColor: alpha("#0f172a", 0.28),
+            backgroundColor: alpha("#ffffff", 0.62),
           },
         },
       },
@@ -273,7 +271,7 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
     MuiDivider: {
       styleOverrides: {
         root: {
-          borderColor: isDark ? alpha("#dbeafe", 0.2) : alpha("#ffffff", 0.7),
+          borderColor: alpha("#ffffff", 0.7),
         },
       },
     },
@@ -299,8 +297,8 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
     MuiTableContainer: {
       styleOverrides: {
         root: {
-          backgroundColor: isDark ? alpha("#0f172a", 0.64) : glass.soft,
-          border: `1px solid ${isDark ? alpha("#dbeafe", 0.18) : glass.border}`,
+          backgroundColor: glass.soft,
+          border: `1px solid ${glass.border}`,
           backdropFilter: "blur(14px) saturate(140%)",
           boxShadow: "0 10px 24px rgba(15, 23, 42, 0.08)",
         },
@@ -309,7 +307,7 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
     MuiTableCell: {
       styleOverrides: {
         root: {
-          borderBottom: `1px solid ${isDark ? alpha("#dbeafe", 0.16) : alpha("#ffffff", 0.64)}`,
+          borderBottom: `1px solid ${alpha("#ffffff", 0.64)}`,
           paddingTop: `${densityTokens.cellPaddingY}px`,
           paddingBottom: `${densityTokens.cellPaddingY}px`,
           paddingLeft: `${densityTokens.cellPaddingX}px`,
@@ -351,8 +349,8 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
       styleOverrides: {
         root: {
           height: `${uiDensityTokens.chipHeight}px`,
-          backgroundColor: isDark ? alpha("#0f172a", 0.58) : alpha("#ffffff", 0.62),
-          border: `1px solid ${isDark ? alpha("#dbeafe", 0.22) : alpha("#ffffff", 0.74)}`,
+          backgroundColor: alpha("#ffffff", 0.62),
+          border: `1px solid ${alpha("#ffffff", 0.74)}`,
           backdropFilter: "blur(10px) saturate(130%)",
           borderRadius: uiDensityTokens.radius * (isCompact ? 0.5 : 0.66),
           "& .MuiChip-label": {
@@ -432,4 +430,4 @@ export function buildTheme(mode: PaletteMode, tableDensity: TableDensity = "stan
 });
 }
 
-export const Theme = buildTheme("light");
+export const Theme = buildTheme();
