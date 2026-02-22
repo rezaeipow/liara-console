@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { LockOutlined, MailOutline, Visibility, VisibilityOff } from "@mui/icons-material";
 import { useState } from "react";
 import { Form, Link as RouterLink, useActionData, useNavigation, useSearchParams } from "react-router-dom";
 import type { AuthActionResult } from "../../../app/routing/authData";
@@ -21,8 +21,29 @@ export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const isSubmitting = navigation.state === "submitting";
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
 
   const next = searchParams.get("next");
+  const authFieldSx = {
+    "& .MuiOutlinedInput-root": {
+      alignItems: "center",
+    },
+    "& .MuiOutlinedInput-input": {
+      py: 1.3,
+      lineHeight: 1.4,
+      "&::placeholder": {
+        opacity: 1,
+      },
+    },
+  } as const;
+  const authLabelSx = {
+    "&.MuiInputLabel-outlined:not(.MuiInputLabel-shrink)": {
+      transform: "translate(42px, 12px) scale(1)",
+    },
+  } as const;
 
   return (
     <Box sx={{ minHeight: "100vh", display: "grid", placeItems: "center", px: 2 }}>
@@ -45,10 +66,25 @@ export default function LoginPage() {
             type="email"
             required
             fullWidth
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            onFocus={() => setEmailFocused(true)}
+            onBlur={() => setEmailFocused(false)}
             autoComplete="email"
             disabled={isSubmitting}
             error={Boolean(actionData?.fieldErrors?.email)}
             helperText={actionData?.fieldErrors?.email}
+            sx={authFieldSx}
+            slotProps={{
+              inputLabel: { shrink: emailFocused || email.length > 0, sx: authLabelSx },
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <MailOutline fontSize="small" />
+                  </InputAdornment>
+                ),
+              },
+            }}
           />
 
           <TextField
@@ -57,12 +93,23 @@ export default function LoginPage() {
             type={showPassword ? "text" : "password"}
             required
             fullWidth
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            onFocus={() => setPasswordFocused(true)}
+            onBlur={() => setPasswordFocused(false)}
             autoComplete="current-password"
             disabled={isSubmitting}
             error={Boolean(actionData?.fieldErrors?.password)}
             helperText={actionData?.fieldErrors?.password}
+            sx={authFieldSx}
             slotProps={{
+              inputLabel: { shrink: passwordFocused || password.length > 0, sx: authLabelSx },
               input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockOutlined fontSize="small" />
+                  </InputAdornment>
+                ),
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
