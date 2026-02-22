@@ -2,6 +2,15 @@ import { lazy } from "react";
 
 export const LoginPage = lazy(() => import("../../features/pages/auth/LoginPage"));
 export const SignupPage = lazy(() => import("../../features/pages/auth/SignupPage"));
+export const AuthCompletePage = lazy(
+  () => import("../../features/pages/auth/AuthCompletePage"),
+);
+export const ForgotPasswordPage = lazy(
+  () => import("../../features/pages/auth/ForgotPasswordPage"),
+);
+export const ResetPasswordPage = lazy(
+  () => import("../../features/pages/auth/ResetPasswordPage"),
+);
 export const ConsoleHomePage = lazy(
   () => import("../../features/pages/console/ConsoleHomePage"),
 );

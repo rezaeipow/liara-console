@@ -23,7 +23,7 @@ import {
   Menu as MenuIcon,
   Notifications as NotificationsIcon,
 } from "@mui/icons-material";
-import { Link, useFetcher, useLocation } from "react-router-dom";
+import { Link, useFetcher, useLocation, useNavigate } from "react-router-dom";
 import { NotificationsAPI } from "../../api/notificationsApi";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import { selectUser } from "../../app/store/slices/authSlice";
@@ -40,7 +40,7 @@ import {
 
 export default function Topbar() {
   const dispatch = useAppDispatch();
-  const logoutFetcher = useFetcher();
+  const navigate = useNavigate();
   const accountSwitchFetcher = useFetcher();
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down("sm"));
@@ -65,7 +65,7 @@ export default function Topbar() {
 
   const handleLogout = () => {
     handleMenuClose();
-    logoutFetcher.submit(null, { method: "post", action: "/logout" });
+    navigate("/auth/complete?mode=logout&next=%2Flogin&logout=1");
   };
 
   const accountItems = useMemo(

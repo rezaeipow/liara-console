@@ -3,10 +3,12 @@ import { Suspense } from "react";
 import type { ReactNode } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import {
+  forgotPasswordAction,
   loginAction,
   logoutAction,
   protectedConsoleLoader,
   publicOnlyLoader,
+  resetPasswordAction,
   signupAction,
 } from "./authData";
 import { GuardedConsole } from "./guards";
@@ -22,6 +24,7 @@ import { projectAppsAction, projectAppsLoader } from "../../features/pages/apps/
 import { projectVmsAction, projectVmsLoader } from "../../features/pages/vms/vmsData";
 import {
   AccountsPage,
+  AuthCompletePage,
   AppDeploymentsPage,
   AppEnvPage,
   AppLayoutPage,
@@ -33,6 +36,7 @@ import {
   BillingPaymentsPage,
   BillingTopupPage,
   ConsoleHomePage,
+  ForgotPasswordPage,
   LoginPage,
   NewProjectPage,
   NewTicketPage,
@@ -49,6 +53,7 @@ import {
   VmLayoutPage,
   VmMetricsPage,
   VmOverviewPage,
+  ResetPasswordPage,
   VmSettingsPage,
 } from "./pages";
 import { AppInitialFallback, RouteFallback } from "./routeElements";
@@ -89,11 +94,26 @@ export function createAppRouter() {
     action: logoutAction,
   },
   {
+    path: "/auth/complete",
+    element: withSuspense(<AuthCompletePage />),
+    errorElement: <RouteFallback />,
+  },
+  {
     loader: publicOnlyLoader,
     errorElement: <RouteFallback />,
     children: [
       { path: "/login", element: withSuspense(<LoginPage />), action: loginAction },
       { path: "/signup", element: withSuspense(<SignupPage />), action: signupAction },
+      {
+        path: "/forgot-password",
+        element: withSuspense(<ForgotPasswordPage />),
+        action: forgotPasswordAction,
+      },
+      {
+        path: "/reset-password",
+        element: withSuspense(<ResetPasswordPage />),
+        action: resetPasswordAction,
+      },
     ],
   },
   {

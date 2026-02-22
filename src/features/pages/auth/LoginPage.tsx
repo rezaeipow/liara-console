@@ -27,6 +27,7 @@ export default function LoginPage() {
   const [passwordFocused, setPasswordFocused] = useState(false);
 
   const next = searchParams.get("next");
+  const passwordResetDone = searchParams.get("reset") === "1";
   const authFieldSx = {
     "& .MuiOutlinedInput-root": {
       alignItems: "center",
@@ -51,14 +52,17 @@ export default function LoginPage() {
         <Stack spacing={2.25} component={Form} method="post" noValidate>
           <Box>
             <Typography variant="h5" fontWeight={700}>Login</Typography>
-            <Typography variant="body2" color="text.secondary">
-              Sign in with email/password.
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }}>
+              Sign in to continue to your console.
             </Typography>
           </Box>
 
           {next ? <input type="hidden" name="next" value={next} /> : null}
 
           {actionData?.formError ? <Alert severity="error">{actionData.formError}</Alert> : null}
+          {passwordResetDone ? (
+            <Alert severity="success">Password updated successfully. Please login with your new password.</Alert>
+          ) : null}
 
           <TextField
             label="Email"
@@ -128,6 +132,10 @@ export default function LoginPage() {
           <Button type="submit" variant="contained" size="large" disabled={isSubmitting}>
             {isSubmitting ? "Signing in..." : "Login"}
           </Button>
+
+          <Typography variant="body2" color="text.secondary">
+            <Link component={RouterLink} to="/forgot-password" underline="hover">Forgot password?</Link>
+          </Typography>
 
           <Typography variant="body2" color="text.secondary">
             Do not have an account?{" "}

@@ -1,8 +1,10 @@
-﻿import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router-dom";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router-dom";
 import { AccountsAPI } from "../../api/accountsApi";
-import { store } from "../store/index";
-import { fetchMe, login, logout, signup } from "../store/slices/authSlice";
+import { AuthAPI } from "../../api/authApi";
+import { ApiError } from "../../api/httpClient";
 import { setAccounts } from "../store/slices/accountSlice";
+import { fetchMe, login, logout, signup } from "../store/slices/authSlice";
+import { store } from "../store/index";
 
 type AuthActionResult = {
   fieldErrors?: {
@@ -12,11 +14,13 @@ type AuthActionResult = {
     confirmPassword?: string;
   };
   formError?: string;
+  successMessage?: string;
+  resetToken?: string;
 };
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const STRONG_PASSWORD_REGEX =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,<>/?`~]).{8,}$/;
 
 function validateCredentials(input: {
   name?: string;
@@ -53,6 +57,16 @@ function validateCredentials(input: {
 
 function getAuthState() {
   return store.getState().auth;
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof ApiError) {
+    return error.message || fallback;
+  }
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return fallback;
 }
 
 export async function publicOnlyLoader({ request }: LoaderFunctionArgs) {
@@ -113,7 +127,8 @@ export async function loginAction({ request }: ActionFunctionArgs) {
 
   const url = new URL(request.url);
   const next = url.searchParams.get("next") ?? "/console";
-  throw redirect(next.startsWith("/") ? next : "/console");
+  const safeNext = next.startsWith("/") ? next : "/console";
+  throw redirect(`/auth/complete?mode=login&next=${encodeURIComponent(safeNext)}`);
 }
 
 export async function signupAction({ request }: ActionFunctionArgs) {
@@ -144,13 +159,75 @@ export async function signupAction({ request }: ActionFunctionArgs) {
     return { formError: message } satisfies AuthActionResult;
   }
 
-  throw redirect("/console");
+  throw redirect("/auth/complete?mode=signup&next=%2Fconsole");
+}
+
+export async function forgotPasswordAction({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const email = String(formData.get("email") ?? "").trim();
+
+  if (!email || !EMAIL_REGEX.test(email)) {
+    return {
+      fieldErrors: { email: "Please enter a valid email address." },
+    } satisfies AuthActionResult;
+  }
+
+  try {
+    const response = await AuthAPI.forgotPassword({ email });
+    return {
+      successMessage: response.message,
+      resetToken: response.resetToken,
+    } satisfies AuthActionResult;
+  } catch (error: unknown) {
+    return {
+      formError: getErrorMessage(error, "Could not process forgot password request."),
+    } satisfies AuthActionResult;
+  }
+}
+
+export async function resetPasswordAction({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const token = String(formData.get("token") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+  const confirmPassword = String(formData.get("confirmPassword") ?? "");
+
+  if (!token) {
+    return { formError: "Reset token is missing or invalid." } satisfies AuthActionResult;
+  }
+
+  const fieldErrors: NonNullable<AuthActionResult["fieldErrors"]> = {};
+  if (!password || !STRONG_PASSWORD_REGEX.test(password)) {
+    fieldErrors.password =
+      "Password must include uppercase, lowercase, number, and special character.";
+  }
+  if (password !== confirmPassword) {
+    fieldErrors.confirmPassword = "Password confirmation does not match.";
+  }
+  if (Object.keys(fieldErrors).length > 0) {
+    return { fieldErrors } satisfies AuthActionResult;
+  }
+
+  try {
+    await AuthAPI.resetPassword({ token, password });
+    throw redirect("/login?reset=1");
+  } catch (error: unknown) {
+    if (error instanceof Response) throw error;
+    if (error instanceof ApiError && error.message.includes("different from current")) {
+      return {
+        fieldErrors: {
+          password: "New password must be different from your current password.",
+        },
+      } satisfies AuthActionResult;
+    }
+    return {
+      formError: getErrorMessage(error, "Reset password failed."),
+    } satisfies AuthActionResult;
+  }
 }
 
 export async function logoutAction() {
   await store.dispatch(logout());
-  throw redirect("/login");
+  throw redirect("/auth/complete?mode=logout&next=%2Flogin");
 }
 
 export type { AuthActionResult };
-
