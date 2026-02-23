@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import type { User } from "@/api/types";
+import { store } from "@/app/store";
 import authReducer, {
   clearAuthError,
   disable2FA,
@@ -110,7 +111,7 @@ describe("authSlice", () => {
         password: "Password123!",
       }),
     );
-    const root = { auth };
+    const root = { ...store.getState(), auth };
     expect(selectUser(root)).toEqual(user);
     expect(selectToken(root)).toBe("seed-token");
     expect(selectAuthStatus(root)).toBe("authenticated");
