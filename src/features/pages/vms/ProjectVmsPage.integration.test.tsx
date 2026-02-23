@@ -1,4 +1,4 @@
-import { render, screen, waitFor, waitForElementToBeRemoved } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { RouterProvider, createMemoryRouter } from "react-router-dom";
@@ -58,9 +58,9 @@ describe("ProjectVmsPage integration", () => {
       expect(screen.getByText("stopped-vm")).toBeInTheDocument();
     });
 
-    await waitForElementToBeRemoved(() =>
-      screen.queryByRole("dialog", { name: /Create Virtual Machine/i }),
-    );
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog", { name: /Create Virtual Machine/i })).not.toBeInTheDocument();
+    });
 
     await userEvent.click(screen.getByRole("button", { name: /^Stopped$/i }));
 

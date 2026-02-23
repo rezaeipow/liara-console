@@ -23,7 +23,7 @@ describe("ProjectsPage integration", () => {
   it("shows load more only when no query is active", () => {
     setProjectsLoaderData(baseProjectsLoaderData({ items: [makeProject({ id: "prj-1", name: "liara-console" })], total: 12 }));
     renderProjectsPage(["/console/projects"]);
-    expect(screen.getByText(/Project Directory/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Project Directory/i })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Load more/i })).toBeInTheDocument();
   });
 

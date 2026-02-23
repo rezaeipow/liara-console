@@ -19,6 +19,28 @@ function buildRequest(url: string, form: Record<string, string>) {
 }
 
 describe("projectsData integration", () => {
+  async function createProjectAndGetId(name: string) {
+    vi.spyOn(ProjectsAPI, "getMeta").mockResolvedValue({
+      regions: ["de-fra"],
+      plans: ["starter"],
+    });
+
+    const created = await projectCreateAction({
+      request: buildRequest("http://localhost/console/projects/new", {
+        intent: "create",
+        name,
+        region: "de-fra",
+        plan: "starter",
+      }),
+    } as unknown as ActionFunctionArgs);
+
+    expect(created).toBeInstanceOf(Response);
+    const location = (created as Response).headers.get("Location") ?? "";
+    const projectId = location.split("/").pop() ?? "";
+    expect(projectId.startsWith("prj-")).toBe(true);
+    return projectId;
+  }
+
   it("validates project creation fields", async () => {
     vi.spyOn(ProjectsAPI, "getMeta").mockResolvedValue({
       regions: ["de-fra"],
@@ -48,14 +70,6 @@ describe("projectsData integration", () => {
       regions: ["de-fra"],
       plans: ["starter"],
     });
-    vi.spyOn(ProjectsAPI, "create").mockResolvedValue({
-      id: "prj-99",
-      accountId: "acc-1",
-      name: "alpha",
-      region: "de-fra",
-      plan: "starter",
-      createdAt: new Date().toISOString(),
-    });
 
     const result = await projectCreateAction({
       request: buildRequest("http://localhost/console/projects/new", {
@@ -68,22 +82,15 @@ describe("projectsData integration", () => {
 
     expect(result).toBeInstanceOf(Response);
     const response = result as Response;
-    expect(response.headers.get("Location")).toBe("/console/projects/prj-99");
+    expect(response.headers.get("Location")).toMatch(/^\/console\/projects\/prj-/);
   });
 
   it("renames project", async () => {
-    vi.spyOn(ProjectsAPI, "rename").mockResolvedValue({
-      id: "prj-1",
-      accountId: "acc-1",
-      name: "renamed",
-      region: "de-fra",
-      plan: "starter",
-      createdAt: new Date().toISOString(),
-    });
+    const projectId = await createProjectAndGetId("rename-target");
 
     const result = await projectOverviewAction({
-      params: { projectId: "prj-1" },
-      request: buildRequest("http://localhost/console/projects/prj-1", {
+      params: { projectId },
+      request: buildRequest(`http://localhost/console/projects/${projectId}`, {
         intent: "rename",
         name: "renamed",
       }),
@@ -97,11 +104,11 @@ describe("projectsData integration", () => {
   });
 
   it("deletes project and redirects", async () => {
-    vi.spyOn(ProjectsAPI, "remove").mockResolvedValue({ id: "prj-1" });
+    const projectId = await createProjectAndGetId("delete-target");
 
     const result = await projectOverviewAction({
-      params: { projectId: "prj-1" },
-      request: buildRequest("http://localhost/console/projects/prj-1", {
+      params: { projectId },
+      request: buildRequest(`http://localhost/console/projects/${projectId}`, {
         intent: "delete",
       }),
     } as unknown as ActionFunctionArgs);
