@@ -21,6 +21,7 @@ test.beforeEach(async ({ page }) => {
   });
 
   await page.addInitScript(() => {
+    localStorage.clear();
     const session = {
       token: "e2e-token",
       user: {
@@ -38,17 +39,20 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("projects list navigation to overview, apps, and vms", async ({ page }) => {
-  await page.goto("/console/projects");
-  await expect(page.getByRole("heading", { name: "Projects" })).toBeVisible();
-  await expect(page.getByText("liara-console")).toBeVisible();
+  const projectName = `e2e-nav-project-${Date.now()}`;
 
-  await page.getByRole("link", { name: "Open overview" }).first().click();
-  await expect(page.getByRole("heading", { name: "liara-console" })).toBeVisible();
+  await page.goto("/console/projects/new");
+  await page.getByLabel("Project name").fill(projectName);
+  await page.getByRole("button", { name: "Create Project" }).click();
+
+  await expect(page).toHaveURL(/\/console\/projects\/prj-/);
+  await expect(page.getByRole("heading", { name: projectName })).toBeVisible();
 
   await page.getByRole("link", { name: "Open apps" }).click();
   await expect(page.getByRole("heading", { name: "Project Apps" })).toBeVisible();
 
-  await page.goto("/console/projects/prj-1");
+  await page.getByRole("link", { name: "Back to Project" }).click();
+  await expect(page).toHaveURL(/\/console\/projects\/prj-/);
   await page.getByRole("link", { name: "Open VMs" }).click();
   await expect(page.getByRole("heading", { name: "Project Virtual Machines" })).toBeVisible();
 });
