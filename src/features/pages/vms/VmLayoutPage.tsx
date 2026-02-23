@@ -1,9 +1,7 @@
 import DnsOutlinedIcon from "@mui/icons-material/DnsOutlined";
 import { Chip } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Outlet, useParams } from "react-router-dom";
-import { VmsAPI } from "@/api/vmsApi";
-import type { Vm } from "@/api/types";
+import { Outlet, useLoaderData } from "react-router-dom";
 import {
   ConsolePageShell,
   ConsoleResourceLayoutBody,
@@ -11,6 +9,7 @@ import {
   ResourceStatusMetaChips,
 } from "@/shared/components/console";
 import { getVmStatusTone } from "@/shared/ui/statusTones";
+import type { VmLayoutLoaderData } from "./vmsData";
 
 const vmTabs = [
   { label: "Overview", path: "overview" },
@@ -19,42 +18,12 @@ const vmTabs = [
 ];
 
 export default function VmLayoutPage() {
-  const { vmId } = useParams();
-  const [vm, setVm] = useState<Vm | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { vm: loadedVm } = useLoaderData() as VmLayoutLoaderData;
+  const [vm, setVm] = useState(loadedVm);
 
   useEffect(() => {
-    let active = true;
-
-    const loadVm = async () => {
-      if (!vmId) {
-        if (!active) return;
-        setError("VM id is missing.");
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      setError(null);
-      try {
-        const response = await VmsAPI.getById(vmId);
-        if (!active) return;
-        setVm(response);
-      } catch (requestError: unknown) {
-        if (!active) return;
-        setError(requestError instanceof Error ? requestError.message : "Could not load VM.");
-      } finally {
-        if (active) setIsLoading(false);
-      }
-    };
-
-    void loadVm();
-
-    return () => {
-      active = false;
-    };
-  }, [vmId]);
+    setVm(loadedVm);
+  }, [loadedVm]);
 
   const statusChipTone = vm?.status ? getVmStatusTone(vm.status) : "neutral";
 
@@ -67,8 +36,8 @@ export default function VmLayoutPage() {
         backTo={vm?.projectId ? `/console/projects/${vm.projectId}/vms` : null}
         backLabel="Back to VMs List"
         tabs={vmTabs}
-        isLoading={isLoading}
-        error={error}
+        isLoading={false}
+        error={null}
         smTabColumns={3}
       />
 
@@ -84,7 +53,7 @@ export default function VmLayoutPage() {
           </ResourceStatusMetaChips>
         }
       >
-        <Outlet context={{ vm, isLoading, error, setVm }} />
+        <Outlet context={{ vm, isLoading: false, error: null, setVm }} />
       </ConsoleResourceLayoutBody>
     </ConsolePageShell>
   );

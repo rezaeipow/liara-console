@@ -71,7 +71,7 @@ export function useProjectOverviewState(): ProjectOverviewState {
     onNextProjectNameChange: setNextProjectName,
     onSubmitRename: () => {
       setRenameDialogOpen(false);
-      actionFetcher.submit(
+      void actionFetcher.submit(
         { intent: "rename", name: nextProjectName },
         { method: "post" },
       );
@@ -84,7 +84,7 @@ export function useProjectOverviewState(): ProjectOverviewState {
     onDeleteConfirmTextChange: setDeleteConfirmText,
     onSubmitDelete: () => {
       setDeleteDialogOpen(false);
-      actionFetcher.submit({ intent: "delete" }, { method: "post" });
+      void actionFetcher.submit({ intent: "delete" }, { method: "post" });
     },
     onFeedbackClose: feedback.close,
   };

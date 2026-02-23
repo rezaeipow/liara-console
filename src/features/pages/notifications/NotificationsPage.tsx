@@ -84,7 +84,7 @@ export default function NotificationsPage() {
         isSubmitting={isSubmitting}
         onClose={() => setConfirmReadAllOpen(false)}
         onConfirm={() => {
-          submit({ intent: "mark-all-read" }, { method: "post", replace: true });
+          void submit({ intent: "mark-all-read" }, { method: "post", replace: true });
           setConfirmReadAllOpen(false);
         }}
       />

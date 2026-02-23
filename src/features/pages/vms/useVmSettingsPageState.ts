@@ -50,7 +50,7 @@ export function useVmSettingsPageState(): VmSettingsPageState {
 
   const onRename = () => {
     if (!canRename) return;
-    renameFetcher.submit(
+    void renameFetcher.submit(
       {
         intent: "rename",
         name: trimmedName,
@@ -86,7 +86,7 @@ export function useVmSettingsPageState(): VmSettingsPageState {
       setDeleteDialogOpen(false);
       showFeedback("VM deleted successfully.", "success");
       const targetProject = vm.projectId ?? "prj-1";
-      navigate(`/console/projects/${targetProject}/vms`, { replace: true });
+      void navigate(`/console/projects/${targetProject}/vms`, { replace: true });
     } catch (requestError: unknown) {
       const message = requestError instanceof Error ? requestError.message : "Could not delete VM.";
       setDeleteError(message);

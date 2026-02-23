@@ -107,10 +107,10 @@ export function useTopbarState(): TopbarState {
     onMenuClose: () => setAnchorEl(null),
     onLogout: () => {
       setAnchorEl(null);
-      navigate("/auth/complete?mode=logout&next=%2Flogin&logout=1");
+      void navigate("/auth/complete?mode=logout&next=%2Flogin&logout=1");
     },
     onAccountChange: (event: SelectChangeEvent) => {
-      accountSwitchFetcher.submit(
+      void accountSwitchFetcher.submit(
         { intent: "switch", accountId: event.target.value },
         { method: "post", action: "/console/accounts" },
       );

@@ -1,6 +1,8 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router-dom";
 import { store } from "@/app/store/index";
 import { api } from "@/app/store/api";
+import { VmsAPI } from "@/api/vmsApi";
+import type { Vm } from "@/api/types";
 
 export async function projectVmsLoader({ params }: LoaderFunctionArgs) {
   const projectId = String(params.projectId ?? "").trim();
@@ -10,6 +12,22 @@ export async function projectVmsLoader({ params }: LoaderFunctionArgs) {
 
   await store.dispatch(api.endpoints.getVmsByProject.initiate(projectId)).unwrap();
   return { projectId };
+}
+
+export type VmLayoutLoaderData = {
+  vm: Vm;
+};
+
+export async function vmLayoutLoader({
+  params,
+}: LoaderFunctionArgs): Promise<VmLayoutLoaderData> {
+  const vmId = String(params.vmId ?? "").trim();
+  if (!vmId) {
+    throw new Response("VM id is required", { status: 400 });
+  }
+
+  const vm = await VmsAPI.getById(vmId);
+  return { vm };
 }
 
 async function readActionFormData(request: Request) {

@@ -32,12 +32,12 @@ export default function AuthCompletePage() {
 
   useEffect(() => {
     if (!isAuthenticated && !isLogoutMode) {
-      navigate("/login", { replace: true });
+      void navigate("/login", { replace: true });
       return;
     }
 
     const timer = window.setTimeout(() => {
-      navigate(safeNext, { replace: true });
+      void navigate(safeNext, { replace: true });
     }, isLogoutMode ? 1500 : 1200);
 
     return () => window.clearTimeout(timer);
