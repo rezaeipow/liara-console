@@ -11,6 +11,7 @@
     "test": "vitest",
     "test:unit": "vitest run unit.test.ts",
     "test:integration": "vitest run integration.test.ts",
+    "test:coverage": "vitest run unit.test.ts integration.test.ts --coverage",
     "test:e2e": "playwright test"
   },
   "dependencies": {

@@ -1,6 +1,8 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router-dom";
 import { store } from "@/app/store/index";
 import { api } from "@/app/store/api";
+import { AppsAPI } from "@/api/appsApi";
+import type { AppService } from "@/api/types";
 import { readActionFormData } from "./appsDataUtils";
 import {
   handleCreateAppAction,
@@ -21,6 +23,22 @@ export async function projectAppsLoader({ params }: LoaderFunctionArgs) {
   ]);
 
   return { projectId };
+}
+
+export type AppLayoutLoaderData = {
+  app: AppService;
+};
+
+export async function appLayoutLoader({
+  params,
+}: LoaderFunctionArgs): Promise<AppLayoutLoaderData> {
+  const appId = String(params.appId ?? "").trim();
+  if (!appId) {
+    throw new Response("App id is required", { status: 400 });
+  }
+
+  const app = await AppsAPI.getById(appId);
+  return { app };
 }
 
 export type ProjectAppsActionData = {

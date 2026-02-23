@@ -62,11 +62,11 @@ export function useAccountsPageState(): AccountsPageState {
   };
   const submitEdit = () => {
     if (!editingAccountId) return;
-    rowFetcher.submit({ intent: "edit", accountId: editingAccountId, name: editingName }, { method: "post" });
+    void rowFetcher.submit({ intent: "edit", accountId: editingAccountId, name: editingName }, { method: "post" });
     cancelEditing();
   };
   const submitSwitch = (accountId: string) => {
-    rowFetcher.submit({ intent: "switch", accountId }, { method: "post" });
+    void rowFetcher.submit({ intent: "switch", accountId }, { method: "post" });
   };
   const openDeleteDialog = (accountId: string) => setAccountIdToDelete(accountId);
   const closeDeleteDialog = () => {
@@ -75,7 +75,7 @@ export function useAccountsPageState(): AccountsPageState {
   };
   const confirmDelete = () => {
     if (!accountIdToDelete) return;
-    rowFetcher.submit({ intent: "delete", accountId: accountIdToDelete }, { method: "post" });
+    void rowFetcher.submit({ intent: "delete", accountId: accountIdToDelete }, { method: "post" });
     if (editingAccountId === accountIdToDelete) cancelEditing();
     setAccountIdToDelete(null);
   };
@@ -90,7 +90,7 @@ export function useAccountsPageState(): AccountsPageState {
   const handleCreateSubmit = () => {
     const trimmed = newAccountName.trim();
     if (trimmed.length < 2 || isCreating) return;
-    createFetcher.submit({ intent: "create", name: trimmed }, { method: "post" });
+    void createFetcher.submit({ intent: "create", name: trimmed }, { method: "post" });
     setIsCreateDialogOpen(false);
     setNewAccountName("");
   };

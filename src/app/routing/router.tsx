@@ -19,8 +19,8 @@ import {
   projectOverviewLoader,
   projectsLoader,
 } from "@/features/pages/projects/projectsData";
-import { projectAppsAction, projectAppsLoader } from "@/features/pages/apps/appsData";
-import { projectVmsAction, projectVmsLoader } from "@/features/pages/vms/vmsData";
+import { appLayoutLoader, projectAppsAction, projectAppsLoader } from "@/features/pages/apps/appsData";
+import { projectVmsAction, projectVmsLoader, vmLayoutLoader } from "@/features/pages/vms/vmsData";
 import {
   AccountsPage,
   AuthCompletePage,
@@ -158,6 +158,7 @@ export function createAppRouter() {
       {
         path: "projects/:projectId/apps/:appId",
         element: withSuspense(<AppLayoutPage />),
+        loader: appLayoutLoader,
         errorElement: <RouteFallback />,
         children: [
           { index: true, element: <Navigate to="overview" replace /> },
@@ -178,6 +179,7 @@ export function createAppRouter() {
       {
         path: "apps/:appId",
         element: withSuspense(<AppLayoutPage />),
+        loader: appLayoutLoader,
         errorElement: <RouteFallback />,
         children: [
           { index: true, element: <Navigate to="overview" replace /> },
@@ -205,6 +207,7 @@ export function createAppRouter() {
       {
         path: "vms/:vmId",
         element: withSuspense(<VmLayoutPage />),
+        loader: vmLayoutLoader,
         errorElement: <RouteFallback />,
         children: [
           { index: true, element: <Navigate to="overview" replace /> },

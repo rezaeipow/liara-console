@@ -45,7 +45,7 @@ export default function RouteErrorPage() {
               variant="outlined"
               startIcon={<RefreshIcon fontSize="small" />}
               onClick={() => {
-                revalidator.revalidate();
+                void revalidator.revalidate();
               }}
               disabled={revalidator.state !== "idle"}
             >

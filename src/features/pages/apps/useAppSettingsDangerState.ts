@@ -62,7 +62,7 @@ export function useAppSettingsDangerState({
       setDeleteDialogOpen(false);
       showFeedback("App deleted successfully.", "success");
       const targetProject = appProjectId ?? routeProjectId ?? "prj-1";
-      navigate(`/console/projects/${targetProject}/apps`, { replace: true });
+      void navigate(`/console/projects/${targetProject}/apps`, { replace: true });
     } catch (requestError: unknown) {
       const message =
         requestError instanceof Error
