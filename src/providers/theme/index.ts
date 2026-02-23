@@ -1,6 +1,6 @@
 import { alpha, createTheme } from "@mui/material/styles";
-import type { TableDensity } from "../../app/store/slices/uiSlice";
-import { glassBackdrop } from "../../shared/ui/glassTokens";
+import type { TableDensity } from "@/app/store/slices/uiSlice";
+import { glassBackdrop } from "@/shared/ui/glassTokens";
 
 const glass = {
   base: "rgba(255, 255, 255, 0.78)",

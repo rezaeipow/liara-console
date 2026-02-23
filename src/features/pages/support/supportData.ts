@@ -1,8 +1,7 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router-dom";
-import { redirect } from "react-router-dom";
-import { ApiError } from "../../../api/httpClient";
-import { TicketsAPI } from "../../../api/ticketsApi";
-import type { Ticket } from "../../../api/types";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router-dom";
+import { ApiError } from "@/api/httpClient";
+import { TicketsAPI } from "@/api/ticketsApi";
+import type { Ticket } from "@/api/types";
 
 export type TicketsLoaderData = {
   items: Ticket[];

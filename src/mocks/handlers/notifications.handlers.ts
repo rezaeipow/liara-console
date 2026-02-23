@@ -1,6 +1,5 @@
-import { http, HttpResponse } from "msw";
-import type { HttpHandler } from "msw";
-import { db, persistRuntimeState } from "../data/db";
+import { http, HttpResponse, type HttpHandler } from "msw";
+import { db, persistRuntimeState } from "@/mocks/data/db";
 
 export const notificationHandlers: HttpHandler[] = [
   http.get("/notifications", () => {

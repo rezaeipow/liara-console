@@ -1,240 +1,52 @@
-import {
-  Alert,
-  Box,
-  Button,
-  IconButton,
-  InputAdornment,
-  Link,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { LockOutlined, MailOutline, PersonOutline, Visibility, VisibilityOff } from "@mui/icons-material";
-import { useState } from "react";
-import { Form, Link as RouterLink, useActionData, useNavigation } from "react-router-dom";
-import type { AuthActionResult } from "../../../app/routing/authData";
+import { Alert, Box, Paper, Stack, Typography } from "@mui/material";
+import { Form } from "react-router-dom";
+import SignupFormFields from "./components/SignupFormFields";
+import { useSignupPageState } from "./useSignupPageState";
 
 export default function SignupPage() {
-  const actionData = useActionData() as AuthActionResult | undefined;
-  const navigation = useNavigation();
-  const isSubmitting = navigation.state === "submitting";
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [nameFocused, setNameFocused] = useState(false);
-  const [emailFocused, setEmailFocused] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
-  const [confirmPasswordFocused, setConfirmPasswordFocused] = useState(false);
-  const authFieldSx = {
-    "& .MuiOutlinedInput-root": {
-      alignItems: "center",
-    },
-    "& .MuiOutlinedInput-input": {
-      py: 1.3,
-      lineHeight: 1.4,
-      "&::placeholder": {
-        opacity: 1,
-      },
-    },
-  } as const;
-  const authLabelSx = {
-    "&.MuiInputLabel-outlined:not(.MuiInputLabel-shrink)": {
-      transform: "translate(42px, 12px) scale(1)",
-    },
-  } as const;
-  const passwordChecks = {
-    length: password.length >= 8,
-    upper: /[A-Z]/.test(password),
-    lower: /[a-z]/.test(password),
-    number: /\d/.test(password),
-    special: /[!@#$%^&*()_+\-=[\]{};':"\\|,<>/?`~]/.test(password),
-  };
-  const allPasswordChecksPassed = Object.values(passwordChecks).every(Boolean);
-  const showPasswordRules = password.length > 0 || Boolean(actionData?.fieldErrors?.password);
-  const passwordHelper = showPasswordRules && !allPasswordChecksPassed ? (
-    <Typography component="span" variant="caption" sx={{ color: "text.primary" }}>
-      Use at least{" "}
-      <Box component="span" sx={{ color: passwordChecks.length ? "text.primary" : "error.main", fontWeight: 600 }}>
-        8 chars
-      </Box>{" "}
-      with{" "}
-      <Box component="span" sx={{ color: passwordChecks.upper ? "text.primary" : "error.main", fontWeight: 600 }}>
-        uppercase
-      </Box>
-      /
-      <Box component="span" sx={{ color: passwordChecks.lower ? "text.primary" : "error.main", fontWeight: 600 }}>
-        lowercase
-      </Box>
-      ,{" "}
-      <Box component="span" sx={{ color: passwordChecks.number ? "text.primary" : "error.main", fontWeight: 600 }}>
-        number
-      </Box>
-      ,{" "}
-      <Box component="span" sx={{ color: passwordChecks.special ? "text.primary" : "error.main", fontWeight: 600 }}>
-        special
-      </Box>
-      .
-    </Typography>
-  ) : !allPasswordChecksPassed ? (
-    "Use at least 8 chars with upper/lowercase, number, special."
-  ) : (
-    ""
-  );
+  const state = useSignupPageState();
 
   return (
     <Box sx={{ minHeight: "100vh", display: "grid", placeItems: "center", px: 2 }}>
       <Paper sx={{ width: "100%", maxWidth: 460, p: { xs: 2.5, sm: 3 } }}>
         <Stack spacing={2.25} component={Form} method="post" noValidate>
           <Box>
-            <Typography variant="h5" fontWeight={700}>Signup</Typography>
+            <Typography variant="h5" fontWeight={700}>
+              Signup
+            </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }}>
               Create your account and continue to console.
             </Typography>
           </Box>
 
-          {actionData?.formError ? <Alert severity="error">{actionData.formError}</Alert> : null}
+          {state.actionData?.formError ? <Alert severity="error">{state.actionData.formError}</Alert> : null}
 
-          <TextField
-            label="Name"
-            name="name"
-            required
-            fullWidth
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            onFocus={() => setNameFocused(true)}
-            onBlur={() => setNameFocused(false)}
-            autoComplete="name"
-            disabled={isSubmitting}
-            error={Boolean(actionData?.fieldErrors?.name)}
-            helperText={actionData?.fieldErrors?.name}
-            sx={authFieldSx}
-            slotProps={{
-              inputLabel: { shrink: nameFocused || name.length > 0, sx: authLabelSx },
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <PersonOutline fontSize="small" />
-                  </InputAdornment>
-                ),
-              },
-            }}
+          <SignupFormFields
+            isSubmitting={state.isSubmitting}
+            actionData={state.actionData}
+            showPassword={state.showPassword}
+            showConfirmPassword={state.showConfirmPassword}
+            name={state.name}
+            email={state.email}
+            password={state.password}
+            confirmPassword={state.confirmPassword}
+            nameFocused={state.nameFocused}
+            emailFocused={state.emailFocused}
+            passwordFocused={state.passwordFocused}
+            confirmPasswordFocused={state.confirmPasswordFocused}
+            showPasswordRules={state.showPasswordRules}
+            passwordChecks={state.passwordChecks}
+            onSetShowPassword={state.onSetShowPassword}
+            onSetShowConfirmPassword={state.onSetShowConfirmPassword}
+            onNameChange={state.onNameChange}
+            onEmailChange={state.onEmailChange}
+            onPasswordChange={state.onPasswordChange}
+            onConfirmPasswordChange={state.onConfirmPasswordChange}
+            onSetNameFocused={state.onSetNameFocused}
+            onSetEmailFocused={state.onSetEmailFocused}
+            onSetPasswordFocused={state.onSetPasswordFocused}
+            onSetConfirmPasswordFocused={state.onSetConfirmPasswordFocused}
           />
-
-          <TextField
-            label="Email"
-            name="email"
-            type="email"
-            required
-            fullWidth
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            onFocus={() => setEmailFocused(true)}
-            onBlur={() => setEmailFocused(false)}
-            autoComplete="email"
-            disabled={isSubmitting}
-            error={Boolean(actionData?.fieldErrors?.email)}
-            helperText={actionData?.fieldErrors?.email}
-            sx={authFieldSx}
-            slotProps={{
-              inputLabel: { shrink: emailFocused || email.length > 0, sx: authLabelSx },
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MailOutline fontSize="small" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-
-          <TextField
-            label="Password"
-            name="password"
-            type={showPassword ? "text" : "password"}
-            required
-            fullWidth
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            onFocus={() => setPasswordFocused(true)}
-            onBlur={() => setPasswordFocused(false)}
-            autoComplete="new-password"
-            disabled={isSubmitting}
-            error={Boolean(actionData?.fieldErrors?.password)}
-            helperText={passwordHelper}
-            sx={authFieldSx}
-            slotProps={{
-              inputLabel: { shrink: passwordFocused || password.length > 0, sx: authLabelSx },
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockOutlined fontSize="small" />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                      edge="end"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-
-          <TextField
-            label="Confirm Password"
-            name="confirmPassword"
-            type={showConfirmPassword ? "text" : "password"}
-            required
-            fullWidth
-            value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
-            onFocus={() => setConfirmPasswordFocused(true)}
-            onBlur={() => setConfirmPasswordFocused(false)}
-            autoComplete="new-password"
-            disabled={isSubmitting}
-            error={Boolean(actionData?.fieldErrors?.confirmPassword)}
-            helperText={actionData?.fieldErrors?.confirmPassword}
-            sx={authFieldSx}
-            slotProps={{
-              inputLabel: { shrink: confirmPasswordFocused || confirmPassword.length > 0, sx: authLabelSx },
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockOutlined fontSize="small" />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-                      edge="end"
-                      onClick={() => setShowConfirmPassword((prev) => !prev)}
-                    >
-                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-
-          <Button type="submit" variant="contained" size="large" disabled={isSubmitting}>
-            {isSubmitting ? "Creating..." : "Create account"}
-          </Button>
-
-          <Typography variant="body2" color="text.secondary">
-            Already have an account?{" "}
-            <Link component={RouterLink} to="/login" underline="hover">Login</Link>
-          </Typography>
         </Stack>
       </Paper>
     </Box>

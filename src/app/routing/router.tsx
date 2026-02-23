@@ -1,6 +1,5 @@
 import { Alert } from "@mui/material";
-import { Suspense } from "react";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import {
   forgotPasswordAction,
@@ -12,16 +11,16 @@ import {
   signupAction,
 } from "./authData";
 import { GuardedConsole } from "./guards";
-import { accountsAction, accountsLoader } from "../../features/pages/accounts/accountsData";
+import { accountsAction, accountsLoader } from "@/features/pages/accounts/accountsData";
 import {
   projectCreateAction,
   projectCreateLoader,
   projectOverviewAction,
   projectOverviewLoader,
   projectsLoader,
-} from "../../features/pages/projects/projectsData";
-import { projectAppsAction, projectAppsLoader } from "../../features/pages/apps/appsData";
-import { projectVmsAction, projectVmsLoader } from "../../features/pages/vms/vmsData";
+} from "@/features/pages/projects/projectsData";
+import { projectAppsAction, projectAppsLoader } from "@/features/pages/apps/appsData";
+import { projectVmsAction, projectVmsLoader } from "@/features/pages/vms/vmsData";
 import {
   AccountsPage,
   AuthCompletePage,
@@ -57,26 +56,26 @@ import {
   VmSettingsPage,
 } from "./pages";
 import { AppInitialFallback, RouteFallback } from "./routeElements";
-import { appSettingsAction } from "../../features/pages/apps/appSettingsData";
-import { vmSettingsAction } from "../../features/pages/vms/vmSettingsData";
+import { appSettingsAction } from "@/features/pages/apps/appSettingsData";
+import { vmSettingsAction } from "@/features/pages/vms/vmSettingsData";
 import {
   billingInvoicesLoader,
   billingOverviewLoader,
   billingPaymentsLoader,
   billingTopupAction,
   billingTopupLoader,
-} from "../../features/pages/billing/billingData";
+} from "@/features/pages/billing/billingData";
 import {
   newTicketAction,
   newTicketLoader,
   ticketDetailAction,
   ticketDetailLoader,
   ticketsLoader,
-} from "../../features/pages/support/supportData";
+} from "@/features/pages/support/supportData";
 import {
   notificationsAction,
   notificationsLoader,
-} from "../../features/pages/notifications/notificationsData";
+} from "@/features/pages/notifications/notificationsData";
 
 function withSuspense(node: ReactNode) {
   return <Suspense fallback={<AppInitialFallback />}>{node}</Suspense>;

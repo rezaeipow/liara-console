@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs } from "react-router-dom";
-import { VmsAPI } from "../../../api/vmsApi";
+import { VmsAPI } from "@/api/vmsApi";
 
 export type VmSettingsActionData = {
   ok?: boolean;

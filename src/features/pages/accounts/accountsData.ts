@@ -1,12 +1,12 @@
-﻿import { AccountsAPI } from "../../../api/accountsApi";
-import { store } from "../../../app/store/index";
+import { AccountsAPI } from "@/api/accountsApi";
+import { store } from "@/app/store/index";
 import {
   addAccount,
   removeAccount,
   setAccounts,
   setActiveAccountId,
   updateAccountName,
-} from "../../../app/store/slices/accountSlice";
+} from "@/app/store/slices/accountSlice";
 import type { ActionFunctionArgs } from "react-router-dom";
 
 type AccountsActionResult = {

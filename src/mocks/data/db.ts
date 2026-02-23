@@ -1,5 +1,4 @@
-import { createSeedData } from "./seed";
-import type { BillingState, MockDb, Notification, Project, Ticket } from "./seed";
+import { createSeedData, type BillingState, type MockDb, type Notification, type Project, type Ticket } from "./seed";
 
 const ACCOUNTS_STORAGE_KEY = "mock-accounts-state";
 const RUNTIME_STORAGE_KEY = "mock-runtime-state";

@@ -1,6 +1,5 @@
-import { http, HttpResponse } from "msw";
-import type { HttpHandler } from "msw";
-import { createId, db } from "../data/db";
+import { http, HttpResponse, type HttpHandler } from "msw";
+import { createId, db } from "@/mocks/data/db";
 
 const resetTokens = new Map<string, { userId: string; expiresAt: number }>();
 const RESET_TOKEN_TTL_MS = 15 * 60 * 1000;

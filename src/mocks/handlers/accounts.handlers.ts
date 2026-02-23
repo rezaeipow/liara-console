@@ -1,12 +1,11 @@
-import { http, HttpResponse } from "msw";
-import type { HttpHandler } from "msw";
+import { http, HttpResponse, type HttpHandler } from "msw";
 import {
   createId,
   db,
   getBillingByAccountId,
   persistAccountsState,
   persistRuntimeState,
-} from "../data/db";
+} from "@/mocks/data/db";
 
 export const accountHandlers: HttpHandler[] = [
   http.get("/accounts", () => {

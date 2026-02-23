@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { ActionFunctionArgs } from "react-router-dom";
-import { ProjectsAPI } from "../../../api/projectsApi";
+import { ProjectsAPI } from "@/api/projectsApi";
 import { projectCreateAction, projectOverviewAction } from "./projectsData";
 
 function buildRequest(url: string, form: Record<string, string>) {

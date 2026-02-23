@@ -1,5 +1,4 @@
-import { http, HttpResponse } from "msw";
-import type { HttpHandler } from "msw";
+import { http, HttpResponse, type HttpHandler } from "msw";
 import {
   createId,
   db,
@@ -8,7 +7,7 @@ import {
   paginate,
   persistAccountsState,
   persistRuntimeState,
-} from "../data/db";
+} from "@/mocks/data/db";
 
 function resolveActiveAccountId() {
   if (db.accounts.length === 0) {

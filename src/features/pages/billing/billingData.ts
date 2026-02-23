@@ -1,7 +1,7 @@
-﻿import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router-dom";
-import { BillingAPI } from "../../../api/billingApi";
-import { ApiError } from "../../../api/httpClient";
-import type { Invoice, Payment } from "../../../api/types";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router-dom";
+import { BillingAPI } from "@/api/billingApi";
+import { ApiError } from "@/api/httpClient";
+import type { Invoice, Payment } from "@/api/types";
 
 export type BillingOverviewLoaderData = {
   credit: number;
@@ -52,8 +52,10 @@ function mapStatusText(status: number): string {
 function mapStatusHint(status: number): string {
   if (status === 408) return "The request timed out. Please retry.";
   if (status === 401) return "Your session may be expired. Please login again.";
-  if (status === 403) return "You do not have permission to perform this top-up.";
-  if (status === 404) return "Billing endpoint not found. Please retry shortly.";
+  if (status === 403)
+    return "You do not have permission to perform this top-up.";
+  if (status === 404)
+    return "Billing endpoint not found. Please retry shortly.";
   if (status >= 500) return "Server problem detected. Retry in a few moments.";
   return "Please check your request and try again.";
 }
@@ -121,7 +123,9 @@ export async function billingTopupAction({
   }
 
   if (amount > 500000000) {
-    return { fieldErrors: { amount: "Maximum top-up amount is 500,000,000 IRR." } };
+    return {
+      fieldErrors: { amount: "Maximum top-up amount is 500,000,000 IRR." },
+    };
   }
 
   try {
@@ -141,7 +145,8 @@ export async function billingTopupAction({
     }
 
     return {
-      formError: error instanceof Error ? error.message : "Could not complete top-up.",
+      formError:
+        error instanceof Error ? error.message : "Could not complete top-up.",
       errorStatus: 500,
       errorHint: mapStatusHint(500),
     };
@@ -164,12 +169,17 @@ export async function billingPaymentsLoader({
 
     const sorted = [...filtered].sort((left, right) => {
       if (sort === "oldest") {
-        return new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime();
+        return (
+          new Date(left.createdAt).getTime() -
+          new Date(right.createdAt).getTime()
+        );
       }
       if (sort === "amount") {
         return right.amount - left.amount;
       }
-      return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+      return (
+        new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
+      );
     });
 
     return { items: sorted };
@@ -194,12 +204,17 @@ export async function billingInvoicesLoader({
 
     const sorted = [...filtered].sort((left, right) => {
       if (sort === "oldest") {
-        return new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime();
+        return (
+          new Date(left.createdAt).getTime() -
+          new Date(right.createdAt).getTime()
+        );
       }
       if (sort === "amount") {
         return right.amount - left.amount;
       }
-      return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+      return (
+        new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
+      );
     });
 
     return { items: sorted };

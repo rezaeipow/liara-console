@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "../index";
+import type { RootState } from "@/app/store/index";
+import { getStorageItem, removeStorageItem, setStorageItem } from "@/shared/utils/storage";
 
 export interface Account {
   id: string;
@@ -16,23 +17,15 @@ interface AccountState {
 const STORAGE_KEY = "console-active-account-id";
 
 function readPersistedActiveAccount(): string | null {
-  try {
-    return localStorage.getItem(STORAGE_KEY);
-  } catch {
-    return null;
-  }
+  return getStorageItem(STORAGE_KEY);
 }
 
 function persistActiveAccountId(value: string | null) {
-  try {
-    if (!value) {
-      localStorage.removeItem(STORAGE_KEY);
-      return;
-    }
-    localStorage.setItem(STORAGE_KEY, value);
-  } catch {
-    // ignore storage errors
+  if (!value) {
+    removeStorageItem(STORAGE_KEY);
+    return;
   }
+  setStorageItem(STORAGE_KEY, value);
 }
 
 const initialState: AccountState = {

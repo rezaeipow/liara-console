@@ -1,6 +1,5 @@
-import { delay, http, HttpResponse } from "msw";
-import type { HttpHandler } from "msw";
-import { createId, getActiveBilling, persistRuntimeState } from "../data/db";
+import { delay, http, HttpResponse, type HttpHandler } from "msw";
+import { createId, getActiveBilling, persistRuntimeState } from "@/mocks/data/db";
 
 const TIMEOUT_DELAY_MS = 13_000;
 

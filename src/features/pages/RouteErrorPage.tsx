@@ -20,7 +20,7 @@ export default function RouteErrorPage() {
   }
 
   if (import.meta.env.DEV && details) {
-    // eslint-disable-next-line no-console
+     
     console.error("Route error:", details);
   }
 

@@ -31,7 +31,8 @@ if (originalFetch) {
 
     const nextInput = resolveInput(input);
     if (!init?.signal) return originalFetch(nextInput, init);
-    const { signal, ...rest } = init;
+    const rest = { ...init };
+    delete rest.signal;
     return originalFetch(nextInput, rest);
   }) as typeof fetch;
 }
@@ -42,7 +43,8 @@ if (OriginalRequest) {
   globalThis.Request = class RequestWithoutSignal extends OriginalRequest {
     constructor(input: RequestInfo | URL, init?: RequestInit) {
       if (init?.signal) {
-        const { signal, ...rest } = init;
+        const rest = { ...init };
+        delete rest.signal;
         super(input, rest);
       } else {
         super(input, init);

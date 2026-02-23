@@ -1,13 +1,12 @@
-﻿import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router-dom";
-import { redirect } from "react-router-dom";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router-dom";
 import {
   ProjectsAPI,
   type ProjectMeta,
   type ProjectOverview,
-} from "../../../api/projectsApi";
-import type { Project } from "../../../api/types";
-import { store } from "../../../app/store/index";
-import { api } from "../../../app/store/api";
+} from "@/api/projectsApi";
+import type { Project } from "@/api/types";
+import { store } from "@/app/store/index";
+import { api } from "@/app/store/api";
 
 export type ProjectHealthStatus = "healthy" | "provisioning";
 
@@ -109,7 +108,7 @@ export async function projectsLoader({
     };
   } catch (error) {
     if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
+       
       console.error("projectsLoader error", error);
     }
     throw error;
@@ -160,7 +159,7 @@ export async function projectCreateLoader(): Promise<ProjectCreateLoaderData> {
     return { meta };
   } catch (error) {
     if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
+       
       console.error("projectCreateLoader error", error);
     }
     throw error;
@@ -182,7 +181,7 @@ export async function projectOverviewLoader({
     return { project };
   } catch (error) {
     if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
+       
       console.error("projectOverviewLoader error", error);
     }
     throw error;

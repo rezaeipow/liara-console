@@ -1,14 +1,14 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { BaseQueryFn } from "@reduxjs/toolkit/query";
-import { request, ApiError } from "../../api/httpClient";
+import { request, ApiError } from "@/api/httpClient";
 import type {
   AppService,
   Deployment,
   PaginatedResponse,
   Project,
   Vm,
-} from "../../api/types";
-import type { ProjectMeta, ProjectOverview } from "../../api/projectsApi";
+} from "@/api/types";
+import type { ProjectMeta, ProjectOverview } from "@/api/projectsApi";
 
 type RequestArgs = {
   url: string;

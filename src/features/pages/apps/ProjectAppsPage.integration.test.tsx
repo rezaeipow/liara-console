@@ -1,9 +1,9 @@
-﻿import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { RouterProvider, createMemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
-import { store } from "../../../app/store/index";
+import { store } from "@/app/store/index";
 import ProjectAppsPage from "./ProjectAppsPage";
 import { projectAppsAction } from "./appsData";
 
@@ -57,4 +57,3 @@ describe("ProjectAppsPage integration", () => {
     });
   });
 });
-

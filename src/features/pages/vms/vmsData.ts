@@ -1,6 +1,6 @@
-﻿import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router-dom";
-import { store } from "../../../app/store/index";
-import { api } from "../../../app/store/api";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router-dom";
+import { store } from "@/app/store/index";
+import { api } from "@/app/store/api";
 
 export async function projectVmsLoader({ params }: LoaderFunctionArgs) {
   const projectId = String(params.projectId ?? "").trim();

@@ -1,8 +1,8 @@
-import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import {
   toggleSidebarMode,
   selectSidebarMode,
-} from "../../app/store/slices/uiSlice";
+} from "@/app/store/slices/uiSlice";
 
 export function useSidebarToggle() {
   const dispatch = useAppDispatch();

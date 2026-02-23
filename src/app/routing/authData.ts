@@ -1,10 +1,10 @@
 import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router-dom";
-import { AccountsAPI } from "../../api/accountsApi";
-import { AuthAPI } from "../../api/authApi";
-import { ApiError } from "../../api/httpClient";
-import { setAccounts } from "../store/slices/accountSlice";
-import { fetchMe, login, logout, signup } from "../store/slices/authSlice";
-import { store } from "../store/index";
+import { AccountsAPI } from "@/api/accountsApi";
+import { AuthAPI } from "@/api/authApi";
+import { ApiError } from "@/api/httpClient";
+import { setAccounts } from "@/app/store/slices/accountSlice";
+import { fetchMe, login, logout, signup } from "@/app/store/slices/authSlice";
+import { store } from "@/app/store/index";
 
 type AuthActionResult = {
   fieldErrors?: {

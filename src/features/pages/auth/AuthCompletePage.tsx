@@ -1,21 +1,21 @@
 import { Box, CircularProgress, Fade, Paper, Stack, Typography } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../../app/store/hooks";
-import { logout, selectIsAuthenticated } from "../../../app/store/slices/authSlice";
+import { useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
+import { logout, selectIsAuthenticated } from "@/app/store/slices/authSlice";
+import { useQueryParams } from "@/shared/hooks/useQueryParams";
 
 export default function AuthCompletePage() {
   const dispatch = useAppDispatch();
-  const [searchParams] = useSearchParams();
+  const { getEnumParam, getParam, getBooleanParam } = useQueryParams();
   const navigate = useNavigate();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
-  const [visible, setVisible] = useState(false);
 
-  const mode = searchParams.get("mode");
-  const next = searchParams.get("next") ?? "/console";
+  const mode = getEnumParam("mode", ["signup", "login", "logout"] as const, "login");
+  const next = getParam("next", "/console");
   const safeNext = useMemo(() => (next.startsWith("/") ? next : "/console"), [next]);
   const isLogoutMode = mode === "logout";
-  const shouldPerformLogout = searchParams.get("logout") === "1";
+  const shouldPerformLogout = getBooleanParam("logout");
 
   const title =
     mode === "signup" ? "Account Created" : isLogoutMode ? "Signed Out" : "Welcome Back";
@@ -24,10 +24,6 @@ export default function AuthCompletePage() {
     : mode === "signup"
       ? "Preparing your console workspace..."
       : "Signing you into your console...";
-
-  useEffect(() => {
-    setVisible(true);
-  }, []);
 
   useEffect(() => {
     if (!isLogoutMode || !shouldPerformLogout) return;
@@ -49,7 +45,7 @@ export default function AuthCompletePage() {
 
   return (
     <Box sx={{ minHeight: "100vh", display: "grid", placeItems: "center", px: 2 }}>
-      <Fade in={visible} timeout={280}>
+      <Fade in timeout={280}>
         <Paper
           elevation={0}
           sx={{

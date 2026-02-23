@@ -1,11 +1,5 @@
 import { Box, Paper, Typography } from "@mui/material";
-import type { ReactNode } from "react";
-
-interface PagePlaceholderProps {
-  title: string;
-  description?: string;
-  children?: ReactNode;
-}
+import type { PagePlaceholderProps } from "./types";
 
 export function PagePlaceholder({ title, description, children }: PagePlaceholderProps) {
   return (

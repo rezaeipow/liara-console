@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs } from "react-router-dom";
-import { AppsAPI } from "../../../api/appsApi";
+import { AppsAPI } from "@/api/appsApi";
 
 export type AppSettingsActionData = {
   ok?: boolean;
@@ -24,7 +24,9 @@ export async function appSettingsAction({
   if (intent === "rename") {
     const name = String(formData.get("name") ?? "").trim();
     if (name.length < 3 || name.length > 32) {
-      return { fieldErrors: { name: "Name must be between 3 and 32 characters." } };
+      return {
+        fieldErrors: { name: "Name must be between 3 and 32 characters." },
+      };
     }
 
     try {
@@ -32,7 +34,8 @@ export async function appSettingsAction({
       return { ok: true, message: "App renamed.", updatedName: updated.name };
     } catch (error: unknown) {
       return {
-        formError: error instanceof Error ? error.message : "Could not rename app.",
+        formError:
+          error instanceof Error ? error.message : "Could not rename app.",
       };
     }
   }

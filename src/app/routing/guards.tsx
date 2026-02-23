@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
-import ConsoleLayout from "../../layout/ConsoleLayout";
-import { useAppSelector } from "../store/hooks";
-import { selectToken } from "../store/slices/authSlice";
+import ConsoleLayout from "@/layout/ConsoleLayout";
+import { useAppSelector } from "@/app/store/hooks";
+import { selectToken } from "@/app/store/slices/authSlice";
 
 export function GuardedConsole() {
   const token = useAppSelector(selectToken);

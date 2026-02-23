@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from "react-router-dom";
-import { NotificationsAPI } from "../../../api/notificationsApi";
-import { ApiError } from "../../../api/httpClient";
-import type { NotificationItem } from "../../../api/types";
+import { NotificationsAPI } from "@/api/notificationsApi";
+import { ApiError } from "@/api/httpClient";
+import type { NotificationItem } from "@/api/types";
 
 export type NotificationsLoaderData = {
   items: NotificationItem[];

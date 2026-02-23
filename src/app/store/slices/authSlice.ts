@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { AuthAPI, type AuthResponse, type LoginRequest, type SignupRequest } from "../../../api/authApi";
-import type { User } from "../../../api/types";
-import type { RootState } from "../index";
+import { AuthAPI, type AuthResponse, type LoginRequest, type SignupRequest } from "@/api/authApi";
+import type { User } from "@/api/types";
+import type { RootState } from "@/app/store/index";
+import { getStorageJson, removeStorageItem, setStorageJson } from "@/shared/utils/storage";
 
 type AuthStatus = "idle" | "loading" | "authenticated" | "error";
 
@@ -28,23 +29,15 @@ function cacheKeyForUser(user: Pick<User, "id" | "email">): string {
 }
 
 function readProfileCache(): PersistedProfileCache {
-  try {
-    const raw = localStorage.getItem(PROFILE_CACHE_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw) as PersistedProfileCache;
-    if (!parsed || typeof parsed !== "object") return {};
-    return parsed;
-  } catch {
+  const parsed = getStorageJson<PersistedProfileCache | null>(PROFILE_CACHE_KEY, null);
+  if (!parsed || typeof parsed !== "object") {
     return {};
   }
+  return parsed;
 }
 
 function writeProfileCache(cache: PersistedProfileCache) {
-  try {
-    localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(cache));
-  } catch {
-    // ignore persistence errors
-  }
+  setStorageJson(PROFILE_CACHE_KEY, cache);
 }
 
 function mergeUserWithProfileCache(user: User | null): User | null {
@@ -73,37 +66,23 @@ function upsertProfileCache(user: User | null) {
 }
 
 function readPersistedAuth(): PersistedAuth {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return { token: null, user: null };
-    }
-
-    const parsed = JSON.parse(raw) as PersistedAuth;
-    return {
-      token: parsed.token ?? null,
-      user: mergeUserWithProfileCache(parsed.user ?? null),
-    };
-  } catch {
+  const parsed = getStorageJson<PersistedAuth | null>(STORAGE_KEY, null);
+  if (!parsed) {
     return { token: null, user: null };
   }
+  return {
+    token: parsed.token ?? null,
+    user: mergeUserWithProfileCache(parsed.user ?? null),
+  };
 }
 
 function persistAuth(payload: PersistedAuth) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    upsertProfileCache(payload.user);
-  } catch {
-    // ignore persistence errors
-  }
+  setStorageJson(STORAGE_KEY, payload);
+  upsertProfileCache(payload.user);
 }
 
 function clearPersistedAuth() {
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    // ignore persistence errors
-  }
+  removeStorageItem(STORAGE_KEY);
 }
 
 function getErrorMessage(error: unknown, fallback: string): string {

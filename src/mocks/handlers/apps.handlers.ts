@@ -1,6 +1,5 @@
-import { http, HttpResponse } from "msw";
-import type { HttpHandler } from "msw";
-import { createId, db, persistRuntimeState } from "../data/db";
+import { http, HttpResponse, type HttpHandler } from "msw";
+import { createId, db, persistRuntimeState } from "@/mocks/data/db";
 
 function nextDeploymentVersion(appId: string) {
   const versions = db.deployments

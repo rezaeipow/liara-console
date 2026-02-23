@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { getStorageJson, setStorageJson } from "@/shared/utils/storage";
 export type SidebarMode = "expanded" | "collapsed";
 export type TableDensity = "compact" | "standard" | "comfortable";
 
@@ -32,29 +33,26 @@ const STORAGE_KEY = "console-ui-preferences";
 ------------------------------ */
 
 function loadPreferences(): UIPreferences {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) throw new Error();
-    const parsed = JSON.parse(raw) as Partial<UIPreferences>;
-    return {
-      sidebarMode: parsed.sidebarMode === "collapsed" ? "collapsed" : "expanded",
-      tableDensity:
-        parsed.tableDensity === "comfortable" ||
-        parsed.tableDensity === "compact" ||
-        parsed.tableDensity === "standard"
-          ? parsed.tableDensity
-          : "standard",
-    };
-  } catch {
+  const parsed = getStorageJson<Partial<UIPreferences> | null>(STORAGE_KEY, null);
+  if (!parsed) {
     return {
       sidebarMode: "expanded",
       tableDensity: "standard",
     };
   }
+  return {
+    sidebarMode: parsed.sidebarMode === "collapsed" ? "collapsed" : "expanded",
+    tableDensity:
+      parsed.tableDensity === "comfortable" ||
+      parsed.tableDensity === "compact" ||
+      parsed.tableDensity === "standard"
+        ? parsed.tableDensity
+        : "standard",
+  };
 }
 
 function savePreferences(prefs: UIPreferences) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+  setStorageJson(STORAGE_KEY, prefs);
 }
 
 /* -----------------------------

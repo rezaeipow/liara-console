@@ -1,305 +1,60 @@
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
-import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
-import {
-  Alert,
-  Button,
-  FormControl,
-  FormHelperText,
-  InputLabel,
-  LinearProgress,
-  MenuItem,
-  OutlinedInput,
-  Paper,
-  Select,
-  Snackbar,
-  Stack,
-  Typography,
-} from "@mui/material";
-import { alpha } from "@mui/material/styles";
-import { useEffect, useMemo, useState } from "react";
-import {
-  Form,
-  Link,
-  useActionData,
-  useLoaderData,
-  useNavigation,
-  useSearchParams,
-} from "react-router-dom";
-import { useAppSelector } from "../../../app/store/hooks";
-import { selectTableDensity } from "../../../app/store/slices/uiSlice";
-import { glassBackdrop } from "../../../shared/ui/glassTokens";
-import type { NewTicketLoaderData, TicketActionData } from "./supportData";
-
-const DRAFT_KEY = "support-ticket-draft";
-
-type DraftPayload = {
-  subject: string;
-  category: string;
-  body: string;
-};
-
-function readDraft(defaultCategory: string): DraftPayload {
-  try {
-    const raw = localStorage.getItem(DRAFT_KEY);
-    if (!raw) return { subject: "", category: defaultCategory, body: "" };
-    const parsed = JSON.parse(raw) as Partial<DraftPayload>;
-    return {
-      subject: typeof parsed.subject === "string" ? parsed.subject : "",
-      category: typeof parsed.category === "string" ? parsed.category : defaultCategory,
-      body: typeof parsed.body === "string" ? parsed.body : "",
-    };
-  } catch {
-    return { subject: "", category: defaultCategory, body: "" };
-  }
-}
+import FeedbackSnackbar from "@/shared/components/common/FeedbackSnackbar";
+import ResourceActionConfirmDialog from "@/shared/components/common/ResourceActionConfirmDialog";
+import ConsoleContentContainer from "@/shared/components/console/ConsoleContentContainer";
+import NewTicketFormCard from "./components/NewTicketFormCard";
+import NewTicketHero from "./components/NewTicketHero";
+import { useNewTicketPageState } from "./useNewTicketPageState";
 
 export default function NewTicketPage() {
-  const { categories } = useLoaderData() as NewTicketLoaderData;
-  const actionData = useActionData() as TicketActionData | undefined;
-  const navigation = useNavigation();
-  const [searchParams] = useSearchParams();
-  const tableDensity = useAppSelector(selectTableDensity);
-  const isCompact = tableDensity === "compact";
-  const actionButtonSize = isCompact ? "small" : "medium";
-  const isSubmitting = navigation.state === "submitting";
-  const isRouteLoading =
-    navigation.state === "loading" &&
-    (navigation.location?.pathname ?? "").startsWith("/console/support/tickets/new");
-
-  const prefilledCategory = searchParams.get("category") ?? "apps";
-  const initialDraft = useMemo(() => readDraft(prefilledCategory), [prefilledCategory]);
-  const [subject, setSubject] = useState(initialDraft.subject);
-  const [category, setCategory] = useState(initialDraft.category);
-  const [body, setBody] = useState(initialDraft.body);
-
-  useEffect(() => {
-    const payload: DraftPayload = { subject, category, body };
-    try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
-    } catch {
-      // ignore storage errors
-    }
-  }, [body, category, subject]);
-
-  const hasError = Boolean(actionData?.formError);
-  const snackbarOpen = Boolean(actionData?.formError || actionData?.successMessage);
-  const noticeTone = actionData?.formError ? "error" : "success";
-
-  const categoryOptions = useMemo(
-    () => categories.map((value) => ({ value, label: value.toUpperCase() })),
-    [categories],
-  );
-
-  const clearDraft = () => {
-    setSubject("");
-    setCategory("apps");
-    setBody("");
-    try {
-      localStorage.removeItem(DRAFT_KEY);
-    } catch {
-      // ignore storage errors
-    }
-  };
+  const state = useNewTicketPageState();
 
   return (
     <>
-      <Stack
-        spacing={isCompact ? 1.2 : 2.2}
-        aria-busy={isRouteLoading}
-        sx={{
-          width: "100%",
-          maxWidth: { xs: "100%", sm: 860, lg: 980 },
-          mx: { xs: 0, sm: "auto" },
-          mt: { xs: 1.25, sm: 1.5 },
-          px: { xs: 1.25, sm: 1.5, md: 2, lg: 2 },
-        }}
+      <ConsoleContentContainer
+        spacing={state.isCompact ? 1.2 : 2.2}
+        aria-busy={state.isRouteLoading}
+        maxWidth={{ xs: "100%", sm: 860, lg: 980 }}
       >
-        <Paper
-          sx={{
-            p: isCompact ? { xs: 1.2, sm: 1.4 } : { xs: 2, sm: 2.5 },
-            borderRadius: isCompact ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
-            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.32)}`,
-            background: (theme) =>
-              `linear-gradient(120deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.14)})`,
-            backdropFilter: glassBackdrop.hero,
-          }}
-        >
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            spacing={isCompact ? 0.8 : 1.4}
-            justifyContent="space-between"
-            alignItems={{ xs: "flex-start", md: "center" }}
-          >
-            <Stack spacing={isCompact ? 0.3 : 0.5}>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <SupportAgentOutlinedIcon fontSize="small" />
-                <Typography variant={isCompact ? "h6" : "h5"} fontWeight={800}>
-                  Create Support Ticket
-                </Typography>
-              </Stack>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={isCompact ? { fontSize: "0.78rem", lineHeight: 1.25 } : undefined}
-              >
-                Share issue details and the support team will follow up in this thread.
-              </Typography>
-            </Stack>
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={isCompact ? 0.55 : 1}>
-              <Button
-                type="button"
-                variant="outlined"
-                color="inherit"
-                startIcon={<DeleteOutlineIcon fontSize="small" />}
-                onClick={clearDraft}
-                size={actionButtonSize}
-              >
-                Discard draft
-              </Button>
-              <Button
-                component={Link}
-                to="/console/support/tickets"
-                variant="outlined"
-                startIcon={<ArrowBackIcon fontSize="small" />}
-                aria-label="Back to tickets list"
-                size={actionButtonSize}
-              >
-                Back to list
-              </Button>
-            </Stack>
-          </Stack>
-        </Paper>
+        <NewTicketHero
+          isCompact={state.isCompact}
+          actionButtonSize={state.actionButtonSize}
+          onOpenDiscardDialog={state.onOpenDiscardDialog}
+        />
 
-        <Paper
-          sx={{
-            p: isCompact ? { xs: 1.2, sm: 1.4 } : { xs: 2, sm: 2.5 },
-            borderRadius: isCompact ? { xs: 0.75, sm: 1 } : { xs: 1.5, sm: 2 },
-            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
-            background: (theme) =>
-              `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.88)}, ${alpha(theme.palette.common.white, 0.76)})`,
-            backdropFilter: glassBackdrop.card,
-          }}
-        >
-          {isRouteLoading ? <LinearProgress sx={{ mb: 1.2 }} /> : null}
-          <Stack spacing={isCompact ? 0.9 : 1.6}>
-            <Form method="post" aria-label="Create support ticket form">
-              <Stack spacing={isCompact ? 0.7 : 1.4}>
-                <FormControl size="small" error={Boolean(actionData?.fieldErrors?.subject)}>
-                  <InputLabel htmlFor="support-ticket-subject">Subject</InputLabel>
-                  <OutlinedInput
-                    id="support-ticket-subject"
-                    name="subject"
-                    label="Subject"
-                    value={subject}
-                    onChange={(event) => setSubject(event.target.value)}
-                    placeholder="Example: Deployment failed after pushing commit"
-                    inputProps={{ "aria-label": "Ticket subject", maxLength: 120 }}
-                    sx={
-                      isCompact
-                        ? { "& .MuiInputBase-input": { py: 0.85, fontSize: "0.82rem" } }
-                        : undefined
-                    }
-                  />
-                  <FormHelperText>
-                    {actionData?.fieldErrors?.subject ??
-                      `A short title helps faster triage (${subject.length}/120)`}
-                  </FormHelperText>
-                </FormControl>
+        <NewTicketFormCard
+          categories={state.categoryOptions}
+          actionData={state.actionData}
+          hasError={state.hasError}
+          subject={state.subject}
+          category={state.category}
+          body={state.body}
+          isSubmitting={state.isSubmitting}
+          isRouteLoading={state.isRouteLoading}
+          isCompact={state.isCompact}
+          actionButtonSize={state.actionButtonSize}
+          onSubjectChange={state.onSubjectChange}
+          onCategoryChange={state.onCategoryChange}
+          onBodyChange={state.onBodyChange}
+        />
+      </ConsoleContentContainer>
 
-                <FormControl size="small" error={Boolean(actionData?.fieldErrors?.category)}>
-                  <InputLabel id="support-ticket-category-label">Category</InputLabel>
-                  <Select
-                    labelId="support-ticket-category-label"
-                    id="support-ticket-category"
-                    name="category"
-                    value={category}
-                    onChange={(event) => setCategory(event.target.value)}
-                    label="Category"
-                    inputProps={{ "aria-label": "Ticket category" }}
-                    sx={isCompact ? { "& .MuiSelect-select": { py: 0.85, fontSize: "0.82rem" } } : undefined}
-                  >
-                    {categoryOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  <FormHelperText>
-                    {actionData?.fieldErrors?.category ?? "Choose the most relevant area."}
-                  </FormHelperText>
-                </FormControl>
-
-                <FormControl size="small" error={Boolean(actionData?.fieldErrors?.body)}>
-                  <InputLabel htmlFor="support-ticket-body">Description</InputLabel>
-                  <OutlinedInput
-                    id="support-ticket-body"
-                    name="body"
-                    label="Description"
-                    value={body}
-                    onChange={(event) => setBody(event.target.value)}
-                    multiline
-                    minRows={isCompact ? 4 : 6}
-                    placeholder="What happened? What did you expect? Include key details."
-                    inputProps={{ "aria-label": "Ticket description", maxLength: 2000 }}
-                    sx={
-                      isCompact
-                        ? { "& .MuiInputBase-inputMultiline": { py: 0.7, fontSize: "0.8rem" } }
-                        : undefined
-                    }
-                  />
-                  <FormHelperText>
-                    {actionData?.fieldErrors?.body ??
-                      `Include steps and exact error text if available (${body.length}/2000)`}
-                  </FormHelperText>
-                </FormControl>
-
-                {hasError ? (
-                  <Alert severity="error">
-                    <Stack spacing={0.25}>
-                      <Typography variant="body2">{actionData?.formError}</Typography>
-                      {actionData?.errorStatus ? (
-                        <Typography variant="caption">Error code: {actionData.errorStatus}</Typography>
-                      ) : null}
-                      {actionData?.errorHint ? (
-                        <Typography variant="caption">{actionData.errorHint}</Typography>
-                      ) : null}
-                    </Stack>
-                  </Alert>
-                ) : null}
-
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={isCompact ? 0.6 : 1}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    startIcon={<SendOutlinedIcon />}
-                    disabled={isSubmitting}
-                    aria-label="Submit support ticket"
-                    size={actionButtonSize}
-                  >
-                    {isSubmitting ? "Submitting..." : "Submit ticket"}
-                  </Button>
-                  <Button component={Link} to="/console/support/tickets" variant="text" size={actionButtonSize}>
-                    Cancel
-                  </Button>
-                </Stack>
-              </Stack>
-            </Form>
-          </Stack>
-        </Paper>
-      </Stack>
-
-      <Snackbar
-        open={snackbarOpen}
+      <FeedbackSnackbar
+        open={state.feedbackOpen}
         autoHideDuration={3000}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert severity={noticeTone} variant="filled">
-          {actionData?.formError ?? actionData?.successMessage}
-        </Alert>
-      </Snackbar>
+        severity={state.feedbackSeverity}
+        message={state.feedbackMessage}
+        onClose={state.onFeedbackClose}
+      />
+
+      <ResourceActionConfirmDialog
+        open={state.discardConfirmOpen}
+        onClose={state.onCloseDiscardDialog}
+        onConfirm={state.onConfirmDiscard}
+        title="Discard draft?"
+        message="Subject, category, and description draft data will be cleared."
+        confirmLabel="Discard"
+        confirmColor="error"
+      />
     </>
   );
 }
-
